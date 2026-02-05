@@ -1,0 +1,12 @@
+
+> @repo/database@1.0.0 build
+> tsc
+
+src/seed.ts(2,10): error TS2614: Module '"./seeders/users.seeder"' has no exported member 'seedUsers'. Did you mean to use 'import seedUsers from "./seeders/users.seeder"' instead?
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path D:\Kantiss\zanza_project\ansania-ecommerce\packages\database
+npm error workspace @repo/database@1.0.0
+npm error location D:\Kantiss\zanza_project\ansania-ecommerce\packages\database
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c tsc

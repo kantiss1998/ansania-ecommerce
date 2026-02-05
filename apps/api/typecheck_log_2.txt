@@ -1,0 +1,5 @@
+﻿
+> api@1.0.0 typecheck
+> tsc --noEmit
+
+src/services/odoo/product.service.ts(630,11): error TS4053: Return type of public method from exported class has or is using name 'CreationAttributeBrand' from external module "D:/Kantiss/zanza_project/ansania-ecommerce/node_modules/sequelize/types/model" but cannot be named.

@@ -1,0 +1,212 @@
+[
+  {
+    "id": 1,
+    "name": "GUDANG GEDEBAGE",
+    "code": "WHGB"
+  },
+  {
+    "id": 23,
+    "name": "GUDANG SUSANTEX",
+    "code": "WHSX"
+  },
+  {
+    "id": 24,
+    "name": "GUDANG CILAJA",
+    "code": "WHCLJ"
+  },
+  {
+    "id": 25,
+    "name": "GUDANG DGP KWS",
+    "code": "WHDGP"
+  },
+  {
+    "id": 42,
+    "name": "GALERI BANCEUY",
+    "code": "GLBCY"
+  },
+  {
+    "id": 59,
+    "name": "GUDANG ONLINE",
+    "code": "WHOL"
+  },
+  {
+    "id": 26,
+    "name": "PABRIK SINAR SARI",
+    "code": "PBSS"
+  },
+  {
+    "id": 27,
+    "name": "PABRIK SPTI",
+    "code": "PBSPT"
+  },
+  {
+    "id": 28,
+    "name": "PABRIK NOVATEX",
+    "code": "PBNV"
+  },
+  {
+    "id": 29,
+    "name": "PABRIK MSU",
+    "code": "PBMSU"
+  },
+  {
+    "id": 54,
+    "name": "VENDOR AJI",
+    "code": "VDAJ"
+  },
+  {
+    "id": 55,
+    "name": "VENDOR EVA",
+    "code": "VDEV"
+  },
+  {
+    "id": 56,
+    "name": "VENDOR RIZAL",
+    "code": "VDRZ"
+  },
+  {
+    "id": 57,
+    "name": "PABRIK KORIN",
+    "code": "PBKRN"
+  },
+  {
+    "id": 60,
+    "name": "HIJANS YOGYA KEPATIHAN",
+    "code": "HJYK"
+  },
+  {
+    "id": 61,
+    "name": "HIJANS YOGYA SOREANG",
+    "code": "HJYS"
+  },
+  {
+    "id": 62,
+    "name": "HIJANS BURSA SAJADAH",
+    "code": "HJBS"
+  },
+  {
+    "id": 63,
+    "name": "EVENT ONLINE",
+    "code": "EVON"
+  },
+  {
+    "id": 64,
+    "name": "VENDOR NABILA",
+    "code": "VDNB"
+  },
+  {
+    "id": 30,
+    "name": "PABRIK SAMTEX",
+    "code": "PBSX"
+  },
+  {
+    "id": 43,
+    "name": "PABRIK ATRITEX",
+    "code": "PBATX"
+  },
+  {
+    "id": 31,
+    "name": "PABRIK SAMIN TEXTILE INDUSTRIES",
+    "code": "PBSTI"
+  },
+  {
+    "id": 32,
+    "name": "PABRIK MAHUGI",
+    "code": "PBMJS"
+  },
+  {
+    "id": 33,
+    "name": "PABRIK KORIESTER",
+    "code": "PBKR"
+  },
+  {
+    "id": 34,
+    "name": "PABRIK IDAR BUANA",
+    "code": "PBIB"
+  },
+  {
+    "id": 35,
+    "name": "VENDOR KWS",
+    "code": "VDKWS"
+  },
+  {
+    "id": 36,
+    "name": "VENDOR HERI",
+    "code": "VDHR"
+  },
+  {
+    "id": 37,
+    "name": "VENDOR USTAD SILMI",
+    "code": "VDUS"
+  },
+  {
+    "id": 38,
+    "name": "VENDOR IPIT",
+    "code": "VDIP"
+  },
+  {
+    "id": 39,
+    "name": "VENDOR YAYAN",
+    "code": "VDYY"
+  },
+  {
+    "id": 40,
+    "name": "VENDOR AHMAD",
+    "code": "VDAM"
+  },
+  {
+    "id": 41,
+    "name": "VENDOR HUDALLAH",
+    "code": "VDHD"
+  },
+  {
+    "id": 44,
+    "name": "KONSINYASI ELZATTA",
+    "code": "KSELZ"
+  },
+  {
+    "id": 45,
+    "name": "KONSINYASI N2N",
+    "code": "KSN2N"
+  },
+  {
+    "id": 46,
+    "name": "KONSINYASI MUSTOFA",
+    "code": "KSMTF"
+  },
+  {
+    "id": 47,
+    "name": "KONSINYASI RABBANI",
+    "code": "KSRBN"
+  },
+  {
+    "id": 48,
+    "name": "KONSINYASI ZOYA",
+    "code": "KSZYA"
+  },
+  {
+    "id": 49,
+    "name": "KONSINYASI KCI",
+    "code": "KSKCI"
+  },
+  {
+    "id": 50,
+    "name": "DEPO YOGYAKARTA",
+    "code": "DPYYK"
+  },
+  {
+    "id": 51,
+    "name": "DEPO MOJOKERTO",
+    "code": "DPMKT"
+  },
+  {
+    "id": 52,
+    "name": "DEPO MAKASSAR",
+    "code": "DPMKS"
+  },
+  {
+    "id": 53,
+    "name": "DEPO PALEMBANG",
+    "code": "DPPMB"
+  }
+]

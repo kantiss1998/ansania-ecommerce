@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand colors from @repo/shared */
+    --primary: #BA3565;
+    --primary-light: #FFE4E8;
+    --primary-dark: #881649;
+    --secondary: #FFE4E4;
+    --secondary-light: #FFF9F9;
+    --accent-gold: #D4AF37;
+    --destructive: #EF4444;
+    --destructive-dark: #991B1B;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --info: #3B82F6;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+
+  body {
+    @apply bg-white text-gray-900;
+  }
+}
+
+@layer utilities {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}

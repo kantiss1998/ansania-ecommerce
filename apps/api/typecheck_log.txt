@@ -1,0 +1,23 @@
+﻿
+> api@1.0.0 typecheck
+> tsc --noEmit
+
+src/controllers/cartController.ts(15,23): error TS7030: Not all code paths return a value.
+src/controllers/cartController.ts(36,23): error TS7030: Not all code paths return a value.
+src/controllers/cartController.ts(51,23): error TS7030: Not all code paths return a value.
+src/controllers/cartController.ts(67,23): error TS7030: Not all code paths return a value.
+src/controllers/checkoutController.ts(7,23): error TS7030: Not all code paths return a value.
+src/controllers/checkoutController.ts(37,23): error TS7030: Not all code paths return a value.
+src/controllers/flashSaleController.ts(5,23): error TS7030: Not all code paths return a value.
+src/controllers/flashSaleController.ts(17,23): error TS7030: Not all code paths return a value.
+src/controllers/voucherController.ts(6,23): error TS7030: Not all code paths return a value.
+src/controllers/voucherController.ts(31,23): error TS7030: Not all code paths return a value.
+src/routes/cart.routes.ts(11,36): error TS6133: 'res' is declared but its value is never read.
+src/services/orderService.ts(91,35): error TS2339: Property 'courier_name' does not exist on type 'JNTRateResponse'.
+src/services/orderService.ts(94,46): error TS2339: Property 'description' does not exist on type 'JNTRateResponse'.
+src/services/orderService.ts(120,18): error TS2551: Property 'voucher_code' does not exist on type 'Cart'. Did you mean 'voucher_id'?
+src/services/orderService.ts(142,20): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(key: "id" | "created_at" | "updated_at" | "user_id" | "session_id" | "voucher_id" | "subtotal" | "discount_amount" | "total" | "expires_at" | "voucher", value: any, options?: InstanceUpdateOptions<InferAttributes<...>> | undefined): Promise<...>', gave the following error.
+    Argument of type '{ subtotal: number; discount_amount: number; total: number; voucher_code: null; }' is not assignable to parameter of type '"id" | "created_at" | "updated_at" | "user_id" | "session_id" | "voucher_id" | "subtotal" | "discount_amount" | "total" | "expires_at" | "voucher"'.
+  Overload 2 of 2, '(keys: { id?: (number & { [CreationAttributeBrand]?: true | undefined; }) | Fn | Col | Literal | undefined; user_id?: Fn | Col | Literal | (number & ... 1 more ... & { ...; }) | null | undefined; ... 8 more ...; voucher?: any; }, options?: InstanceUpdateOptions<...> | undefined): Promise<...>', gave the following error.
+    Object literal may only specify known properties, but 'voucher_code' does not exist in type '{ id?: (number & { [CreationAttributeBrand]?: true | undefined; }) | Fn | Col | Literal | undefined; user_id?: Fn | Col | Literal | (number & ... 1 more ... & { ...; }) | null | undefined; ... 8 more ...; voucher?: any; }'. Did you mean to write 'voucher_id'?
