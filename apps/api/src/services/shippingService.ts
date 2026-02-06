@@ -164,8 +164,8 @@ async function cacheShippingRates(
 
         // Create new cache entries
         const cacheEntries = rates.map(rate => ({
-            origin_city_id: originCity as any,
-            destination_city_id: destinationCity as any,
+            origin_city_id: originCity,
+            destination_city_id: destinationCity,
             courier: 'JNT',
             service: rate.service,
             weight: weight,

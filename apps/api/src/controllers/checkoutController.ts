@@ -3,11 +3,13 @@ import { Request, Response, NextFunction } from 'express';
 import * as shippingService from '../services/shippingService';
 import * as orderService from '../services/orderService';
 import * as cartService from '../services/cartService'; // To get active cart
+import { AuthenticatedRequest } from '../types/express';
+import { CreateOrderDTO } from '@repo/shared/schemas';
 
 export async function getShippingRates(req: Request, res: Response, next: NextFunction) {
     try {
         const { shipping_address_id } = req.body;
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
         const sessionId = req.headers['x-session-id'] as string; // Allow guest? Maybe not for shipping if address needed.
 
         // Address usually implies User?
@@ -38,13 +40,14 @@ export async function getShippingRates(req: Request, res: Response, next: NextFu
 
 export async function createOrder(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
             res.status(401).json({ success: false, error: 'Unauthorized' });
             return;
         }
 
-        const order = await orderService.createOrder(userId, req.body);
+        const body = req.body as CreateOrderDTO;
+        const order = await orderService.createOrder(userId, body);
         res.status(201).json({
             success: true,
             data: order,

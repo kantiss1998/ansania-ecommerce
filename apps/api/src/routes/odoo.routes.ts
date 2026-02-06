@@ -1,13 +1,12 @@
 
 import { Router } from 'express';
 import * as odooController from '../controllers/odooController';
-// import { authenticate } from '../middleware/auth';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
 // All Odoo sync endpoints require authentication
-// TEMPORARILY DISABLED FOR TESTING - TODO: Re-enable after testing
-// router.use(authenticate);
+router.use(authenticate);
 
 // Sync products from Odoo to local database
 router.post('/sync/products', odooController.syncProducts);

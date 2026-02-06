@@ -14,5 +14,5 @@ export async function queueEmail(
         body,
         status: 'pending',
         attempts: 0
-    } as any);
+    });
 }

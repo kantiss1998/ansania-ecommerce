@@ -68,7 +68,7 @@ export function Footer() {
                         <ul className="space-y-2 text-sm">
                             <li>
                                 <Link
-                                    href="/contact"
+                                    href="/contact-us"
                                     className="text-gray-600 hover:text-primary-700"
                                 >
                                     Contact Us
@@ -84,7 +84,7 @@ export function Footer() {
                             </li>
                             <li>
                                 <Link
-                                    href="/shipping"
+                                    href="/shipping-info"
                                     className="text-gray-600 hover:text-primary-700"
                                 >
                                     Shipping Info
@@ -92,7 +92,7 @@ export function Footer() {
                             </li>
                             <li>
                                 <Link
-                                    href="/returns"
+                                    href="/returns-and-exchanges"
                                     className="text-gray-600 hover:text-primary-700"
                                 >
                                     Returns & Exchanges
@@ -150,13 +150,13 @@ export function Footer() {
 
                         <div className="flex items-center space-x-6">
                             <Link
-                                href="/privacy"
+                                href="/privacy-policy"
                                 className="text-sm text-gray-600 hover:text-blue-600"
                             >
                                 Privacy Policy
                             </Link>
                             <Link
-                                href="/terms"
+                                href="/terms-and-conditions"
                                 className="text-sm text-gray-600 hover:text-blue-600"
                             >
                                 Terms of Service

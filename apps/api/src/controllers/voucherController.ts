@@ -2,12 +2,13 @@
 import { Request, Response, NextFunction } from 'express';
 import * as voucherService from '../services/voucherService';
 import * as cartService from '../services/cartService';
+import { AuthenticatedRequest } from '../types/express';
 
 export async function applyVoucher(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
         const sessionId = req.headers['x-session-id'] as string;
-        const { code } = req.body;
+        const { code } = req.body as { code: string };
 
         if (!code) {
             res.status(400).json({ success: false, error: 'Voucher code is required' });
@@ -34,7 +35,7 @@ export async function applyVoucher(req: Request, res: Response, next: NextFuncti
 
 export async function removeVoucher(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
         const sessionId = req.headers['x-session-id'] as string;
 
         const cart = await cartService.getCart(userId, sessionId);

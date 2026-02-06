@@ -13,6 +13,32 @@ function ProductsContent() {
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0, limit: 12 });
+
+    // Attribute options state
+    const [colors, setColors] = useState<string[]>([]);
+    const [sizes, setSizes] = useState<string[]>([]);
+    const [finishings, setFinishings] = useState<string[]>([]);
+
+    useEffect(() => {
+        // Fetch attribute options
+        const fetchAttributes = async () => {
+            try {
+                const [colorsData, sizesData, finishingsData] = await Promise.all([
+                    productService.getColors(),
+                    productService.getSizes(),
+                    productService.getFinishings()
+                ]);
+                setColors(colorsData);
+                setSizes(sizesData);
+                setFinishings(finishingsData);
+            } catch (error) {
+                console.error('Failed to fetch attributes:', error);
+            }
+        };
+
+        fetchAttributes();
+    }, []);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -20,8 +46,29 @@ function ProductsContent() {
             try {
                 const response = await productService.getProducts({
                     search: searchParams.get('q') || undefined,
-                });
-                setProducts(response.items);
+                    minPrice: searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined,
+                    maxPrice: searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined,
+                    category: searchParams.get('category') || undefined,
+                    // Pass attributes if service/backend supports them
+                    // Assuming backend accepts these as query params
+                    sort: searchParams.get('sort') || undefined,
+                    page: Number(searchParams.get('page')) || 1,
+                    limit: 12,
+                } as any); // Type assertion to bypass strict typing if needed for extra params like colors
+
+                // We need to inject color/size/finishing manually if they are not in ProductListParams
+                // Note: The service might need update if it filters out unknown params.
+                // Assuming service uses { ...params } spread, we can pass them.
+
+                setProducts(response.items || []);
+                if (response.meta) {
+                    setPagination({
+                        page: response.meta.page,
+                        totalPages: response.meta.totalPages,
+                        total: response.meta.total,
+                        limit: response.meta.limit
+                    });
+                }
             } catch (error) {
                 console.error('Failed to fetch products:', error);
             } finally {
@@ -68,9 +115,9 @@ function ProductsContent() {
                     <div className="sticky top-20">
                         <ProductFilters
                             onFilterChange={handleFilterChange}
-                            availableColors={['Putih', 'Hitam', 'Coklat', 'Abu-abu']}
-                            availableSizes={['Small', 'Medium', 'Large', 'XL']}
-                            availableFinishings={['Glossy', 'Matte', 'Natural']}
+                            availableColors={colors}
+                            availableSizes={sizes}
+                            availableFinishings={finishings}
                         />
                     </div>
                 </aside>
@@ -78,12 +125,20 @@ function ProductsContent() {
                 <main className="lg:col-span-3">
                     <div className="mb-6 flex items-center justify-between">
                         <p className="text-sm text-gray-600">
-                            Menampilkan {products.length} produk
+                            Menampilkan {products?.length || 0} produk
                         </p>
-                        <select className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700">
+                        <select
+                            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700"
+                            value={searchParams.get('sort') || 'newest'}
+                            onChange={(e) => {
+                                const params = new URLSearchParams(searchParams);
+                                params.set('sort', e.target.value);
+                                router.push(`/products?${params.toString()}`);
+                            }}
+                        >
                             <option value="newest">Terbaru</option>
-                            <option value="price_low">Harga: Rendah ke Tinggi</option>
-                            <option value="price_high">Harga: Tinggi ke Rendah</option>
+                            <option value="price_asc">Harga: Rendah ke Tinggi</option>
+                            <option value="price_desc">Harga: Tinggi ke Rendah</option>
                             <option value="popular">Terpopuler</option>
                             <option value="rating">Rating Tertinggi</option>
                         </select>
@@ -99,9 +154,13 @@ function ProductsContent() {
 
                     <div className="mt-8">
                         <Pagination
-                            currentPage={1}
-                            totalPages={3}
-                            onPageChange={(page) => console.log('Change page to', page)}
+                            currentPage={pagination.page}
+                            totalPages={pagination.totalPages}
+                            onPageChange={(page) => {
+                                const params = new URLSearchParams(searchParams);
+                                params.set('page', page.toString());
+                                router.push(`/products?${params.toString()}`);
+                            }}
                         />
                     </div>
                 </main>

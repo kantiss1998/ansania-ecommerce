@@ -1,8 +1,8 @@
 
 import { Router } from 'express';
 import * as wishlistController from '../controllers/wishlistController';
-// import { validateRequest } from '../middleware/validation';
-// import { wishlistSchemas } from '@repo/shared/schemas';
+import { validateRequest } from '../middleware/validation';
+import { wishlistSchemas } from '@repo/shared/schemas';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();
@@ -11,15 +11,13 @@ router.use(authenticate);
 
 router.get(
     '/',
-    // TODO: Add validation when wishlistSchemas is defined
-    // validateRequest(wishlistSchemas.listWishlist),
+    validateRequest(wishlistSchemas.list),
     wishlistController.getWishlist
 );
 
 router.post(
     '/',
-    // TODO: Add validation when wishlistSchemas is defined  
-    // validateRequest(wishlistSchemas.addToWishlist),
+    validateRequest(wishlistSchemas.add),
     wishlistController.addToWishlist
 );
 

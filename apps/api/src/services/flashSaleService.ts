@@ -9,7 +9,7 @@ export async function getActiveFlashSales() {
             is_active: true,
             start_time: { [Op.lte]: now },
             end_time: { [Op.gte]: now }
-        },
+        } as any,
         include: [
             {
                 model: FlashSaleProduct,
@@ -21,11 +21,12 @@ export async function getActiveFlashSales() {
                         include: [{ model: ProductImage, as: 'images' }]
                     }
                 ],
+                // @ts-ignore
                 order: [['display_order', 'ASC']]
             }
         ],
         order: [['start_time', 'ASC']]
-    } as any);
+    });
 
     return flashSales;
 }
@@ -47,10 +48,11 @@ export async function getFlashSale(id: number) {
                         include: [{ model: ProductImage, as: 'images' }]
                     }
                 ],
+                // @ts-ignore
                 order: [['display_order', 'ASC']]
             }
         ]
-    } as any);
+    });
 
     return flashSale;
 }

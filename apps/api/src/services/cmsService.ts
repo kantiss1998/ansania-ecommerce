@@ -18,13 +18,25 @@ export async function getPage(slug: string) {
     return page;
 }
 
+export async function getAllPages() {
+    return CmsPage.findAll();
+}
+
+export async function updatePage(id: number, data: Partial<CmsPage>) {
+    const page = await CmsPage.findByPk(id);
+
+    if (!page) throw new NotFoundError('Page');
+
+    await page.update(data);
+    return page;
+}
+
 export async function getSettings() {
     const settings = await CmsSetting.findAll();
     // Convert array to object key-value
     const settingsMap: Record<string, string> = {};
     settings.forEach((s) => {
-        // Type assertion to access properties
-        const setting = s as any;
+        const setting = s as unknown as { key: string; value: string };
         settingsMap[setting.key] = setting.value;
     });
     return settingsMap;

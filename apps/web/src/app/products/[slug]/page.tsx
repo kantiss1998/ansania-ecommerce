@@ -27,6 +27,7 @@ async function getProduct(slug: string): Promise<ProductDetailData> {
         category: product.category?.name || 'Uncategorized',
         variants: product.variants || [],
         reviews: [], // Fetch reviews separately if needed, or if included in response
+        related_products: product.related_products || [], // Map related products
     };
 }
 

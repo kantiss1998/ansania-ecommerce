@@ -27,7 +27,7 @@ export function CartDrawer() {
             product_name: 'Kursi Minimalis Modern',
             product_slug: 'kursi-minimalis-modern',
             variant_info: 'Putih, Medium',
-            product_image: '/placeholder-product.jpg',
+            product_image: '/placeholder-product.svg',
             price: 1200000,
             quantity: 2,
             subtotal: 2400000,

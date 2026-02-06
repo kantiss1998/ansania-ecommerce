@@ -1,55 +1,43 @@
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
+import { Order } from '@/services/orderService';
 
-/**
- * Order data type
- */
-export interface Order {
-    id: number;
-    order_number: string;
-    status: 'pending_payment' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-    total: number;
-    items_count: number;
-    created_at: string;
-}
-
-/**
- * Order card component
- */
 export interface OrderCardProps {
     order: Order;
 }
 
 export function OrderCard({ order }: OrderCardProps) {
-    const statusConfig = {
+    const statusConfig: Record<string, { label: string; variant: 'warning' | 'info' | 'success' | 'error' }> = {
         pending_payment: {
             label: 'Menunggu Pembayaran',
-            variant: 'warning' as const,
+            variant: 'warning',
         },
         processing: {
             label: 'Diproses',
-            variant: 'info' as const,
+            variant: 'info',
         },
         shipped: {
             label: 'Dikirim',
-            variant: 'info' as const,
+            variant: 'info',
         },
         delivered: {
             label: 'Selesai',
-            variant: 'success' as const,
+            variant: 'success',
         },
         cancelled: {
             label: 'Dibatalkan',
-            variant: 'error' as const,
+            variant: 'error',
         },
     };
 
-    const config = statusConfig[order.status];
+    // safely handle status mapping
+    const status = order.status || 'pending_payment';
+    const config = statusConfig[status] || statusConfig.pending_payment;
 
     return (
         <Link
-            href={`/orders/${order.id}`}
+            href={`/orders/${order.order_number}`}
             className="block rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
         >
             <div className="flex items-start justify-between">
@@ -58,7 +46,8 @@ export function OrderCard({ order }: OrderCardProps) {
                         <h3 className="font-semibold text-gray-900">
                             {order.order_number}
                         </h3>
-                        <Badge variant={config.variant}>{config.label}</Badge>
+                        {/* Ensure variant matches allowed Badge variants */}
+                        <Badge variant={config.variant as any}>{config.label}</Badge>
                     </div>
                     <p className="mt-1 text-sm text-gray-600">
                         {new Date(order.created_at).toLocaleDateString('id-ID', {
@@ -73,10 +62,10 @@ export function OrderCard({ order }: OrderCardProps) {
             <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
                 <div>
                     <p className="text-sm text-gray-600">
-                        {order.items_count} item
+                        {order.items ? order.items.length : 0} item
                     </p>
                     <p className="mt-1 text-lg font-bold text-primary-700">
-                        {formatCurrency(order.total)}
+                        {formatCurrency(order.total_amount)}
                     </p>
                 </div>
                 <div className="text-sm font-medium text-primary-700">

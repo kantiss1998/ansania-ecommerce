@@ -170,15 +170,37 @@ export const useCartStore = create<CartState>()(
 
             applyVoucher: async (code: string) => {
                 set({ isLoading: true, error: null });
-                // TODO: Implement apply voucher in service if available
-                // For now just mock or ignore
-                console.log('Apply voucher not implemented in service yet', code);
-                set({ isLoading: false });
+                try {
+                    const cart = await cartService.applyVoucher(code);
+                    set({
+                        cart: cart as unknown as Cart,
+                        isLoading: false,
+                        error: null,
+                    });
+                } catch (error) {
+                    const message = getErrorMessage(error);
+                    set({
+                        isLoading: false,
+                        error: message,
+                    });
+                }
             },
 
             removeVoucher: async () => {
-                set({ isLoading: true, error: null });
-                set({ isLoading: false });
+                try {
+                    const cart = await cartService.removeVoucher();
+                    set({
+                        cart: cart as unknown as Cart,
+                        isLoading: false,
+                        error: null,
+                    });
+                } catch (error) {
+                    const message = getErrorMessage(error);
+                    set({
+                        isLoading: false,
+                        error: message,
+                    });
+                }
             },
 
             clearCart: () => {

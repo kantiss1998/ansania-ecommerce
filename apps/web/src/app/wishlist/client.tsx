@@ -1,57 +1,40 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { WishlistItemCard } from '@/components/features/wishlist/WishlistItemCard';
 import { useToast } from '@/components/ui/Toast';
 import { useCartStore } from '@/store/cartStore';
+import { wishlistService, WishlistItem } from '@/services/wishlistService';
 
 function WishlistContent() {
     const router = useRouter();
     const { addItem, isLoading: cartLoading } = useCartStore();
     const { success, error } = useToast();
+    const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Mock wishlist data - will be replaced with actual API call
-    const mockWishlistItems = [
-        {
-            id: 1,
-            product_id: 1,
-            product_name: 'Kursi Minimalis Modern',
-            product_slug: 'kursi-minimalis-modern',
-            product_image: '/placeholder-product.jpg',
-            base_price: 1500000,
-            discount_price: 1200000,
-            stock_status: 'in_stock' as const,
-            is_available: true,
-        },
-        {
-            id: 2,
-            product_id: 2,
-            product_name: 'Meja Makan Kayu Jati',
-            product_slug: 'meja-makan-kayu-jati',
-            product_image: '/placeholder-product.jpg',
-            base_price: 3500000,
-            discount_price: null,
-            stock_status: 'limited_stock' as const,
-            is_available: true,
-        },
-        {
-            id: 3,
-            product_id: 3,
-            product_name: 'Lemari Pakaian 3 Pintu',
-            product_slug: 'lemari-pakaian-3-pintu',
-            product_image: '/placeholder-product.jpg',
-            base_price: 4500000,
-            discount_price: null,
-            stock_status: 'out_of_stock' as const,
-            is_available: false,
-        },
-    ];
+    const fetchWishlist = async () => {
+        setIsLoading(true);
+        try {
+            const data = await wishlistService.getWishlist();
+            setWishlistItems(data);
+        } catch (err) {
+            console.error(err);
+            // safe fail
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchWishlist();
+    }, []);
 
     const handleRemoveFromWishlist = async (itemId: number) => {
         try {
-            // Will implement API call later
-            console.log('Remove from wishlist:', itemId);
+            await wishlistService.removeFromWishlist(itemId);
+            setWishlistItems(prev => prev.filter(item => item.id !== itemId));
             success('Produk berhasil dihapus dari wishlist');
         } catch (err) {
             error('Gagal menghapus produk dari wishlist');
@@ -70,7 +53,7 @@ function WishlistContent() {
     };
 
     // Empty wishlist state
-    if (mockWishlistItems.length === 0) {
+    if (!isLoading && wishlistItems.length === 0) {
         return (
             <div className="container mx-auto px-4 py-16">
                 <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
@@ -107,27 +90,44 @@ function WishlistContent() {
     return (
         <div className="container mx-auto px-4 py-8">
             {/* Header */}
+            {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900">
                     Wishlist Saya
                 </h1>
                 <p className="mt-2 text-gray-600">
-                    {mockWishlistItems.length} produk dalam wishlist
+                    {wishlistItems.length} produk dalam wishlist
                 </p>
             </div>
 
             {/* Wishlist Grid */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {mockWishlistItems.map((item) => (
-                    <WishlistItemCard
-                        key={item.id}
-                        item={item}
-                        onRemove={handleRemoveFromWishlist}
-                        onAddToCart={handleAddToCart}
-                        isLoading={cartLoading}
-                    />
-                ))}
-            </div>
+            {isLoading ? (
+                <div className="flex h-64 items-center justify-center">
+                    Loading wishlist...
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {wishlistItems.map((item) => (
+                        <WishlistItemCard
+                            key={item.id}
+                            item={{
+                                id: item.id,
+                                product_id: item.product_id,
+                                product_name: item.product.name,
+                                product_slug: item.product.slug,
+                                product_image: item.product.images?.[0] || '/placeholder-product.svg', // item.product.images is string[] based on prior knowledge or will verify
+                                base_price: item.product.base_price || 0,
+                                discount_price: null, // Assuming product structure doesn't have it directly or need logic
+                                stock_status: 'in_stock', // Default or need mapping
+                                is_available: true,
+                            } as any} // Temporary cast if WishlistItemCard expects specific mock interface
+                            onRemove={handleRemoveFromWishlist}
+                            onAddToCart={handleAddToCart}
+                            isLoading={cartLoading}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

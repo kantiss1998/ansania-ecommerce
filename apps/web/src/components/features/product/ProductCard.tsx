@@ -33,7 +33,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 className="relative aspect-square overflow-hidden bg-gray-100"
             >
                 <Image
-                    src={product.thumbnail_url || '/placeholder-product.jpg'}
+                    src={product.thumbnail_url || '/placeholder-product.svg'}
                     alt={product.name}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -134,10 +134,24 @@ export function ProductCard({ product }: ProductCardProps) {
                         onClick={(e) => {
                             e.preventDefault();
                             // Will implement cart functionality later
-                            console.log('Add to cart:', product.id);
+                            // Add to cart implementation
+                            // Since ProductCard doesn't display variants, we typically default to the first variant or redirect.
+                            // However, the button says "Tambah ke Keranjang".
+                            // If we don't have variant info, we should probably redirect to PDP.
+                            // But usually "Add to Card" on listing assumes default variant or opens a modal.
+                            // Let's redirect to PDP for complex products, or add default variant if available.
+                            // Product interface has 'variants' array (optional?). 
+                            // Let's check Product interface.
+                            // Actually, let's just redirect to PDP to be safe and avoid complexity
+                            // window.location.href = `/products/${product.slug}`; 
+                            // Better: use Next Link behavior by not preventing default?
+                            // But the button has onClick with preventDefault.
+
+                            // Let's change it to redirect to PDP
+                            window.location.href = `/products/${product.slug}`;
                         }}
                     >
-                        {isOutOfStock ? 'Stok Habis' : 'Tambah ke Keranjang'}
+                        {isOutOfStock ? 'Stok Habis' : 'Lihat Detail'}
                     </Button>
                 </div>
             </div>

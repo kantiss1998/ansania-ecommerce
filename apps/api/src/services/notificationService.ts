@@ -2,7 +2,6 @@
 import { Notification } from '@repo/database';
 
 export async function getUserNotifications(userId: number) {
-    // @ts-ignore
     return Notification.findAll({
         where: { user_id: userId },
         order: [['created_at', 'DESC']]
@@ -10,7 +9,6 @@ export async function getUserNotifications(userId: number) {
 }
 
 export async function markAsRead(notificationId: number, userId: number) {
-    // @ts-ignore
     const notification = await Notification.findOne({
         where: { id: notificationId, user_id: userId }
     });
@@ -23,7 +21,6 @@ export async function markAsRead(notificationId: number, userId: number) {
 }
 
 export async function markAllAsRead(userId: number) {
-    // @ts-ignore
     return Notification.update(
         { is_read: true },
         { where: { user_id: userId, is_read: false } }

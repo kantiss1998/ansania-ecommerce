@@ -1,39 +1,16 @@
 'use client';
 
-import { useState, Suspense } from 'react';
-import { OrderCard, Order } from '@/components/features/dashboard/OrderCard';
+import { useState, Suspense, useEffect } from 'react';
+import { OrderCard } from '@/components/features/dashboard/OrderCard';
 import { Button } from '@/components/ui/Button';
+import { orderService, Order } from '@/services/orderService';
+import { useToast } from '@/components/ui/Toast';
 
 function OrdersContent() {
-    const [activeTab, setActiveTab] = useState<'all' | 'pending_payment' | 'processing' | 'shipped' | 'delivered'>('all');
-
-    // Mock orders - will be replaced with API call
-    const mockOrders: Order[] = [
-        {
-            id: 123,
-            order_number: 'ORD-123',
-            status: 'pending_payment',
-            total: 2450000,
-            items_count: 2,
-            created_at: '2026-02-03T10:30:00',
-        },
-        {
-            id: 122,
-            order_number: 'ORD-122',
-            status: 'processing',
-            total: 1500000,
-            items_count: 1,
-            created_at: '2026-02-01T14:20:00',
-        },
-        {
-            id: 121,
-            order_number: 'ORD-121',
-            status: 'delivered',
-            total: 3200000,
-            items_count: 3,
-            created_at: '2026-01-28T09:15:00',
-        },
-    ];
+    const [activeTab, setActiveTab] = useState('all');
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { error } = useToast();
 
     const tabs = [
         { key: 'all' as const, label: 'Semua' },
@@ -43,9 +20,32 @@ function OrdersContent() {
         { key: 'delivered' as const, label: 'Selesai' },
     ];
 
-    const filteredOrders = activeTab === 'all'
-        ? mockOrders
-        : mockOrders.filter(order => order.status === activeTab);
+    useEffect(() => {
+        const fetchOrders = async () => {
+            setLoading(true);
+            try {
+                // If filtering by status is needed, pass it to getOrders
+                // API might support 'status' param.
+                const params = activeTab !== 'all' ? { status: activeTab } : {};
+                const response = await orderService.getOrders({ ...params, limit: 50 });
+                // We need to ensure response.items matches OrderCard's Order interface
+                // OrderCard expects { total_amount, items[], ... } which matches orderService Order
+                setOrders(response.items);
+            } catch (err) {
+                console.error('Failed to fetch orders', err);
+                error('Gagal memuat pesanan');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrders();
+    }, [activeTab]); // Refetch when tab changes if we want server-side filtering
+    // Alternatively fetch all and filter client side if list is small. 
+    // Given the initial mock code had client side filtering, but real app should rely on API if possible.
+    // Let's assume API filtering for now to be robust.
+
+    // No client-side filter needed if we fetch based on tab
+    const filteredOrders = orders;
 
     return (
         <div className="space-y-6">
@@ -78,7 +78,11 @@ function OrdersContent() {
             </div>
 
             {/* Orders List */}
-            {filteredOrders.length === 0 ? (
+            {loading ? (
+                <div className="flex h-64 items-center justify-center">
+                    Loading orders...
+                </div>
+            ) : filteredOrders.length === 0 ? (
                 <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
                     <svg
                         className="mx-auto h-16 w-16 text-gray-400"

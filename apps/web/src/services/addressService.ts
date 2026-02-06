@@ -6,7 +6,9 @@ export interface Address {
     phone: string;
     address_line: string;
     city: string;
+    city_id?: string | number;
     province: string;
+    province_id?: string | number;
     postal_code: string;
     is_default: boolean;
 }
@@ -16,7 +18,9 @@ export interface CreateAddressData {
     phone: string;
     address_line: string;
     city: string;
+    city_id?: string | number;
     province: string;
+    province_id?: string | number;
     postal_code: string;
     is_default?: boolean;
 }

@@ -1,9 +1,36 @@
 import { cmsClient } from '@/lib/cms';
+import { productService } from '@/services/productService';
+import { flashSaleService } from '@/services/flashSaleService';
 import { BannerCarousel } from '@/components/features/home/BannerCarousel';
+import { FlashSale } from '@/components/features/home/FlashSale';
 import { FeaturedProducts } from '@/components/features/home/FeaturedProducts';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
-    const banners = await cmsClient.getBanners();
+    const bannersPromise = cmsClient.getBanners();
+    const featuredProductsPromise = productService.getProducts({ isFeatured: true, limit: 4 });
+    const flashSalesPromise = flashSaleService.getActiveFlashSales();
+    const siteSettingsPromise = cmsClient.getSettings();
+
+    const [banners, featuredProductsRes, flashSales, siteSettings] = await Promise.all([
+        bannersPromise,
+        featuredProductsPromise,
+        flashSalesPromise,
+        siteSettingsPromise
+    ]);
+
+    // Use the first active flash sale if available
+    const activeFlashSale = flashSales.length > 0 ? flashSales[0] : null;
+
+    // Map FlashSaleProduct to Product structure expected by component
+    const flashSaleProducts = activeFlashSale?.products.map(item => ({
+        ...item.product,
+        base_price: item.original_price,
+        discount_price: item.flash_sale_price,
+        // Ensure thumbnail is available
+        thumbnail_url: item.product.thumbnail_url || item.product.images?.[0]
+    })) || [];
 
     return (
         <main className="min-h-screen">
@@ -11,8 +38,16 @@ export default async function HomePage() {
                 {/* Hero / Banners */}
                 <BannerCarousel banners={banners} />
 
+                {/* Flash Sale Section */}
+                {activeFlashSale && flashSaleProducts.length > 0 && (
+                    <FlashSale
+                        products={flashSaleProducts}
+                        endTime={new Date(activeFlashSale.end_time)}
+                    />
+                )}
+
                 {/* Featured Products */}
-                <FeaturedProducts />
+                <FeaturedProducts products={featuredProductsRes.items} />
 
                 {/* Value Props Section */}
                 <section className="my-16 grid grid-cols-1 gap-8 rounded-2xl bg-primary-50 p-8 md:grid-cols-3">
@@ -44,6 +79,27 @@ export default async function HomePage() {
                         <p className="text-sm text-gray-600">Layanan pelanggan siap membantu Anda kapan saja.</p>
                     </div>
                 </section>
+
+                {/* Social Media Links from Settings */}
+                {siteSettings && siteSettings.socialLinks && (
+                    <section className="my-8 flex justify-center gap-6">
+                        {siteSettings.socialLinks.instagram && (
+                            <a href={siteSettings.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary-600">
+                                Instagram
+                            </a>
+                        )}
+                        {siteSettings.socialLinks.facebook && (
+                            <a href={siteSettings.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary-600">
+                                Facebook
+                            </a>
+                        )}
+                        {siteSettings.socialLinks.whatsapp && (
+                            <a href={siteSettings.socialLinks.whatsapp} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary-600">
+                                WhatsApp
+                            </a>
+                        )}
+                    </section>
+                )}
             </div>
         </main>
     );

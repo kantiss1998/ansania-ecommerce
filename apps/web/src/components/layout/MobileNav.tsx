@@ -165,7 +165,7 @@ export function MobileNav() {
                         </li>
                         <li>
                             <Link
-                                href="/contact"
+                                href="/contact-us"
                                 onClick={toggleMobileMenu}
                                 className="block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-100"
                             >

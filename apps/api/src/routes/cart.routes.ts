@@ -1,5 +1,6 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
+import { AuthenticatedRequest } from '../types/express';
 import * as cartController from '../controllers/cartController';
 import { validateRequest } from '../middleware/validation';
 import { cartSchemas } from '@repo/shared/schemas';
@@ -14,10 +15,9 @@ const extractUser = (req: Request, _res: Response, next: NextFunction) => {
         try {
             const token = authHeader.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-            (req as any).user = decoded;
+            (req as AuthenticatedRequest).user = decoded as { userId: number; email: string; role: string };
         } catch (e) {
-            // Invalid token, ignore or return 401?
-            // If they sent garbage, maybe warn.
+            // Invalid token, ignore
         }
     }
     next();

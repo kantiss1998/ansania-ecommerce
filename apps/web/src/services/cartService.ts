@@ -66,4 +66,22 @@ export const cartService = {
             throw new Error(getErrorMessage(error));
         }
     },
+
+    async applyVoucher(code: string): Promise<Cart> {
+        try {
+            const response = await apiClient.post<ApiResponse<Cart>>('/cart/voucher', { code });
+            return response.data.data!;
+        } catch (error) {
+            throw new Error(getErrorMessage(error));
+        }
+    },
+
+    async removeVoucher(): Promise<Cart> {
+        try {
+            const response = await apiClient.delete<ApiResponse<Cart>>('/cart/voucher');
+            return response.data.data!;
+        } catch (error) {
+            throw new Error(getErrorMessage(error));
+        }
+    },
 };

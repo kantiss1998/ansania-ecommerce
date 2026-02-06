@@ -18,6 +18,8 @@ import flashSaleRoutes from './routes/flashSale.routes';
 import notificationRoutes from './routes/notification.routes';
 import statsRoutes from './routes/stats.routes';
 import odooRoutes from './routes/odoo.routes';
+import orderRoutes from './routes/order.routes';
+import shippingRoutes from './routes/shipping.routes';
 
 // Note: Environment variables are loaded in server.ts before this module is imported
 
@@ -55,6 +57,8 @@ app.use('/flash-sales', flashSaleRoutes);
 app.use('/notifications', notificationRoutes);
 app.use('/stats', statsRoutes);
 app.use('/odoo', odooRoutes);
+app.use('/orders', orderRoutes);
+app.use('/shipping-info', shippingRoutes);
 
 app.get('/api', (_req, res) => {
     res.json({

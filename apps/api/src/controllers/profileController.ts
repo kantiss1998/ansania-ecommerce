@@ -1,10 +1,14 @@
 
 import { Request, Response, NextFunction } from 'express';
 import * as profileService from '../services/profileService';
+import { AuthenticatedRequest } from '../types/express';
+import { UpdateProfileDTO, ChangePasswordDTO } from '@repo/shared/schemas';
 
 export async function getProfile(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) throw new Error('User not found');
+
         const user = await profileService.getProfile(userId);
         res.json({
             success: true,
@@ -17,8 +21,11 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
 
 export async function updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
-        const user = await profileService.updateProfile(userId, req.body);
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) throw new Error('User not found');
+
+        const body = req.body as UpdateProfileDTO;
+        const user = await profileService.updateProfile(userId, body);
         res.json({
             success: true,
             data: user,
@@ -30,8 +37,11 @@ export async function updateProfile(req: Request, res: Response, next: NextFunct
 
 export async function changePassword(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
-        await profileService.changePassword(userId, req.body);
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) throw new Error('User not found');
+
+        const body = req.body as ChangePasswordDTO;
+        await profileService.changePassword(userId, body);
         res.json({
             success: true,
             message: 'Password changed successfully',

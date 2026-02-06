@@ -1,63 +1,62 @@
 import apiClient, { ApiResponse, getErrorMessage } from '@/lib/api';
 
-// Reusing types from existing lib/cms.ts or defining them here
-export interface CMSBanner {
+export interface CMSPage {
+    id: number;
+    title: string;
+    slug: string;
+    content: string;
+    meta_title?: string;
+    meta_description?: string;
+    updated_at: string;
+    publishedAt?: string; // Optional if not always present, but used by admin/components
+}
+
+export interface CmsSettings {
+    [key: string]: string;
+}
+
+export interface CmsBanner {
     id: number;
     title: string;
     description: string;
     imageUrl: string;
     linkUrl: string;
     linkText: string;
-}
-
-export interface CMSPage {
-    id: number;
-    slug: string;
-    title: string;
-    content: string;
-    publishedAt: string;
-}
-
-export interface SiteSettings {
-    siteName: string;
-    logos: {
-        header: string;
-        footer: string;
-    };
-    socialLinks: {
-        instagram: string;
-        facebook: string;
-        whatsapp: string;
-    };
+    display_order: number;
 }
 
 export const cmsService = {
-    async getBanners(): Promise<CMSBanner[]> {
+    async getBanners(): Promise<CmsBanner[]> {
         try {
-            const response = await apiClient.get<ApiResponse<CMSBanner[]>>('/cms/banners');
+            const response = await apiClient.get<ApiResponse<CmsBanner[]>>('/cms/banners');
             return response.data.data || [];
         } catch (error) {
-            console.error('Failed to fetch banners:', error);
-            return []; // Fallback to empty array to allow UI to render
+            console.error('Failed to fetch banners', error);
+            return [];
         }
     },
 
-    async getPage(slug: string): Promise<CMSPage | null> {
+    async getPage(slug: string): Promise<CMSPage> {
         try {
-            const response = await apiClient.get<ApiResponse<CMSPage>>(`/cms/pages/${slug}`);
-            return response.data.data || null;
+            const response = await apiClient.get<ApiResponse<any>>(`/cms/pages/${slug}`);
+            // Map backend response if necessary, assuming backend returns snake_case
+            const data = response.data.data!;
+            return {
+                ...data,
+                publishedAt: data.published_at || data.updated_at // Fallback to updated_at if published_at missing
+            };
         } catch (error) {
-            console.error(`Failed to fetch page ${slug}:`, error);
-            return null;
+            throw new Error(getErrorMessage(error)); // Allow 404 to bubble up for Next.js notFound()
         }
     },
 
-    async getSettings(): Promise<SiteSettings> {
+    async getSettings(): Promise<CmsSettings> {
         try {
-            const response = await apiClient.get<ApiResponse<SiteSettings>>('/cms/settings');
+            const response = await apiClient.get<ApiResponse<CmsSettings>>('/cms/settings');
             return response.data.data!;
         } catch (error) {
-            throw new Error(getErrorMessage(error));
+            console.error('Failed to fetch settings', error);
+            return {};
         }
-    },
+    }
 };

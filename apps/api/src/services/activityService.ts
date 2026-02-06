@@ -13,7 +13,6 @@ export async function logActivity(
     }
 ) {
     try {
-        // @ts-ignore
         await ActivityLog.create({
             user_id: data.userId || null,
             action,

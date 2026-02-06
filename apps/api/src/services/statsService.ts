@@ -8,11 +8,10 @@ export async function recordSearch(userId: number | null, query: string, _ipAddr
     await SearchHistory.create({
         user_id: userId || null,
         search_query: query.trim(),
-    } as any);
+    });
 }
 
 export async function recordProductView(userId: number | null, productId: number, ipAddress?: string) {
-    // @ts-ignore
     await ProductView.create({
         user_id: userId || null,
         product_id: productId,
@@ -29,7 +28,7 @@ export async function getTopSearches(limit: number = 10) {
         group: ['search_query'],
         order: [[literal('count'), 'DESC']],
         limit
-    } as any);
+    });
 }
 
 export async function getMostViewedProducts(limit: number = 10) {
@@ -48,5 +47,5 @@ export async function getMostViewedProducts(limit: number = 10) {
         group: ['product_id'],
         order: [[literal('view_count'), 'DESC']],
         limit
-    } as any);
+    });
 }

@@ -1,21 +1,7 @@
-import { cmsService } from '@/services/cmsService';
+import { cmsService, CMSPage, CmsBanner } from '@/services/cmsService';
 
-export interface CMSBanner {
-    id: number;
-    title: string;
-    description: string;
-    imageUrl: string;
-    linkUrl: string;
-    linkText: string;
-}
-
-export interface CMSPage {
-    id: number;
-    slug: string;
-    title: string;
-    content: string; // Markdown or HTML
-    publishedAt: string;
-}
+export type { CMSPage };
+export type CMSBanner = CmsBanner;
 
 export interface SiteSettings {
     siteName: string;
@@ -36,10 +22,29 @@ export const cmsClient = {
     },
 
     getPage: async (slug: string): Promise<CMSPage | null> => {
-        return cmsService.getPage(slug);
+        try {
+            return await cmsService.getPage(slug);
+        } catch (error) {
+            console.error(`Failed to fetch CMS page: ${slug}`, error);
+            return null;
+        }
     },
 
     getSettings: async (): Promise<SiteSettings> => {
-        return cmsService.getSettings();
+        const settings = await cmsService.getSettings();
+        // Map generic settings to typed SiteSettings
+        // Using defaults or casting if structure matches
+        return {
+            siteName: settings['site_name'] || 'Ansania',
+            logos: {
+                header: settings['logo_header'] || '/logo.svg',
+                footer: settings['logo_footer'] || '/logo-white.svg',
+            },
+            socialLinks: {
+                instagram: settings['social_instagram'] || '#',
+                facebook: settings['social_facebook'] || '#',
+                whatsapp: settings['social_whatsapp'] || '#',
+            },
+        };
     },
 };

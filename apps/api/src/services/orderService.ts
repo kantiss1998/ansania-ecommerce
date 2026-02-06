@@ -1,5 +1,6 @@
 
-import { Order, OrderItem, Cart, CartItem, ProductVariant, Product, sequelize, Shipping, Address, Voucher, VoucherUsage } from '@repo/database';
+import { Order, OrderItem, Cart, CartItem, ProductVariant, Product, sequelize, Shipping, Address, Voucher, VoucherUsage, Payment } from '@repo/database';
+import { WhereOptions } from 'sequelize';
 import { CreateOrderDTO } from '@repo/shared/schemas';
 import { AppError, NotFoundError, InsufficientStockError } from '@repo/shared/errors';
 import { generateOrderNumber } from '@repo/shared/utils';
@@ -74,12 +75,11 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
         }, { transaction });
 
         // Fetch Shipping Address Snapshot
-        // @ts-ignore
         const shippingAddress = await Address.findByPk(data.shipping_address_id, { transaction });
         if (!shippingAddress) throw new NotFoundError('Shipping Address');
 
         // Create Shipping Record
-        // @ts-ignore
+        // Create Shipping Record
         await Shipping.create({
             order_id: order.id,
             recipient_name: shippingAddress.recipient_name,
@@ -118,17 +118,14 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
 
         // 6. Clear Cart & Log Voucher Usage
         if (cart.voucher_id) {
-            // @ts-ignore
             const voucher = await Voucher.findByPk(cart.voucher_id, { transaction });
             if (voucher) {
                 // Increment usage count on voucher (assuming method exists or do it manually)
                 // voucher.increment('used_count', { transaction }); // Sequelize helper or manual update
                 // Manual update to be safe with types
-                // @ts-ignore
-                await voucher.update({ used_count: (voucher.used_count || 0) + 1 }, { transaction });
+                await voucher.update({ usage_count: (voucher.usage_count || 0) + 1 }, { transaction });
 
                 // Create Usage Record
-                // @ts-ignore
                 await VoucherUsage.create({
                     voucher_id: voucher.id,
                     user_id: userId,
@@ -153,4 +150,73 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
         await transaction.rollback();
         throw error;
     }
+}
+
+export async function getUserOrders(userId: number, page: number = 1, limit: number = 10, status?: string) {
+    const offset = (page - 1) * limit;
+    const whereClause: WhereOptions = { user_id: userId };
+
+    if (status && status !== 'all') {
+        whereClause.status = status;
+    }
+
+    const { count, rows } = await Order.findAndCountAll({
+        where: whereClause,
+        limit,
+        offset,
+        order: [['created_at', 'DESC']],
+        include: [
+            {
+                model: OrderItem,
+                as: 'items',
+                // Assuming OrderItem has association to ProductVariant or Product to get details if needed
+                // For now, OrderItem has snapshot data (product_name, etc) so we might not need deep include for list view
+            },
+            {
+                model: Payment,
+                as: 'payment'
+            }
+        ],
+        distinct: true
+    });
+
+    return {
+        data: rows,
+        meta: {
+            total: count,
+            page,
+            limit,
+            totalPages: Math.ceil(count / limit)
+        }
+    };
+}
+
+export async function getOrderDetail(userId: number, orderNumber: string) {
+    const order = await Order.findOne({
+        where: {
+            order_number: orderNumber,
+            user_id: userId
+        },
+        include: [
+            {
+                model: OrderItem,
+                as: 'items',
+                // If specific relations are missing, we rely on snapshot data in OrderItem
+            },
+            {
+                model: Payment,
+                as: 'payment'
+            },
+            {
+                model: Shipping,
+                as: 'shipping'
+            }
+        ]
+    });
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return order;
 }

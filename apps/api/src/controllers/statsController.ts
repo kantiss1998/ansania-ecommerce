@@ -1,14 +1,14 @@
-
 import { Request, Response, NextFunction } from 'express';
 import * as statsService from '../services/statsService';
+import { AuthenticatedRequest } from '../types/express';
 
 export async function recordSearch(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
-        const { query } = req.body;
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        const { query } = req.body as { query: string };
         const ipAddress = req.ip;
 
-        await statsService.recordSearch(userId, query, ipAddress);
+        await statsService.recordSearch(userId || null, query, ipAddress);
         res.status(201).json({ success: true });
     } catch (error) {
         next(error);
@@ -17,11 +17,11 @@ export async function recordSearch(req: Request, res: Response, next: NextFuncti
 
 export async function recordProductView(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
         const { productId } = req.params;
         const ipAddress = req.ip;
 
-        await statsService.recordProductView(userId, Number(productId), ipAddress);
+        await statsService.recordProductView(userId || null, Number(productId), ipAddress);
         res.status(201).json({ success: true });
     } catch (error) {
         next(error);

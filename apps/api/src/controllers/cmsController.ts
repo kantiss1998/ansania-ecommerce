@@ -27,6 +27,32 @@ export async function getPage(req: Request, res: Response, next: NextFunction) {
     }
 }
 
+
+export async function getAllPages(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const pages = await cmsService.getAllPages();
+        res.json({
+            success: true,
+            data: pages,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updatePage(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const page = await cmsService.updatePage(Number(id), req.body);
+        res.json({
+            success: true,
+            data: page,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export async function getSettings(_req: Request, res: Response, next: NextFunction) {
     try {
         const settings = await cmsService.getSettings();

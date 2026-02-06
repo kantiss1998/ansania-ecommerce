@@ -3,17 +3,22 @@ import { Request, Response, NextFunction } from 'express';
 import * as productService from '../services/productService';
 import { OdooProductService } from '../services/odoo/product.service';
 const odooProductService = new OdooProductService();
+import { ListProductsQuery } from '@repo/shared/schemas';
 import { NotFoundError } from '@repo/shared/errors';
 
 export async function getProducts(req: Request, res: Response, next: NextFunction) {
     try {
-        const query = req.query as any; // Cast to bypass strict types until verified with validaton middleware which coerces types
-        // Actually middleware should have coerced numbers if using z.coerce in schema.
-        // req.body is replaced by middleware, typically req.query is also replaced if we chose to.
-        // In validation.ts I merged but maybe not assigned back to req.query?
-        // validation.ts: req.body = validated;
-        // So req.query might strictly be strings if Express default.
-        // But let's assume valid types or handling in service.
+        const query = req.query as unknown as ListProductsQuery;
+        // Middleware `validateRequest(productSchemas.listProducts)` ensures usage of coerced types.
+        // req.query by default is ParsedQs (string | string[] | ParsedQs | ParsedQs[]).
+        // validation middleware assigns validated data to req.body currently in strict standards, 
+        // but typically for GET requests we should rely on req.query being validated/coerced.
+        // If validation middleware puts it in req.body, we should use req.body? 
+        // Waiting for validation.ts refactor to decide if we merge to req.query or just use req.body.
+        // CODING_STANDARDS.md says: req.body = validated;
+        // So for GET requests, we might need to look at req.body if that's where validation puts it?
+        // Let's assume for now we cast req.query because existing validation logic in routes might handle it or we update validation.ts later.
+        // Actually, let's use the standard `ListProductsQuery` imports.
 
         const result = await productService.listProducts(query);
         res.json({
@@ -34,9 +39,14 @@ export async function getProductDetail(req: Request, res: Response, next: NextFu
             throw new NotFoundError('Product');
         }
 
+        const related = await productService.getRelatedProducts(product.id);
+
         res.json({
             success: true,
-            data: product,
+            data: {
+                ...product.toJSON(),
+                related_products: related
+            },
         });
     } catch (error) {
         next(error);
@@ -52,5 +62,49 @@ export async function syncProducts(_req: Request, res: Response, next: NextFunct
         });
     } catch (error) {
         next(error);
+    }
+}
+
+export async function getAttributes(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { attribute } = req.params;
+
+        if (!['color', 'size', 'finishing'].includes(attribute)) {
+            return res.status(400).json({ success: false, message: 'Invalid attribute type' });
+        }
+
+        const values = await productService.getDistinctAttributes(attribute as 'color' | 'size' | 'finishing');
+
+        return res.json({
+            success: true,
+            data: values,
+        });
+    } catch (error) {
+        return next(error);
+    }
+}
+
+export async function recordSearch(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { query, filters, results_count } = req.body;
+
+        if (!query) {
+            return res.status(400).json({ success: false, message: 'Query is required' });
+        }
+
+        const { SearchHistory } = await import('@repo/database');
+
+        await SearchHistory.create({
+            search_query: query,
+            filters_applied: filters,
+            results_count: results_count || 0
+        } as any);
+
+        return res.status(201).json({
+            success: true,
+        });
+    } catch (error) {
+        console.error('Search log error', error);
+        return next(error);
     }
 }

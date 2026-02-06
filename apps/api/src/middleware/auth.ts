@@ -1,12 +1,8 @@
-// @ts-nocheck
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest } from '../types/express';
 
-interface AuthRequest extends Request {
-    user?: any;
-}
-
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -21,7 +17,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-        req.user = decoded;
+        req.user = decoded as { userId: number; email: string; role: string };
         next();
     } catch (error) {
         res.status(401).json({

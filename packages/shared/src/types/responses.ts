@@ -188,10 +188,7 @@ export interface FilterFinishing {
 }
 
 // Query Types (untuk frontend API calls)
-export interface ListWishlistQuery {
-    page?: number;
-    limit?: number;
-}
+// ListWishlistQuery is now exported from schemas
 
 export interface ListOrdersQuery {
     page?: number;

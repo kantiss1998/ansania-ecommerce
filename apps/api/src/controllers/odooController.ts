@@ -49,6 +49,11 @@ export const syncStock = async (_req: Request, res: Response, next: NextFunction
 export const syncCustomer = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = parseInt(req.params.userId);
+        if (isNaN(userId)) {
+            res.status(400).json({ success: false, error: 'Invalid User ID' });
+            return;
+        }
+
         const odooPartnerId = await customerService.syncCustomer(userId);
 
         res.json({
@@ -70,6 +75,11 @@ export const syncCustomer = async (req: Request, res: Response, next: NextFuncti
 export const syncOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const orderId = parseInt(req.params.orderId);
+        if (isNaN(orderId)) {
+            res.status(400).json({ success: false, error: 'Invalid Order ID' });
+            return;
+        }
+
         const odooOrderId = await orderService.syncOrder(orderId);
 
         res.json({

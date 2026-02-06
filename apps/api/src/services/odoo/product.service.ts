@@ -1,6 +1,6 @@
 
 import { odooClient } from './odoo.client';
-import { Product, ProductVariant, Category, FlashSale, FlashSaleProduct, ProductStock } from '@repo/database';
+import { Product, ProductVariant, Category, FlashSale, FlashSaleProduct, ProductStock, FilterColor, FilterSize, FilterFinishing } from '@repo/database';
 import { slugify } from '@repo/shared/utils';
 
 export class OdooProductService {
@@ -271,6 +271,11 @@ export class OdooProductService {
             let processedVariants = 0;
             let errors: string[] = [];
 
+            // Sets to collect unique attributes for Filter tables
+            const collectedColors = new Map<string, string | null>(); // Name -> Hex
+            const collectedSizes = new Set<string>();
+            const collectedFinishings = new Set<string>();
+
             for (const odooProduct of products) {
                 try {
                     // Process pricing data
@@ -443,6 +448,16 @@ export class OdooProductService {
                             }
 
                             processedVariants++;
+                            // Collect attributes for Filter Sync
+                            if (variantInfo.attributes.color) {
+                                collectedColors.set(variantInfo.attributes.color, variantInfo.hexCode || null);
+                            }
+                            if (variantInfo.attributes.size) {
+                                collectedSizes.add(variantInfo.attributes.size);
+                            }
+                            if (variantInfo.attributes.finishing) {
+                                collectedFinishings.add(variantInfo.attributes.finishing);
+                            }
                         } catch (variantError) {
                             console.error(
                                 `❌ Error processing variant ${odooVariant.id}:`,
@@ -459,6 +474,9 @@ export class OdooProductService {
                     errors.push(`Product ${odooProduct.id}: ${productError instanceof Error ? productError.message : String(productError)}`);
                 }
             }
+
+            // Sync Collected Attributes to Filter Tables
+            await this.syncFilterAttributes(collectedColors, collectedSizes, collectedFinishings);
 
             console.log(
                 `✅ Processed ${processedProducts} products and ${processedVariants} variants`,
@@ -795,9 +813,63 @@ export class OdooProductService {
 
             return { updated: variants.length };
 
+
+
         } catch (error) {
             console.error('[ODOO_SYNC] Stock sync failed:', error);
             throw error;
         }
     }
+
+    async syncFilterAttributes(
+        colors: Map<string, string | null>,
+        sizes: Set<string>,
+        finishings: Set<string>
+    ) {
+        try {
+            console.log('🎨 Syncing Filter Attributes...');
+
+            // Sync Colors
+            for (const [name, hex] of colors.entries()) {
+                await FilterColor.findOrCreate({
+                    where: { name },
+                    defaults: {
+                        name,
+                        hex_code: hex || '#000000', // Default if missing
+                        display_order: 0
+                    } as any
+                });
+                // Optional: Update hex if user wants latest from Odoo? 
+                // For now, respect existing unless we want to force update. Defaults to keeping local override if any.
+            }
+
+            // Sync Sizes
+            for (const name of sizes) {
+                await FilterSize.findOrCreate({
+                    where: { name },
+                    defaults: {
+                        name,
+                        display_order: 0
+                    } as any
+                });
+            }
+
+            // Sync Finishings
+            for (const name of finishings) {
+                await FilterFinishing.findOrCreate({
+                    where: { name },
+                    defaults: {
+                        name,
+                        display_order: 0
+                    } as any
+                });
+            }
+            console.log('✅ Filter Attributes synced.');
+
+        } catch (error) {
+            console.error('❌ Failed to sync filter attributes', error);
+            // Non-fatal
+        }
+    }
 }
+

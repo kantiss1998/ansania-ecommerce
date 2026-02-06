@@ -43,7 +43,7 @@ export async function getAddress(userId: number, addressId: number) {
     return address;
 }
 
-export async function updateAddress(userId: number, addressId: number, data: any) {
+export async function updateAddress(userId: number, addressId: number, data: Partial<CreateAddressDTO>) {
     const address = await getAddress(userId, addressId);
 
     if (data.is_default) {

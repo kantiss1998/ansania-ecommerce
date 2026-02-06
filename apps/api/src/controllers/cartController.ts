@@ -1,11 +1,13 @@
 
 import { Request, Response, NextFunction } from 'express';
 import * as cartService from '../services/cartService';
+import { AuthenticatedRequest } from '../types/express';
+import { AddToCartDTO } from '@repo/shared/schemas';
 
 function getSession(req: Request) {
     // If authenticated (via auth middleware), use user.
     // If not, check for 'x-session-id' header or similar for guests.
-    const user = (req as any).user;
+    const user = (req as AuthenticatedRequest).user;
     const userId = user ? user.userId : undefined;
     const sessionId = req.headers['x-session-id'] as string || undefined;
 
@@ -42,7 +44,8 @@ export async function addItem(req: Request, res: Response, next: NextFunction) {
             return;
         }
 
-        const cart = await cartService.addToCart(userId, sessionId, req.body);
+        const body = req.body as AddToCartDTO;
+        const cart = await cartService.addToCart(userId, sessionId, body);
         res.status(201).json({
             success: true,
             data: cart,
@@ -56,7 +59,7 @@ export async function updateItem(req: Request, res: Response, next: NextFunction
     try {
         const { userId, sessionId } = getSession(req);
         const { id } = req.params;
-        const { quantity } = req.body;
+        const { quantity } = req.body as { quantity: number };
 
         const cart = await cartService.updateItem(userId, sessionId, Number(id), quantity);
         res.json({

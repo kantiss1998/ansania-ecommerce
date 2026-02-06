@@ -3,8 +3,10 @@ import { Cart, CartItem, ProductVariant, Product, ProductImage } from '@repo/dat
 import { AddToCartDTO } from '@repo/shared/schemas';
 import { AppError, NotFoundError, InsufficientStockError } from '@repo/shared/errors';
 
+import { WhereOptions } from 'sequelize';
+
 // Helper to get cart with items
-async function getCartWithItems(whereClause: any) {
+async function getCartWithItems(whereClause: WhereOptions) {
     return Cart.findOne({
         where: whereClause,
         include: [
@@ -23,7 +25,7 @@ async function getCartWithItems(whereClause: any) {
             }
         ],
         order: [[{ model: CartItem, as: 'items' }, 'created_at', 'DESC']]
-    } as any);
+    });
 }
 
 export async function getCart(userId?: number, sessionId?: string) {
@@ -31,9 +33,9 @@ export async function getCart(userId?: number, sessionId?: string) {
         throw new AppError('User ID or Session ID required', 400);
     }
 
-    const where: any = {};
-    if (userId) where.user_id = userId;
-    else where.session_id = sessionId;
+    const where: WhereOptions = {};
+    if (userId) (where as any).user_id = userId;
+    else (where as any).session_id = sessionId;
 
     let cart = await getCartWithItems(where);
 

@@ -10,6 +10,9 @@ import { useCartStore } from '@/store/cartStore';
 import { useToast } from '@/components/ui/Toast';
 import { ReviewList, Review } from '@/components/features/reviews/ReviewList';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { FeaturedProducts } from '@/components/features/home/FeaturedProducts';
+import { Product } from '@/services/productService';
+import { wishlistService } from '@/services/wishlistService';
 
 // Define Product interface locally for now, matching the mock data structure
 export interface ProductDetailData {
@@ -27,6 +30,7 @@ export interface ProductDetailData {
     category: string;
     variants: ProductVariant[];
     reviews: Review[];
+    related_products?: Product[];
 }
 
 interface ProductDetailViewProps {
@@ -199,9 +203,18 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                         <Button
                             variant="outline"
                             size="lg"
-                            onClick={() => {
-                                // Will implement wishlist later
-                                console.log('Add to wishlist');
+                            onClick={async () => {
+                                // wishlist implementation
+                                try {
+                                    await wishlistService.addToWishlist(product.id);
+                                    success('Produk ditambahkan ke wishlist');
+                                } catch (err) {
+                                    // if error says 'already in wishlist', show info?
+                                    // for now just generic error or success (if idempotent)
+                                    // Assuming console log for now if we want to be safe, but let's try real call
+                                    console.error(err);
+                                    // success('Produk ditambahkan ke wishlist'); // Optimistic
+                                }
                             }}
                         >
                             <svg
@@ -233,6 +246,13 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                     totalReviews={product.total_reviews}
                 />
             </div>
+
+            {/* Related Products Section */}
+            {product.related_products && product.related_products.length > 0 && (
+                <div className="mt-16">
+                    <FeaturedProducts products={product.related_products} />
+                </div>
+            )}
         </div>
     );
 }

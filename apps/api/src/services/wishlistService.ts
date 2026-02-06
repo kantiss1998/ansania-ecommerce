@@ -76,12 +76,14 @@ export async function getWishlist(userId: number, query: ListWishlistQuery) {
     };
 }
 
+import { WhereOptions } from 'sequelize';
+
 export async function checkWishlist(userId: number, productId: number, variantId?: number) {
-    const where: any = {
+    const where: WhereOptions = {
         user_id: userId,
         product_id: productId
     };
-    if (variantId) where.product_variant_id = variantId;
+    if (variantId) (where as any).product_variant_id = variantId;
 
     const item = await Wishlist.findOne({ where });
     return !!item;

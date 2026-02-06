@@ -5,6 +5,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { Order, sequelize, Payment } from '@repo/database';
+import { Transaction } from 'sequelize';
 import { dokuClient, DokuWebhookPayload } from '../integrations/doku/client';
 import { OdooOrderService } from '../services/odoo/order.service';
 const odooOrderService = new OdooOrderService();
@@ -100,9 +101,9 @@ export async function handleNotification(req: Request, res: Response, next: Next
  * Handle successful payment
  */
 async function handleSuccessfulPayment(
-    order: any,
+    order: Order,
     payload: DokuWebhookPayload,
-    transaction: any
+    transaction: Transaction
 ) {
     console.log('[PAYMENT] Processing successful payment for:', order.order_number);
 
@@ -116,14 +117,14 @@ async function handleSuccessfulPayment(
     // Create Payment Record
     await Payment.create({
         order_id: order.id,
-        payment_method: payload.payment.method,
+        payment_method: payload.payment.method as any,
         payment_provider: 'doku',
         transaction_id: payload.transaction.id,
         amount: order.total_amount,
         status: 'success',
         payment_response: payload,
         paid_at: new Date()
-    } as any, { transaction });
+    }, { transaction });
 
     console.log('[PAYMENT] Payment record created successfully');
 
@@ -146,15 +147,15 @@ async function handleSuccessfulPayment(
  * Handle failed payment
  */
 async function handleFailedPayment(
-    order: any,
+    order: Order,
     payload: DokuWebhookPayload,
-    transaction: any
+    transaction: Transaction
 ) {
     console.log('[PAYMENT] Processing failed payment for:', order.order_number);
 
     await order.update({
-        status: 'payment_failed',
-        payment_status: 'failed'
+        status: 'payment_failed' as any,
+        payment_status: 'failed' as any
     }, { transaction });
 
     // Create Payment Record (Failed)
@@ -178,15 +179,15 @@ async function handleFailedPayment(
  * Handle expired payment
  */
 async function handleExpiredPayment(
-    order: any,
+    order: Order,
     payload: DokuWebhookPayload,
-    transaction: any
+    transaction: Transaction
 ) {
     console.log('[PAYMENT] Processing expired payment for:', order.order_number);
 
     await order.update({
-        status: 'payment_expired',
-        payment_status: 'expired'
+        status: 'payment_expired' as any,
+        payment_status: 'expired' as any
     }, { transaction });
 
     // Create Payment Record (Expired)

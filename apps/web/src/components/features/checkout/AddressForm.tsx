@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { shippingService, Province, City } from '@/services/shippingService';
 
 /**
  * Address data type
@@ -99,6 +100,61 @@ export function AddressForm({
         }
     };
 
+    const [provinces, setProvinces] = useState<Province[]>([]);
+    const [cities, setCities] = useState<City[]>([]);
+    const [isProvincesLoading, setIsProvincesLoading] = useState(false);
+    const [isCitiesLoading, setIsCitiesLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            setIsProvincesLoading(true);
+            const data = await shippingService.getProvinces();
+            setProvinces(data);
+            setIsProvincesLoading(false);
+        };
+        fetchProvinces();
+    }, []);
+
+    useEffect(() => {
+        if (formData.province_id) {
+            const fetchCities = async () => {
+                setIsCitiesLoading(true);
+                const data = await shippingService.getCities(Number(formData.province_id));
+                setCities(data);
+                setIsCitiesLoading(false);
+            };
+            fetchCities();
+        } else {
+            setCities([]);
+        }
+    }, [formData.province_id]);
+
+    const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const provinceId = e.target.value;
+        const provinceName = provinces.find(p => p.province_id === provinceId)?.province || '';
+
+        setFormData(prev => ({
+            ...prev,
+            province_id: Number(provinceId),
+            province: provinceName,
+            city_id: 0,
+            city: '',
+            postal_code: ''
+        }));
+    };
+
+    const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const cityId = e.target.value;
+        const cityData = cities.find(c => c.city_id === cityId);
+
+        setFormData(prev => ({
+            ...prev,
+            city_id: Number(cityId),
+            city: cityData ? `${cityData.type} ${cityData.city_name}` : '',
+            postal_code: cityData?.postal_code || prev.postal_code
+        }));
+    };
+
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -126,28 +182,48 @@ export function AddressForm({
                 value={formData.address_line}
                 onChange={(e) => handleChange('address_line', e.target.value)}
                 error={errors.address_line}
-                helperText="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan"
+                helperText="Nama jalan, nomor rumah, RT/RW"
                 required
             />
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Input
-                    label="Kota/Kabupaten"
-                    type="text"
-                    value={formData.city}
-                    onChange={(e) => handleChange('city', e.target.value)}
-                    error={errors.city}
-                    required
-                />
+                <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                        Provinsi
+                    </label>
+                    <select
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700"
+                        value={formData.province_id || ''}
+                        onChange={handleProvinceChange}
+                        disabled={isProvincesLoading}
+                        required
+                    >
+                        <option value="">Pilih Provinsi</option>
+                        {provinces.map(p => (
+                            <option key={p.province_id} value={p.province_id}>{p.province}</option>
+                        ))}
+                    </select>
+                    {errors.province && <p className="mt-1 text-xs text-red-500">{errors.province}</p>}
+                </div>
 
-                <Input
-                    label="Provinsi"
-                    type="text"
-                    value={formData.province}
-                    onChange={(e) => handleChange('province', e.target.value)}
-                    error={errors.province}
-                    required
-                />
+                <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                        Kota/Kabupaten
+                    </label>
+                    <select
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700"
+                        value={formData.city_id || ''}
+                        onChange={handleCityChange}
+                        disabled={!formData.province_id || isCitiesLoading}
+                        required
+                    >
+                        <option value="">Pilih Kota/Kabupaten</option>
+                        {cities.map(c => (
+                            <option key={c.city_id} value={c.city_id}>{c.type} {c.city_name}</option>
+                        ))}
+                    </select>
+                    {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
+                </div>
             </div>
 
             <Input

@@ -1,5 +1,7 @@
 import { sequelize } from './config/database';
 import userSeeder from './seeders/users.seeder';
+import cmsPagesSeeder from './seeders/cms-pages.seeder';
+import bannersSeeder from './seeders/banners.seeder';
 
 async function runSeeders() {
     try {
@@ -11,6 +13,7 @@ async function runSeeders() {
 
         // Run seeders
         await userSeeder.up(sequelize.getQueryInterface());
+        await cmsPagesSeeder.up(sequelize.getQueryInterface());
 
         console.log('✅ All seeders completed successfully!');
         process.exit(0);

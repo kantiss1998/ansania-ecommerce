@@ -1,16 +1,18 @@
 
 import { Request, Response, NextFunction } from 'express';
 import * as wishlistService from '../services/wishlistService';
+import { AuthenticatedRequest } from '../types/express';
+import { ListWishlistQuery, AddToWishlistDTO } from '@repo/shared/schemas';
 
 export async function getWishlist(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId; // Auth middleware assumed
+        const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
             res.status(401).json({ success: false, error: 'Unauthorized' });
             return;
         }
 
-        const query = req.query as any;
+        const query = req.query as unknown as ListWishlistQuery;
         const result = await wishlistService.getWishlist(userId, query);
         res.json({
             success: true,
@@ -23,13 +25,14 @@ export async function getWishlist(req: Request, res: Response, next: NextFunctio
 
 export async function addToWishlist(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
             res.status(401).json({ success: false, error: 'Unauthorized' });
             return;
         }
 
-        const item = await wishlistService.addToWishlist(userId, req.body);
+        const body = req.body as AddToWishlistDTO;
+        const item = await wishlistService.addToWishlist(userId, body);
         res.status(201).json({
             success: true,
             data: item,
@@ -41,7 +44,7 @@ export async function addToWishlist(req: Request, res: Response, next: NextFunct
 
 export async function removeFromWishlist(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = (req as any).user?.userId;
+        const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
             res.status(401).json({ success: false, error: 'Unauthorized' });
             return;

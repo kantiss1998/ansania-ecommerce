@@ -151,9 +151,9 @@ export async function resetPassword(token: string, newPassword: string) {
 
 export async function refreshToken(token: string) {
     // 1. Verify Refresh Token
-    let decoded: any;
+    let decoded: { userId: number } | undefined;
     try {
-        decoded = jwt.verify(token, JWT_SECRET);
+        decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
     } catch (error) {
         throw new UnauthorizedError('Invalid refresh token');
     }
@@ -177,8 +177,9 @@ export async function refreshToken(token: string) {
 
     // 3. Generate New Access Token
     // We can also rotate refresh token here if we want strict security
+    const user = (session as any).user as User;
     const newAccessToken = jwt.sign(
-        { userId: session.user_id, email: (session as any).user?.email, role: 'user' }, // Type casting if relation not perfectly typed yet
+        { userId: session.user_id, email: user?.email, role: 'user' },
         JWT_SECRET,
         { expiresIn: ACCESS_TOKEN_EXPIRY }
     );

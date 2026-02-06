@@ -4,7 +4,6 @@ import { AppError, NotFoundError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
 
 export async function validateVoucher(code: string, cartTotal: number) {
-    // @ts-ignore
     const voucher = await Voucher.findOne({
         where: {
             code,
@@ -18,7 +17,8 @@ export async function validateVoucher(code: string, cartTotal: number) {
         throw new NotFoundError('Voucher validation failed: Invalid or expired code');
     }
 
-    if (!voucher.isValid(cartTotal)) {
+    // Assuming instance methods exist on the model but not in the type definition available here
+    if (!(voucher as any).isValid(cartTotal)) {
         throw new AppError('Voucher conditions not met (min purchase or usage limit)', 400);
     }
 
@@ -26,7 +26,6 @@ export async function validateVoucher(code: string, cartTotal: number) {
 }
 
 export async function applyVoucher(cartId: number, code: string) {
-    // @ts-ignore
     const cart = await Cart.findByPk(cartId, {
         include: [{ model: CartItem, as: 'items' }] // Need items for total calculation just in case
     });
@@ -42,7 +41,7 @@ export async function applyVoucher(cartId: number, code: string) {
     const voucher = await validateVoucher(code, subtotal);
 
     // Calculate discount
-    const discountAmount = voucher.calculateDiscount(subtotal);
+    const discountAmount = (voucher as any).calculateDiscount(subtotal);
 
     // Update Cart
     await cart.update({
@@ -55,7 +54,6 @@ export async function applyVoucher(cartId: number, code: string) {
 }
 
 export async function removeVoucher(cartId: number) {
-    // @ts-ignore
     const cart = await Cart.findByPk(cartId);
     if (!cart) throw new NotFoundError('Cart');
 

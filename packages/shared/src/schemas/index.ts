@@ -91,7 +91,7 @@ export const productSchemas = {
     listProducts: z.object({
         page: z.coerce.number().int().min(1).optional(),
         limit: z.coerce.number().int().min(1).max(100).optional(),
-        sort: z.enum(['newest', 'price_asc', 'price_desc', 'popular', 'rating']).optional(),
+        sort: z.enum(['newest', 'price_asc', 'price_desc', 'popular', 'rating', 'name_asc', 'name_desc']).optional(),
         category: z.string().optional(),
         color: z.string().optional(),
         finishing: z.string().optional(),
@@ -101,6 +101,10 @@ export const productSchemas = {
         rating_min: z.coerce.number().int().min(1).max(5).optional(),
         search: z.string().optional(),
         in_stock: z.coerce.boolean().optional(),
+        is_featured: z.preprocess((val) => val === 'true' || val === true, z.boolean()).optional(),
+        is_new: z.preprocess((val) => val === 'true' || val === true, z.boolean()).optional(),
+        has_discount: z.preprocess((val) => val === 'true' || val === true, z.boolean()).optional(),
+        excludeId: z.coerce.number().optional(),
     }),
 };
 
@@ -154,11 +158,27 @@ export const reviewSchemas = {
     }),
 };
 
+// Wishlist schemas
+export const wishlistSchemas = {
+    list: z.object({
+        page: z.coerce.number().int().min(1).optional(),
+        limit: z.coerce.number().int().min(1).max(100).optional(),
+    }),
+    add: z.object({
+        product_id: z.number().int().positive(),
+        product_variant_id: z.number().int().positive().optional(),
+    }),
+};
+
 // Infer TypeScript types from schemas
 export type RegisterDTO = z.infer<typeof authSchemas.register>;
 export type LoginDTO = z.infer<typeof authSchemas.login>;
+export type UpdateProfileDTO = z.infer<typeof userSchemas.updateProfile>;
+export type ChangePasswordDTO = z.infer<typeof userSchemas.changePassword>;
 export type CreateAddressDTO = z.infer<typeof addressSchemas.create>;
 export type ListProductsQuery = z.infer<typeof productSchemas.listProducts>;
 export type AddToCartDTO = z.infer<typeof cartSchemas.addItem>;
 export type CreateOrderDTO = z.infer<typeof checkoutSchemas.createOrder>;
 export type CreateReviewDTO = z.infer<typeof reviewSchemas.create>;
+export type AddToWishlistDTO = z.infer<typeof wishlistSchemas.add>;
+export type ListWishlistQuery = z.infer<typeof wishlistSchemas.list>;

@@ -69,6 +69,22 @@ export interface District {
     name: string;
 }
 
+export interface JNTCreateOrderRequest {
+    order_number: string;
+    sender_name: string;
+    sender_phone: string;
+    sender_address: string;
+    receiver_name: string;
+    receiver_phone: string;
+    receiver_address: string;
+    receiver_city: string;
+    receiver_district?: string;
+    receiver_zip?: string;
+    weight: number;
+    items_value: number;
+    goods_type: string;
+}
+
 export class JNTClient {
     private config: JNTConfig;
     private useMock: boolean;
@@ -304,7 +320,7 @@ export class JNTClient {
     /**
      * Create shipping order with J&T
      */
-    async createOrder(orderData: any): Promise<string> {
+    async createOrder(orderData: JNTCreateOrderRequest): Promise<string> {
         if (this.useMock) {
             console.log('[JNT MOCK] Creating order:', orderData);
             return 'JP' + Math.floor(Math.random() * 1000000000).toString();
