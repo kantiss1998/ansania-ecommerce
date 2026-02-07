@@ -112,3 +112,84 @@ export async function getWorstProducts(req: Request, res: Response, next: NextFu
         next(error);
     }
 }
+export async function getDailySales(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminReportService.getSalesReport(startDate, endDate, 'daily');
+        handleReportResponse(req, res, data, 'daily_sales');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getWeeklySales(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminReportService.getSalesReport(startDate, endDate, 'weekly');
+        handleReportResponse(req, res, data, 'weekly_sales');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getMonthlySales(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminReportService.getSalesReport(startDate, endDate, 'monthly');
+        handleReportResponse(req, res, data, 'monthly_sales');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getYearlySales(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminReportService.getSalesReport(startDate, endDate, 'yearly');
+        handleReportResponse(req, res, data, 'yearly_sales');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getBestSellers(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const limit = req.query.limit ? Number(req.query.limit) : 20;
+        const data = await adminReportService.getProductPerformance(startDate, endDate, limit);
+        handleReportResponse(req, res, data, 'best_sellers');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getStockMovement(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminReportService.getStockMovement(startDate, endDate);
+        handleReportResponse(req, res, data, 'stock_movement');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getNewCustomers(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminReportService.getNewCustomersList(startDate, endDate);
+        handleReportResponse(req, res, data, 'new_customers');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getTopSpenders(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const limit = req.query.limit ? Number(req.query.limit) : 20;
+        const data = await adminReportService.getCustomerSpenders(startDate, endDate, limit);
+        handleReportResponse(req, res, data, 'top_spenders');
+    } catch (error) {
+        next(error);
+    }
+}

@@ -12,16 +12,6 @@ export async function getEmailQueue(req: Request, res: Response, next: NextFunct
     }
 }
 
-export async function retryEmail(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { id } = req.params;
-        const result = await adminSystemService.retryEmail(Number(id));
-        res.json({ success: true, data: result });
-    } catch (error) {
-        next(error);
-    }
-}
-
 export async function getEmailDetail(req: Request, res: Response, next: NextFunction) {
     try {
         const { id } = req.params;
@@ -32,10 +22,69 @@ export async function getEmailDetail(req: Request, res: Response, next: NextFunc
     }
 }
 
+export async function retryEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const result = await adminSystemService.retryEmail(Number(id));
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function deleteEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const result = await adminSystemService.deleteEmail(Number(id));
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function bulkRetryEmails(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { ids } = req.body;
+        const result = await adminSystemService.bulkRetryEmails(ids);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function clearFailedEmails(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const result = await adminSystemService.clearFailedEmails();
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+}
+
 // Activity Logs
 export async function getActivityLogs(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminSystemService.listActivityLogs(req.query);
+        res.json({ success: true, ...result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getActivityLogsByUser(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { userId } = req.params;
+        const result = await adminSystemService.listActivityLogsByUser(Number(userId), req.query);
+        res.json({ success: true, ...result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getActivityLogsByEntity(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { entityType, entityId } = req.params;
+        const result = await adminSystemService.listActivityLogsByEntity(entityType, entityId, req.query);
         res.json({ success: true, ...result });
     } catch (error) {
         next(error);
@@ -85,7 +134,26 @@ export async function getSyncSettings(_req: Request, res: Response, next: NextFu
 export async function updateSyncSettings(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminSystemService.updateSyncSettings(req.body);
-        res.json({ ...result }); // result already has success: true
+        res.json({ ...result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Site Settings
+export async function getSiteSettings(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const data = await adminSystemService.getSiteSettings();
+        res.json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateSiteSettings(req: Request, res: Response, next: NextFunction) {
+    try {
+        const result = await adminSystemService.updateSiteSettings(req.body);
+        res.json({ ...result });
     } catch (error) {
         next(error);
     }

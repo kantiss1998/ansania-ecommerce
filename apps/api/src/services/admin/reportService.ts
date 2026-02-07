@@ -196,3 +196,23 @@ export async function getWorstSellers(startDate: Date, endDate: Date, limit: num
 
     return performance;
 }
+export async function getStockMovement(startDate: Date, endDate: Date) {
+    const { SyncLog } = require('@repo/database');
+    return SyncLog.findAll({
+        where: {
+            entity_type: 'stock',
+            created_at: { [Op.between]: [startDate, endDate] }
+        },
+        order: [['created_at', 'DESC']]
+    });
+}
+
+export async function getNewCustomersList(startDate: Date, endDate: Date) {
+    return User.findAll({
+        where: {
+            role: 'user',
+            created_at: { [Op.between]: [startDate, endDate] }
+        },
+        order: [['created_at', 'DESC']]
+    });
+}

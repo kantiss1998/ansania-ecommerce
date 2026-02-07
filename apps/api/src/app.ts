@@ -41,6 +41,7 @@ import adminReportRoutes from './routes/admin/report.routes';
 import adminAnalyticsRoutes from './routes/admin/analytics.routes';
 import adminSystemRoutes from './routes/admin/system.routes';
 import adminSyncRoutes from './routes/admin/sync.routes';
+import adminAttributeRoutes from './routes/admin/attribute.routes';
 
 // Note: Environment variables are loaded in server.ts before this module is imported
 
@@ -109,6 +110,7 @@ app.use('/admin/reports', adminReportRoutes);
 app.use('/admin/analytics', adminAnalyticsRoutes);
 app.use('/admin/system', adminSystemRoutes);
 app.use('/admin/sync', adminSyncRoutes);
+app.use('/admin/attributes', adminAttributeRoutes);
 
 // 404 handler
 app.use((_req, res) => {

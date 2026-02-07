@@ -79,3 +79,23 @@ export async function getRevenueByProduct(req: Request, res: Response, next: Nex
         next(error);
     }
 }
+
+export async function getOverview(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminAnalyticsService.getAnalyticsOverview(startDate, endDate);
+        handleReportResponse(req, res, data, 'analytics_overview');
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getCustomerBehavior(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { startDate, endDate } = getDateRange(req.query);
+        const data = await adminAnalyticsService.getCustomerBehavior(startDate, endDate);
+        handleReportResponse(req, res, data, 'customer_behavior');
+    } catch (error) {
+        next(error);
+    }
+}

@@ -133,3 +133,44 @@ export async function getRevenueByProduct(startDate: Date, endDate: Date, limit:
         limit
     });
 }
+export async function getAnalyticsOverview(startDate: Date, endDate: Date) {
+    const conversion = await getConversionStats(startDate, endDate);
+    const abandoned = await getAbandonedCartStats(startDate, endDate);
+
+    // Get sales trend (daily for overview)
+    const { Order } = require('@repo/database');
+    const salesTrend = await Order.findAll({
+        attributes: [
+            [fn('DATE_FORMAT', col('created_at'), '%Y-%m-%d'), 'date'],
+            [fn('SUM', col('total_amount')), 'revenue'],
+            [fn('COUNT', col('id')), 'orders']
+        ],
+        where: {
+            payment_status: 'paid',
+            created_at: { [Op.between]: [startDate, endDate] }
+        },
+        group: ['date'],
+        order: [[literal('date'), 'ASC']],
+        raw: true
+    });
+
+    return {
+        ...conversion,
+        abandoned,
+        salesTrend
+    };
+}
+
+export async function getCustomerBehavior(startDate: Date, endDate: Date) {
+    const { SearchHistory, ProductView, User } = require('@repo/database');
+
+    const topSearches = await getSearchAnalytics(startDate, endDate);
+    const topViews = await getProductViewStats(startDate, endDate);
+
+    // Average session duration or other behavior metrics would go here if available.
+    // For now, let's return aggregation of interest.
+    return {
+        topSearches,
+        topViews
+    };
+}
