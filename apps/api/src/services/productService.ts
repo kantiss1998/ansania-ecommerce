@@ -272,3 +272,18 @@ export async function getSimilarProducts(productId: number, limit: number = 6) {
     return similar;
 }
 
+/**
+ * Track a product view
+ */
+export async function trackProductView(productId: number) {
+    const product = await Product.findByPk(productId);
+    if (!product) throw new NotFoundError('Product');
+
+    // Increment view_count
+    product.view_count = (product.view_count || 0) + 1;
+    await product.save();
+
+    return product;
+}
+
+import { NotFoundError } from '@repo/shared/errors';

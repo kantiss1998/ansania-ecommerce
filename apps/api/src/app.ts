@@ -23,6 +23,16 @@ import shippingRoutes from './routes/shipping.routes';
 import categoryRoutes from './routes/category.routes';
 import searchRoutes from './routes/search.routes';
 import userDashboardRoutes from './routes/userDashboard.routes';
+import recommendationRoutes from './routes/recommendation.routes';
+
+// Admin Routes
+import adminDashboardRoutes from './routes/admin/dashboard.routes';
+import adminOrderRoutes from './routes/admin/order.routes';
+import adminCustomerRoutes from './routes/admin/customer.routes';
+import adminProductRoutes from './routes/admin/product.routes';
+import adminReviewRoutes from './routes/admin/review.routes';
+import adminStockRoutes from './routes/admin/stock.routes';
+import adminMarketingRoutes from './routes/admin/marketing.routes';
 
 // Note: Environment variables are loaded in server.ts before this module is imported
 
@@ -65,6 +75,7 @@ app.use('/shipping-info', shippingRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/search', searchRoutes);
 app.use('/user', userDashboardRoutes);
+app.use('/recommendations', recommendationRoutes);
 
 app.get('/api', (_req, res) => {
     res.json({
@@ -73,6 +84,15 @@ app.get('/api', (_req, res) => {
         version: '1.0.0',
     });
 });
+
+// Admin group routes
+app.use('/admin/dashboard', adminDashboardRoutes);
+app.use('/admin/orders', adminOrderRoutes);
+app.use('/admin/customers', adminCustomerRoutes);
+app.use('/admin/products', adminProductRoutes);
+app.use('/admin/reviews', adminReviewRoutes);
+app.use('/admin/stock', adminStockRoutes);
+app.use('/admin/marketing', adminMarketingRoutes);
 
 // 404 handler
 app.use((_req, res) => {

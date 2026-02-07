@@ -202,3 +202,15 @@ export async function getRelatedProducts(req: Request, res: Response, next: Next
 }
 
 
+
+export async function trackProductView(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        await productService.trackProductView(Number(id));
+        res.json({
+            success: true,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

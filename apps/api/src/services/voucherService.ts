@@ -25,6 +25,29 @@ export async function validateVoucher(code: string, cartTotal: number) {
     return voucher;
 }
 
+export async function getAvailableVouchers() {
+    return Voucher.findAll({
+        where: {
+            is_active: true,
+            start_date: { [Op.lte]: new Date() },
+            end_date: { [Op.gte]: new Date() }
+        },
+        order: [['created_at', 'DESC']]
+    });
+}
+
+export async function getVoucherByCode(code: string) {
+    const voucher = await Voucher.findOne({
+        where: { code }
+    });
+
+    if (!voucher) {
+        throw new NotFoundError('Voucher not found');
+    }
+
+    return voucher;
+}
+
 export async function applyVoucher(cartId: number, code: string) {
     const cart = await Cart.findByPk(cartId, {
         include: [{ model: CartItem, as: 'items' }] // Need items for total calculation just in case

@@ -24,4 +24,9 @@ router.post('/reset-password', authController.resetPassword);
 router.post('/refresh', authController.refresh);
 router.post('/logout', authController.logout);
 
+router.post('/verify-email', authController.verifyEmail);
+
+import { authenticate } from '../middleware/auth';
+router.delete('/account', authenticate, authController.deleteAccount);
+
 export default router;

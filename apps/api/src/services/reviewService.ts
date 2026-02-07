@@ -1,4 +1,4 @@
-import { Review, Order, OrderItem, ReviewImage, ProductRatingsSummary } from '@repo/database';
+import { Review, Order, OrderItem, ReviewImage, ProductRatingsSummary, Product } from '@repo/database';
 import { AppError, UnauthorizedError } from '@repo/shared/errors';
 import { CreateReviewDTO } from '@repo/shared/schemas';
 import { Includeable } from 'sequelize';
@@ -170,6 +170,127 @@ export async function updateReview(userId: number, reviewId: number, data: Parti
     await updateProductRatings(review.product_id);
 
     return review;
+}
+
+// Delete a review
+export async function deleteReview(userId: number, reviewId: number) {
+    const review = await Review.findByPk(reviewId);
+
+    if (!review) {
+        throw new AppError('Review not found', 404);
+    }
+
+    if (review.user_id !== userId) {
+        throw new UnauthorizedError('You can only delete your own reviews');
+    }
+
+    const productId = review.product_id;
+
+    // Delete associated images first
+    await ReviewImage.destroy({ where: { review_id: reviewId } });
+
+    // Delete the review
+    await review.destroy();
+
+    // Update product ratings
+    await updateProductRatings(productId);
+
+    return { success: true };
+}
+
+// Add an image to an existing review
+export async function addReviewImage(userId: number, reviewId: number, imageUrl: string) {
+    const review = await Review.findByPk(reviewId);
+
+    if (!review) {
+        throw new AppError('Review not found', 404);
+    }
+
+    if (review.user_id !== userId) {
+        throw new UnauthorizedError('You can only add images to your own reviews');
+    }
+
+    // Check image count limit (e.g., 5 images)
+    const currentImages = await ReviewImage.count({ where: { review_id: reviewId } });
+    if (currentImages >= 5) {
+        throw new AppError('Maximum 5 images allowed per review', 400);
+    }
+
+    const reviewImage = await ReviewImage.create({
+        review_id: reviewId,
+        image_url: imageUrl
+    });
+
+    return reviewImage;
+}
+
+// Delete an image from a review
+export async function deleteReviewImage(userId: number, reviewId: number, imageId: number) {
+    const review = await Review.findByPk(reviewId);
+
+    if (!review) {
+        throw new AppError('Review not found', 404);
+    }
+
+    if (review.user_id !== userId) {
+        throw new UnauthorizedError('You can only delete images from your own reviews');
+    }
+
+    const reviewImage = await ReviewImage.findOne({
+        where: { id: imageId, review_id: reviewId }
+    });
+
+    if (!reviewImage) {
+        throw new AppError('Review image not found', 404);
+    }
+
+    await reviewImage.destroy();
+
+    return { success: true };
+}
+
+// Get products that are paid/delivered but not yet reviewed
+export async function getPendingReviews(userId: number) {
+    // 1. Get all paid orders for the user
+    const orders = await Order.findAll({
+        where: { user_id: userId, payment_status: 'paid' },
+        include: [{
+            model: OrderItem,
+            as: 'items',
+            include: [{ model: Product, as: 'product' }]
+        }]
+    });
+
+    // 2. Get all product IDs already reviewed by the user
+    const reviewedProducts = await Review.findAll({
+        where: { user_id: userId },
+        attributes: ['product_id']
+    });
+    const reviewedProductIds = reviewedProducts.map(r => r.product_id);
+
+    // 3. Find items in orders that are not in reviewedProductIds
+    const pendingReviews: any[] = [];
+
+    for (const order of orders) {
+        if (!order.items) continue;
+
+        for (const item of order.items) {
+            if (!reviewedProductIds.includes(item.product_id)) {
+                pendingReviews.push({
+                    order_id: order.id,
+                    order_number: order.order_number,
+                    product_id: item.product_id,
+                    product_name: item.product_name,
+                    variant_name: item.variant_name,
+                    price: item.price,
+                    purchased_at: order.created_at,
+                    product: item.product
+                });
+            }
+        }
+    }
+
+    return pendingReviews;
 }
 
 // Mark a review as helpful

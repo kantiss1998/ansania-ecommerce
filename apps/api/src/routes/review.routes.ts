@@ -14,10 +14,18 @@ router.post(
     reviewController.createReview
 );
 
+router.get('/pending', authenticate, reviewController.getPendingReviews);
+
 router.get('/:productId', reviewController.getReviewsByProduct);
 
 router.put('/:id', authenticate, reviewController.updateReview);
 
+router.delete('/:id', authenticate, reviewController.deleteReview);
+
 router.post('/:id/helpful', authenticate, reviewController.markReviewHelpful);
+
+router.post('/:id/images', authenticate, reviewController.addReviewImage);
+
+router.delete('/:id/images/:imageId', authenticate, reviewController.deleteReviewImage);
 
 export default router;

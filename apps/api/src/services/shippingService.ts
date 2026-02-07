@@ -222,3 +222,17 @@ export async function getCities(provinceId?: number) {
         throw new AppError('Failed to get cities', 500);
     }
 }
+/**
+ * Get list of available couriers
+ */
+export async function getCouriers() {
+    // Currently we only integration with J&T, but we can expand this
+    return [
+        {
+            code: 'JNT',
+            name: 'J&T Express',
+            description: 'Fast and reliable shipping across Indonesia',
+            logo_url: '/images/couriers/jnt.png'
+        }
+    ];
+}

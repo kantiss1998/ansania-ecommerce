@@ -25,6 +25,15 @@ const extractUser = (req: Request, _res: Response, next: NextFunction) => {
 
 router.use(extractUser);
 
+router.get('/available', voucherController.getAvailableVouchers);
+
+router.post(
+    '/validate',
+    voucherController.validateVoucher
+);
+
+router.get('/:code', voucherController.getVoucherByCode);
+
 router.post(
     '/apply',
     validateRequest(cartSchemas.applyVoucher),

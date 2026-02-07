@@ -36,8 +36,13 @@ export async function getSettings() {
     // Convert array to object key-value
     const settingsMap: Record<string, string> = {};
     settings.forEach((s) => {
-        const setting = s as unknown as { key: string; value: string };
-        settingsMap[setting.key] = setting.value;
+        settingsMap[s.setting_key] = s.setting_value || '';
     });
     return settingsMap;
+}
+
+export async function getSettingByKey(key: string) {
+    const setting = await CmsSetting.findOne({ where: { setting_key: key } });
+    if (!setting) throw new NotFoundError('Setting');
+    return setting;
 }

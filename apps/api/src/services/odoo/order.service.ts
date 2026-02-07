@@ -117,4 +117,57 @@ export class OdooOrderService {
             // Don't throw - this is a non-critical sync
         }
     }
+
+    /**
+     * Poll Odoo for order status updates and sync back to local
+     */
+    async syncOrderStatusFromOdoo(): Promise<{ updated: number; failed: number }> {
+        console.log('[ODOO_SYNC] Polling status updates from Odoo...');
+
+        const orders = await Order.findAll({
+            where: {
+                odoo_order_id: { [require('sequelize').Op.ne]: null },
+                status: { [require('sequelize').Op.notIn]: ['delivered', 'cancelled', 'refunded'] }
+            }
+        });
+
+        let updated = 0;
+        let failed = 0;
+
+        for (const order of orders) {
+            try {
+                if (!order.odoo_order_id) continue;
+
+                if (odooClient.isMockMode()) {
+                    continue;
+                }
+
+                const odooOrder = await odooClient.searchRead('sale.order', [['id', '=', order.odoo_order_id]], ['state', 'delivery_status']);
+                if (!odooOrder || odooOrder.length === 0) continue;
+
+                const odooState = odooOrder[0].state;
+
+                // Map Odoo state to local status
+                let newStatus = order.status;
+                if (odooState === 'sale') newStatus = 'processing';
+                if (odooState === 'done') newStatus = 'delivered';
+                if (odooState === 'cancel') newStatus = 'cancelled';
+
+                // Check delivery status if available
+                const deliveryStatus = odooOrder[0].delivery_status;
+                if (deliveryStatus === 'shipped') newStatus = 'shipped';
+
+                if (newStatus !== order.status) {
+                    await order.update({ status: newStatus as any });
+                    updated++;
+                }
+
+            } catch (error) {
+                console.error(`[ODOO_SYNC] Failed to fetch status for order ${order.order_number}:`, error);
+                failed++;
+            }
+        }
+
+        return { updated, failed };
+    }
 }

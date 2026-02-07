@@ -1,6 +1,7 @@
 
 import { Router } from 'express';
 import * as orderController from '../controllers/orderController';
+import * as reviewController from '../controllers/reviewController';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();
@@ -16,6 +17,9 @@ router.get('/:orderNumber', orderController.getOrderDetail);
 
 // Cancel an order
 router.post('/:orderNumber/cancel', orderController.cancelOrder);
+
+// Leave a review for an order
+router.post('/:orderNumber/review', reviewController.createReviewFromOrder);
 
 export default router;
 

@@ -10,6 +10,7 @@ import { dokuClient, DokuWebhookPayload } from '../integrations/doku/client';
 import { OdooOrderService } from '../services/odoo/order.service';
 const odooOrderService = new OdooOrderService();
 import { AppError } from '@repo/shared/errors';
+import * as paymentService from '../services/paymentService';
 
 /**
  * Handle Doku payment webhook notification
@@ -276,5 +277,64 @@ export async function testWebhook(req: Request, res: Response, next: NextFunctio
 
     } catch (error) {
         return next(error);
+    }
+}
+
+/**
+ * Create a new payment session
+ */
+export async function createPayment(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { order_id } = req.body;
+        if (!order_id) {
+            throw new AppError('order_id is required', 400);
+        }
+
+        const paymentResponse = await paymentService.createPayment(Number(order_id));
+
+        res.status(201).json({
+            success: true,
+            data: paymentResponse
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * Get payment detail by transaction ID
+ */
+export async function getPaymentByTransactionId(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { transactionId } = req.params;
+        const payment = await paymentService.getPaymentByTransactionId(transactionId);
+
+        res.json({
+            success: true,
+            data: payment
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * Explicitly verify payment status from provider
+ */
+export async function verifyPayment(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { transactionId } = req.body;
+        if (!transactionId) {
+            throw new AppError('transactionId is required', 400);
+        }
+
+        const status = await paymentService.verifyPayment(transactionId);
+
+        res.json({
+            success: true,
+            data: status
+        });
+    } catch (error) {
+        next(error);
     }
 }

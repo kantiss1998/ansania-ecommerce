@@ -56,3 +56,18 @@ export async function getFlashSale(id: number) {
 
     return flashSale;
 }
+export async function getFlashSaleProducts(flashSaleId: number) {
+    const products = await FlashSaleProduct.findAll({
+        where: { flash_sale_id: flashSaleId },
+        include: [
+            {
+                model: Product,
+                as: 'product',
+                include: [{ model: ProductImage, as: 'images' }]
+            }
+        ],
+        order: [['display_order', 'ASC']]
+    });
+
+    return products;
+}

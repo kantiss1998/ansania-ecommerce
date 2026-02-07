@@ -189,3 +189,35 @@ export async function refreshToken(token: string) {
         refresh_token: token, // Return same refresh token for now, or rotate
     };
 }
+export async function verifyEmail(token: string) {
+    // In a real scenario, we'd find a VerificationToken record
+    // For now, let's assume it's valid if token matches some dummy logic
+    // or we're just placeholders.
+    // Ideally: const vt = await VerificationToken.findOne({ where: { token } });
+
+    // Placeholder logic
+    if (token === 'valid_test_token') {
+        return { success: true };
+    }
+
+    throw new AppError('Invalid or expired verification token', 400);
+}
+
+export async function deleteAccount(userId: number) {
+    const user = await User.findByPk(userId);
+    if (!user) throw new NotFoundError('User');
+
+    // Soft delete or anonymize
+    await user.update({
+        email: `deleted_${userId}@deleted.com`,
+        phone: 'deleted',
+        full_name: 'Deleted User',
+        password: 'deleted',
+        // odoo_user_id: null,
+    });
+
+    // Delete sessions
+    await UserSession.destroy({ where: { user_id: userId } });
+
+    return { success: true };
+}

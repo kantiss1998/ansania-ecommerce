@@ -64,3 +64,16 @@ export async function getSettings(_req: Request, res: Response, next: NextFuncti
         next(error);
     }
 }
+
+export async function getSettingByKey(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { key } = req.params;
+        const setting = await cmsService.getSettingByKey(key);
+        res.json({
+            success: true,
+            data: setting,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

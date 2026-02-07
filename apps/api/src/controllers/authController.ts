@@ -67,3 +67,29 @@ export async function logout(_req: Request, res: Response, next: NextFunction) {
         next(error);
     }
 }
+import { AuthenticatedRequest } from '../types/express';
+
+export async function verifyEmail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { token } = req.body as { token: string };
+        const result = await authService.verifyEmail(token);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function deleteAccount(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) {
+            res.status(401).json({ success: false, error: 'Unauthorized' });
+            return;
+        }
+
+        const result = await authService.deleteAccount(userId);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+}

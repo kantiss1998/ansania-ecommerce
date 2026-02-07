@@ -30,6 +30,7 @@ export interface ProductAttributes {
     is_active: boolean;
     meta_title: string | null;
     meta_description: string | null;
+    view_count: number;
     synced_at: Date;
     created_at: Date;
     updated_at: Date;
@@ -58,6 +59,7 @@ export class Product extends Model<
     declare is_active: CreationOptional<boolean>;
     declare meta_title: string | null;
     declare meta_description: string | null;
+    declare view_count: CreationOptional<number>;
     declare synced_at: CreationOptional<Date>;
 
     declare created_at: CreationOptional<Date>;
@@ -166,6 +168,11 @@ Product.init(
         meta_description: {
             type: DataTypes.TEXT,
             allowNull: true,
+        },
+        view_count: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
         },
         synced_at: {
             type: DataTypes.DATE,

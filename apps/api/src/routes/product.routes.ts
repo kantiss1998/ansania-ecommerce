@@ -38,8 +38,8 @@ router.get('/attributes/:attribute', productController.getAttributes);
 // Search Stats
 router.post('/stats/search', productController.recordSearch);
 
-// Temporary Sync Endpoint
-router.post('/sync', productController.syncProducts);
+// Product Views Tracking
+router.post('/:id/views', productController.trackProductView);
 
 export default router;
 

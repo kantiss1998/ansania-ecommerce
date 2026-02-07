@@ -27,3 +27,14 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
         return;
     }
 };
+
+export const authorizeAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (req.user?.role !== 'admin') {
+        res.status(403).json({
+            success: false,
+            error: 'Forbidden: Admin access required',
+        });
+        return;
+    }
+    next();
+};
