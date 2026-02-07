@@ -14,6 +14,7 @@ async function runSeeders() {
         // Run seeders
         await userSeeder.up(sequelize.getQueryInterface());
         await cmsPagesSeeder.up(sequelize.getQueryInterface());
+        await bannersSeeder.up(sequelize.getQueryInterface());
 
         console.log('✅ All seeders completed successfully!');
         process.exit(0);

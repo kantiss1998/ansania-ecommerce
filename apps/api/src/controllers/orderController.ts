@@ -33,3 +33,19 @@ export const getOrderDetail = async (req: Request, res: Response) => {
         data: order
     });
 };
+
+export const cancelOrder = async (req: Request, res: Response) => {
+    const userId = (req as AuthenticatedRequest).user?.userId;
+    if (!userId) throw new AppError('User not authenticated', 401);
+
+    const { orderNumber } = req.params;
+    if (!orderNumber) throw new AppError('Order number is required', 400);
+
+    const order = await orderService.cancelOrder(userId, orderNumber);
+    res.json({
+        success: true,
+        data: order,
+        message: 'Order cancelled successfully'
+    });
+};
+

@@ -195,3 +195,110 @@ async function updateCartTotals(cartId: number) {
         { where: { id: cartId } }
     );
 }
+
+export async function clearCart(
+    userId: number | undefined,
+    sessionId: string | undefined
+) {
+    const cart = await getCart(userId, sessionId);
+    if (!cart) throw new AppError('Cart not found', 404);
+
+    // Delete all items in the cart
+    await CartItem.destroy({
+        where: { cart_id: cart.id }
+    });
+
+    // Update cart totals to zero
+    await Cart.update(
+        {
+            subtotal: 0,
+            total: 0,
+            discount_amount: 0
+        },
+        { where: { id: cart.id } }
+    );
+
+    return getCart(userId, sessionId);
+}
+
+export async function mergeGuestCartToUser(
+    userId: number,
+    sessionId: string
+) {
+    // Find guest cart
+    const guestCart = await Cart.findOne({
+        where: { session_id: sessionId },
+        include: [{
+            model: CartItem,
+            as: 'items',
+            include: [{
+                model: ProductVariant,
+                as: 'productVariant'
+            }]
+        }]
+    });
+
+    if (!guestCart || !guestCart.items || guestCart.items.length === 0) {
+        // No guest cart or empty, just return user's cart
+        return getCart(userId, undefined);
+    }
+
+    // Get or create user cart
+    let userCart = await Cart.findOne({
+        where: { user_id: userId }
+    });
+
+    if (!userCart) {
+        userCart = await Cart.create({
+            user_id: userId,
+            session_id: null,
+            subtotal: 0,
+            total: 0,
+            discount_amount: 0
+        });
+    }
+
+    // Merge items from guest cart to user cart
+    for (const guestItem of guestCart.items) {
+        // Check if item already exists in user cart
+        const existingItem = await CartItem.findOne({
+            where: {
+                cart_id: userCart.id,
+                product_variant_id: guestItem.product_variant_id
+            }
+        });
+
+        if (existingItem) {
+            // Update quantity (combine)
+            const newQuantity = existingItem.quantity + guestItem.quantity;
+            const variant = guestItem.productVariant;
+            
+            // Check stock before merging
+            if (variant && variant.stock >= newQuantity) {
+                await existingItem.update({
+                    quantity: newQuantity,
+                    subtotal: Number(variant.price) * newQuantity
+                });
+            }
+            // If stock insufficient, keep existing quantity (don't merge)
+        } else {
+            // Add new item to user cart
+            await CartItem.create({
+                cart_id: userCart.id,
+                product_variant_id: guestItem.product_variant_id,
+                quantity: guestItem.quantity,
+                price: guestItem.price,
+                subtotal: guestItem.subtotal
+            });
+        }
+    }
+
+    // Delete guest cart
+    await CartItem.destroy({ where: { cart_id: guestCart.id } });
+    await guestCart.destroy();
+
+    // Update user cart totals
+    await updateCartTotals(userCart.id);
+
+    return getCart(userId, undefined);
+}

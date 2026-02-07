@@ -85,3 +85,47 @@ export async function removeItem(req: Request, res: Response, next: NextFunction
         next(error);
     }
 }
+
+export async function clearCart(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { userId, sessionId } = getSession(req);
+        if (!userId && !sessionId) {
+            res.status(400).json({ success: false, error: 'Session ID or Login required' });
+            return;
+        }
+
+        const cart = await cartService.clearCart(userId, sessionId);
+        res.json({
+            success: true,
+            data: cart,
+            message: 'Cart cleared successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function mergeCart(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { userId } = getSession(req);
+        if (!userId) {
+            res.status(401).json({ success: false, error: 'User must be logged in' });
+            return;
+        }
+
+        const { session_id } = req.body as { session_id: string };
+        if (!session_id) {
+            res.status(400).json({ success: false, error: 'Guest session_id is required' });
+            return;
+        }
+
+        const cart = await cartService.mergeGuestCartToUser(userId, session_id);
+        res.json({
+            success: true,
+            data: cart,
+            message: 'Guest cart merged successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+}

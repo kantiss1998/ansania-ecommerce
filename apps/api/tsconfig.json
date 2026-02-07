@@ -35,7 +35,7 @@
             ],
             "@repo/database/*": [
                 "../../packages/database/src/*"
-            ]
+            ],
         }
     },
     "include": [

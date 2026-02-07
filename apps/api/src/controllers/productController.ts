@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as productService from '../services/productService';
 import { OdooProductService } from '../services/odoo/product.service';
+import { SearchHistory } from '@repo/database';
 const odooProductService = new OdooProductService();
 import { ListProductsQuery } from '@repo/shared/schemas';
 import { NotFoundError } from '@repo/shared/errors';
@@ -92,7 +93,7 @@ export async function recordSearch(req: Request, res: Response, next: NextFuncti
             return res.status(400).json({ success: false, message: 'Query is required' });
         }
 
-        const { SearchHistory } = await import('@repo/database');
+
 
         await SearchHistory.create({
             search_query: query,
@@ -108,3 +109,96 @@ export async function recordSearch(req: Request, res: Response, next: NextFuncti
         return next(error);
     }
 }
+
+export async function getFeaturedProducts(req: Request, res: Response, next: NextFunction) {
+    try {
+        const limit = req.query.limit ? Number(req.query.limit) : 10;
+        const products = await productService.getFeaturedProducts(limit);
+
+        res.json({
+            success: true,
+            data: products,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getNewArrivals(req: Request, res: Response, next: NextFunction) {
+    try {
+        const limit = req.query.limit ? Number(req.query.limit) : 10;
+        const days = req.query.days ? Number(req.query.days) : 30;
+        const products = await productService.getNewArrivals(limit, days);
+
+        res.json({
+            success: true,
+            data: products,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getProductVariants(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const result = await productService.getProductVariants(Number(id));
+
+        if (!result) {
+            throw new NotFoundError('Product');
+        }
+
+        res.json({
+            success: true,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getRecommendedProducts(req: Request, res: Response, next: NextFunction) {
+    try {
+        const limit = req.query.limit ? Number(req.query.limit) : 10;
+        const products = await productService.getRecommendedProducts(limit);
+
+        res.json({
+            success: true,
+            data: products,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getSimilarProducts(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { productId } = req.params;
+        const limit = req.query.limit ? Number(req.query.limit) : 6;
+        const products = await productService.getSimilarProducts(Number(productId), limit);
+
+        res.json({
+            success: true,
+            data: products,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getRelatedProducts(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { productId } = req.params;
+        const limit = req.query.limit ? Number(req.query.limit) : 4;
+        const products = await productService.getRelatedProducts(Number(productId), limit);
+
+        res.json({
+            success: true,
+            data: products,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+

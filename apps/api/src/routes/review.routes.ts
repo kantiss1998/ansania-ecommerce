@@ -16,4 +16,8 @@ router.post(
 
 router.get('/:productId', reviewController.getReviewsByProduct);
 
+router.put('/:id', authenticate, reviewController.updateReview);
+
+router.post('/:id/helpful', authenticate, reviewController.markReviewHelpful);
+
 export default router;

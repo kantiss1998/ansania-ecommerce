@@ -41,4 +41,8 @@ router.put(
 
 router.delete('/items/:id', cartController.removeItem);
 
+router.delete('/clear', cartController.clearCart);
+
+router.post('/merge', cartController.mergeCart);
+
 export default router;

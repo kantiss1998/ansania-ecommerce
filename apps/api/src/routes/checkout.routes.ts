@@ -21,4 +21,7 @@ router.post(
     checkoutController.createOrder
 );
 
+router.post('/validate', checkoutController.validateCheckout);
+
 export default router;
+

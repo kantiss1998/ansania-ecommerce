@@ -83,3 +83,21 @@ export async function deleteAddress(req: Request, res: Response, next: NextFunct
         next(error);
     }
 }
+
+export async function setDefaultAddress(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) throw new Error('User not found');
+
+        const { id } = req.params;
+        const address = await addressService.setDefaultAddress(userId, Number(id));
+        res.json({
+            success: true,
+            data: address,
+            message: 'Default address updated successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+

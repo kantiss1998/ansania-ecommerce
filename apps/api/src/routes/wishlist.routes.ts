@@ -23,4 +23,8 @@ router.post(
 
 router.delete('/:id', wishlistController.removeFromWishlist);
 
+router.post('/move-to-cart/:id', wishlistController.moveToCart);
+
+router.delete('/clear', wishlistController.clearWishlist);
+
 export default router;

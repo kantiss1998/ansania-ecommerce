@@ -88,3 +88,65 @@ export async function checkWishlist(userId: number, productId: number, variantId
     const item = await Wishlist.findOne({ where });
     return !!item;
 }
+
+export async function moveToCart(userId: number, wishlistItemId: number) {
+    // Find wishlist item
+    const wishlistItem = await Wishlist.findOne({
+        where: {
+            id: wishlistItemId,
+            user_id: userId
+        },
+        include: [
+            {
+                model: ProductVariant,
+                as: 'productVariant'
+            }
+        ]
+    });
+
+    if (!wishlistItem) {
+        throw new NotFoundError('Wishlist Item');
+    }
+
+    // Check if variant_id exists, if not get default variant from product
+    let variantId = wishlistItem.product_variant_id;
+
+    if (!variantId) {
+        // Get first available variant for this product
+        const variant = await ProductVariant.findOne({
+            where: { product_id: wishlistItem.product_id, stock: { [require('sequelize').Op.gt]: 0 } }
+        });
+
+        if (!variant) {
+            throw new NotFoundError('Available Product Variant');
+        }
+        variantId = variant.id;
+    }
+
+    // Import cart service to add item to cart
+    const cartService = await import('./cartService');
+
+    // Add to cart
+    await cartService.addToCart(userId, undefined, {
+        product_variant_id: variantId,
+        quantity: 1 // Default quantity when moving from wishlist
+    });
+
+    // Remove from wishlist
+    await wishlistItem.destroy();
+
+    return { success: true, message: 'Item moved to cart successfully' };
+}
+
+export async function clearWishlist(userId: number) {
+    // Delete all wishlist items for the user
+    const deletedCount = await Wishlist.destroy({
+        where: { user_id: userId }
+    });
+
+    return {
+        success: true,
+        message: `Wishlist cleared successfully`,
+        deletedCount
+    };
+}

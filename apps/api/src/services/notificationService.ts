@@ -26,3 +26,40 @@ export async function markAllAsRead(userId: number) {
         { where: { user_id: userId, is_read: false } }
     );
 }
+
+// Get unread notifications
+export async function getUnreadNotifications(userId: number) {
+    return Notification.findAll({
+        where: {
+            user_id: userId,
+            is_read: false
+        },
+        order: [['created_at', 'DESC']]
+    });
+}
+
+// Delete a notification
+export async function deleteNotification(notificationId: number, userId: number) {
+    const notification = await Notification.findOne({
+        where: { id: notificationId, user_id: userId }
+    });
+
+    if (notification) {
+        await notification.destroy();
+    }
+
+    return { success: true };
+}
+
+// Get unread notification count
+export async function getNotificationCount(userId: number) {
+    const count = await Notification.count({
+        where: {
+            user_id: userId,
+            is_read: false
+        }
+    });
+
+    return { unread_count: count };
+}
+

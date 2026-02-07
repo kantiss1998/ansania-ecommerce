@@ -59,3 +59,17 @@ export async function deleteAddress(userId: number, addressId: number) {
     await address.destroy();
     return { success: true };
 }
+
+// Set an address as default
+export async function setDefaultAddress(userId: number, addressId: number) {
+    const address = await getAddress(userId, addressId);
+
+    // Unset all other defaults
+    await Address.update({ is_default: false }, { where: { user_id: userId } });
+
+    // Set this address as default
+    await address.update({ is_default: true });
+
+    return address;
+}
+

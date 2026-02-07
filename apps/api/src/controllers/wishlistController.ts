@@ -60,3 +60,42 @@ export async function removeFromWishlist(req: Request, res: Response, next: Next
         next(error);
     }
 }
+
+export async function moveToCart(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) {
+            res.status(401).json({ success: false, error: 'Unauthorized' });
+            return;
+        }
+
+        const { id } = req.params;
+        const result = await wishlistService.moveToCart(userId, Number(id));
+        res.json({
+            success: true,
+            data: result,
+            message: 'Item moved to cart successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function clearWishlist(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) {
+            res.status(401).json({ success: false, error: 'Unauthorized' });
+            return;
+        }
+
+        const result = await wishlistService.clearWishlist(userId);
+        res.json({
+            success: true,
+            data: result,
+            message: 'Wishlist cleared successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+}

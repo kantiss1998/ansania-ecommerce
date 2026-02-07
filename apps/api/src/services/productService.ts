@@ -153,3 +153,122 @@ export async function getRelatedProducts(productId: number, limit: number = 4) {
 
     return related;
 }
+
+// Get featured products
+export async function getFeaturedProducts(limit: number = 10) {
+    const products = await Product.findAll({
+        where: {
+            is_featured: true,
+            is_active: true
+        },
+        limit,
+        include: [
+            { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+        ],
+        order: [['sort_order', 'ASC'], ['created_at', 'DESC']]
+    });
+
+    return products;
+}
+
+// Get new arrivals (products created within last N days)
+export async function getNewArrivals(limit: number = 10, days: number = 30) {
+    const dateThreshold = new Date();
+    dateThreshold.setDate(dateThreshold.getDate() - days);
+
+    const products = await Product.findAll({
+        where: {
+            is_active: true,
+            created_at: { [Op.gte]: dateThreshold }
+        },
+        limit,
+        include: [
+            { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+        ],
+        order: [['created_at', 'DESC']]
+    });
+
+    return products;
+}
+
+// Get all variants for a product
+export async function getProductVariants(productId: number) {
+    const product = await Product.findByPk(productId);
+    if (!product) return null;
+
+    const variants = await ProductVariant.findAll({
+        where: {
+            product_id: productId,
+            is_visible: true
+        },
+        order: [['sort_order', 'ASC'], ['id', 'ASC']]
+    });
+
+    return {
+        product: {
+            id: product.id,
+            name: product.name,
+            slug: product.slug
+        },
+        variants
+    };
+}
+
+// Get recommended products (combination of featured + most viewed)
+export async function getRecommendedProducts(limit: number = 10) {
+    // For now, return featured + random popular products
+    // In the future, this can be enhanced with ML recommendations
+    const products = await Product.findAll({
+        where: {
+            is_active: true,
+            [Op.or]: [
+                { is_featured: true },
+                { view_count: { [Op.gt]: 0 } }
+            ]
+        } as any,
+        limit,
+        include: [
+            { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+        ],
+        order: [
+            ['is_featured', 'DESC'],
+            ['view_count', 'DESC'] as any,
+            sequelize.random()
+        ]
+    });
+
+    return products;
+}
+
+// Get similar products (same category, similar price range)
+export async function getSimilarProducts(productId: number, limit: number = 6) {
+    const product = await Product.findByPk(productId);
+    if (!product) return [];
+
+    // Calculate price range (±20%)
+    const priceMin = Number(product.selling_price) * 0.8;
+    const priceMax = Number(product.selling_price) * 1.2;
+
+    const similar = await Product.findAll({
+        where: {
+            category_id: product.category_id,
+            id: { [Op.ne]: productId },
+            is_active: true,
+            selling_price: {
+                [Op.between]: [priceMin, priceMax]
+            }
+        },
+        limit,
+        include: [
+            { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+        ],
+        order: sequelize.random()
+    });
+
+    return similar;
+}
+

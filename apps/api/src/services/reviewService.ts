@@ -146,3 +146,44 @@ export async function getReviewsByProduct(productId: number) {
 
 // Need to import User to use in include
 import { User } from '@repo/database';
+
+// Update a review (user can only update their own)
+export async function updateReview(userId: number, reviewId: number, data: Partial<CreateReviewDTO>) {
+    const review = await Review.findByPk(reviewId);
+
+    if (!review) {
+        throw new AppError('Review not found', 404);
+    }
+
+    if (review.user_id !== userId) {
+        throw new UnauthorizedError('You can only update your own reviews');
+    }
+
+    // Update allowed fields
+    if (data.rating !== undefined) review.rating = data.rating;
+    if (data.comment !== undefined) review.comment = data.comment;
+    if (data.title !== undefined) review.title = data.title;
+
+    await review.save();
+
+    // Update product ratings
+    await updateProductRatings(review.product_id);
+
+    return review;
+}
+
+// Mark a review as helpful
+export async function markReviewHelpful(_userId: number, reviewId: number): Promise<any> {
+    const review = await Review.findByPk(reviewId);
+
+    if (!review) {
+        throw new AppError('Review not found', 404);
+    }
+
+    // Increment helpful_count
+    review.helpful_count = (review.helpful_count || 0) + 1;
+    await review.save();
+
+    return { success: true, helpful_count: review.helpful_count };
+}
+

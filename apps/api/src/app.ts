@@ -20,6 +20,9 @@ import statsRoutes from './routes/stats.routes';
 import odooRoutes from './routes/odoo.routes';
 import orderRoutes from './routes/order.routes';
 import shippingRoutes from './routes/shipping.routes';
+import categoryRoutes from './routes/category.routes';
+import searchRoutes from './routes/search.routes';
+import userDashboardRoutes from './routes/userDashboard.routes';
 
 // Note: Environment variables are loaded in server.ts before this module is imported
 
@@ -59,6 +62,9 @@ app.use('/stats', statsRoutes);
 app.use('/odoo', odooRoutes);
 app.use('/orders', orderRoutes);
 app.use('/shipping-info', shippingRoutes);
+app.use('/categories', categoryRoutes);
+app.use('/search', searchRoutes);
+app.use('/user', userDashboardRoutes);
 
 app.get('/api', (_req, res) => {
     res.json({

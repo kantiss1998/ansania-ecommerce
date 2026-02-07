@@ -14,4 +14,8 @@ router.get('/', orderController.getOrders);
 // Get specific order detail
 router.get('/:orderNumber', orderController.getOrderDetail);
 
+// Cancel an order
+router.post('/:orderNumber/cancel', orderController.cancelOrder);
+
 export default router;
+

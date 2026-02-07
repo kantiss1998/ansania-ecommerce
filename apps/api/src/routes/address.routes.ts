@@ -27,4 +27,7 @@ router.put(
 
 router.delete('/:id', addressController.deleteAddress);
 
+router.patch('/:id/set-default', addressController.setDefaultAddress);
+
 export default router;
+

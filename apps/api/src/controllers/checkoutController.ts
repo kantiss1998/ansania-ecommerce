@@ -56,3 +56,22 @@ export async function createOrder(req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+export async function validateCheckout(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = (req as AuthenticatedRequest).user?.userId;
+        if (!userId) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+
+        const validationResult = await orderService.validateCheckout(userId, req.body);
+
+        return res.json({
+            success: true,
+            data: validationResult,
+        });
+    } catch (error) {
+        return next(error);
+    }
+}
+

@@ -220,3 +220,126 @@ export async function getOrderDetail(userId: number, orderNumber: string) {
 
     return order;
 }
+
+// Validate checkout before creating order
+export async function validateCheckout(userId: number, data: any): Promise<any> {
+    // Get Cart
+    const cart = await Cart.findOne({
+        where: { user_id: userId },
+        include: [{
+            model: CartItem,
+            as: 'items',
+            include: [{
+                model: ProductVariant,
+                as: 'productVariant',
+                include: [{ model: Product, as: 'product' }]
+            }]
+        }]
+    });
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+        return {
+            valid: false,
+            errors: ['Cart is empty']
+        };
+    }
+
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Validate stock availability
+    for (const item of cart.items) {
+        const variant = item.productVariant;
+        if (!variant) {
+            errors.push(`Product variant not found for item ${item.id}`);
+            continue;
+        }
+
+        if (variant.stock < item.quantity) {
+            errors.push(`Insufficient stock for ${variant.product.name}. Available: ${variant.stock}, Requested: ${item.quantity}`);
+        }
+
+        if (variant.stock < 5) {
+            warnings.push(`Low stock for ${variant.product.name}`);
+        }
+    }
+
+    // Validate shipping address if provided
+    if (data.shipping_address_id) {
+        const address = await Address.findOne({
+            where: { id: data.shipping_address_id, user_id: userId }
+        });
+
+        if (!address) {
+            errors.push('Invalid shipping address');
+        }
+    } else {
+        errors.push('Shipping address is required');
+    }
+
+    return {
+        valid: errors.length === 0,
+        errors,
+        warnings,
+        cart: {
+            items_count: cart.items.length,
+            subtotal: cart.subtotal,
+            total: cart.total
+        }
+    };
+}
+
+// Cancel an order
+export async function cancelOrder(userId: number, orderNumber: string) {
+    const order = await Order.findOne({
+        where: {
+            order_number: orderNumber,
+            user_id: userId
+        },
+        include: [{
+            model: OrderItem,
+            as: 'items',
+            include: [{
+                model: ProductVariant,
+                as: 'productVariant'
+            }]
+        }]
+    });
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    // Can only cancel pending or processing orders
+    if (!['pending_payment', 'processing'].includes(order.status)) {
+        throw new AppError('Order cannot be cancelled in current status', 400);
+    }
+
+    const transaction = await sequelize.transaction();
+
+    try {
+        // Restore stock
+        const items = order.items || [];
+        for (const item of items) {
+            if (item.productVariant) {
+                await item.productVariant.update({
+                    stock: item.productVariant.stock + item.quantity
+                }, { transaction });
+            }
+        }
+
+        // Update order status
+        await order.update({
+            status: 'cancelled',
+            cancelled_at: new Date()
+        }, { transaction });
+
+        await transaction.commit();
+        return order;
+
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+}
+
