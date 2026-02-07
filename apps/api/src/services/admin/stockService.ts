@@ -1,6 +1,7 @@
 
 import { ProductVariant, Product, ProductStock } from '@repo/database';
 import { Op } from 'sequelize';
+import { NotFoundError } from '@repo/shared/errors';
 
 /**
  * List stock levels with filtering for low/out of stock
@@ -55,6 +56,26 @@ export async function listStockLevels(query: any) {
     };
 }
 
-/**
- * Note: Manual update is removed. All stock must be synced from Odoo.
- */
+export async function getVariantStock(variantId: number) {
+    const variant = await ProductVariant.findByPk(variantId, {
+        include: [
+            { model: Product, as: 'product', attributes: ['name'] },
+            { model: ProductStock, as: 'inventory' }
+        ]
+    });
+    if (!variant) throw new NotFoundError('ProductVariant');
+    return variant;
+}
+
+export async function getLowStock(threshold: number = 10) {
+    return listStockLevels({ status: 'low', lowStockThreshold: threshold, limit: 100 });
+}
+
+export async function getOutOfStock() {
+    return listStockLevels({ status: 'out', limit: 100 });
+}
+
+export async function exportStock(query: any) {
+    const result = await listStockLevels({ ...query, limit: 1000, page: 1 });
+    return result.data;
+}

@@ -1,28 +1,24 @@
 import { AppError } from '@repo/shared/errors';
 
 export class OdooClient {
-    private baseUrl: string;
-    private db: string;
-    private username: string;
-    private password: string;
+    private baseUrl!: string;
+    private db!: string;
+    private username!: string;
+    private password!: string;
     private uid: number | null = null;
     private sessionId: string | null = null;
-    private useMock: boolean;
+    private useMock!: boolean;
 
     constructor() {
+        this.reloadConfig();
+    }
+
+    reloadConfig() {
         this.baseUrl = process.env.ODOO_URL || '';
         this.db = process.env.ODOO_DATABASE || '';
         this.username = process.env.ODOO_USERNAME || '';
         this.password = process.env.ODOO_PASSWORD || '';
 
-        // Debug logging
-        // console.log('[ODOO] Configuration check:');
-        // console.log(`  - ODOO_URL: ${this.baseUrl ? '✅ SET' : '❌ MISSING'}`);
-        // console.log(`  - ODOO_DATABASE: ${this.db ? '✅ SET' : '❌ MISSING'}`);
-        // console.log(`  - ODOO_USERNAME: ${this.username ? '✅ SET' : '❌ MISSING'}`);
-        // console.log(`  - ODOO_PASSWORD: ${this.password ? '✅ SET' : '❌ MISSING'}`);
-
-        // Use mock if credentials not configured
         this.useMock = !this.baseUrl || !this.db || !this.username || !this.password;
 
         if (this.useMock) {
@@ -30,6 +26,27 @@ export class OdooClient {
         } else {
             console.log('[ODOO] ✅ Production mode - All credentials configured');
         }
+    }
+
+    /**
+     * Refresh configuration from database settings
+     */
+    async refreshFromSettings(settings: any[]) {
+        const urlSetting = settings.find(s => s.setting_key === 'odoo_url');
+        const dbSetting = settings.find(s => s.setting_key === 'odoo_db');
+        const userSetting = settings.find(s => s.setting_key === 'odoo_username');
+        const passSetting = settings.find(s => s.setting_key === 'odoo_password');
+
+        if (urlSetting) this.baseUrl = urlSetting.setting_value;
+        if (dbSetting) this.db = dbSetting.setting_value;
+        if (userSetting) this.username = userSetting.setting_value;
+        if (passSetting) this.password = passSetting.setting_value;
+
+        this.useMock = !this.baseUrl || !this.db || !this.username || !this.password;
+
+        // Clear authentication if config changed
+        this.uid = null;
+        this.sessionId = null;
     }
 
     async authenticate(): Promise<number> {

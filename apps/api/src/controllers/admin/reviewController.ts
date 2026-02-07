@@ -64,3 +64,32 @@ export async function bulkReject(req: Request, res: Response, next: NextFunction
         next(error);
     }
 }
+
+export async function approveReview(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const review = await adminReviewService.moderateReview(Number(id), true);
+        res.json({ success: true, data: review });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function rejectReview(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const review = await adminReviewService.moderateReview(Number(id), false);
+        res.json({ success: true, data: review });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getPending(req: Request, res: Response, next: NextFunction) {
+    try {
+        const result = await adminReviewService.getPendingReviews(req.query);
+        res.json({ success: true, ...result });
+    } catch (error) {
+        next(error);
+    }
+}

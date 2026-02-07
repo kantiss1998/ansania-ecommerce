@@ -127,3 +127,23 @@ export async function getCustomerStats(id: number) {
         totalReviews
     };
 }
+
+export async function getCustomerActivity(id: number, query: any) {
+    const { ActivityLog } = require('@repo/database');
+    const { page = 1, limit = 20 } = query;
+    const offset = (Number(page) - 1) * Number(limit);
+
+    const { count, rows } = await ActivityLog.findAndCountAll({
+        where: { user_id: id },
+        limit: Number(limit),
+        offset,
+        order: [['created_at', 'DESC']]
+    });
+
+    return { data: rows, meta: { total: count, page, limit } };
+}
+
+export async function exportCustomers(query: any) {
+    const customers = await listCustomers({ ...query, limit: 1000, page: 1 });
+    return customers.data;
+}

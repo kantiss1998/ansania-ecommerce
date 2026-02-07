@@ -1,5 +1,6 @@
 
-import { EmailQueue, ActivityLog, SyncLog, Notification, User } from '@repo/database';
+import { EmailQueue, ActivityLog, SyncLog, Notification, User, CmsSetting } from '@repo/database';
+import { NotFoundError } from '@repo/shared/errors';
 
 // Email Queue
 export async function listEmailQueue(query: any) {
@@ -26,6 +27,12 @@ export async function retryEmail(id: number) {
     return email;
 }
 
+export async function getEmailDetail(id: number) {
+    const email = await EmailQueue.findByPk(id);
+    if (!email) throw new NotFoundError('Email not found');
+    return email;
+}
+
 // Activity Logs
 export async function listActivityLogs(query: any) {
     const { page = 1, limit = 50, user_id, action } = query;
@@ -45,6 +52,14 @@ export async function listActivityLogs(query: any) {
     return { data: rows, meta: { total: count, page, limit } };
 }
 
+export async function getActivityLogDetail(id: number) {
+    const log = await ActivityLog.findByPk(id, {
+        include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    });
+    if (!log) throw new NotFoundError('Activity Log not found');
+    return log;
+}
+
 // Sync Logs
 export async function listSyncLogs(query: any) {
     const { page = 1, limit = 50, entity_type } = query;
@@ -60,6 +75,12 @@ export async function listSyncLogs(query: any) {
     });
 
     return { data: rows, meta: { total: count, page, limit } };
+}
+
+export async function getSyncLogDetail(id: number) {
+    const log = await SyncLog.findByPk(id);
+    if (!log) throw new NotFoundError('SyncLog not found');
+    return log;
 }
 
 // System Notifications
@@ -79,4 +100,26 @@ export async function listSystemNotifications(query: any) {
 
 export async function createSystemNotification(data: any) {
     return Notification.create(data);
+}
+
+// Sync Settings
+export async function getSyncSettings() {
+    return CmsSetting.findAll({ where: { setting_group: 'sync' } });
+}
+
+export async function updateSyncSettings(settings: Record<string, any>) {
+    const { odooClient } = require('../../services/odoo/odoo.client');
+
+    for (const [key, value] of Object.entries(settings)) {
+        await CmsSetting.update(
+            { setting_value: typeof value === 'string' ? value : JSON.stringify(value) },
+            { where: { setting_key: key, setting_group: 'sync' } }
+        );
+    }
+
+    // Refresh Odoo configuration
+    const updatedSettings = await getSyncSettings();
+    await odooClient.refreshFromSettings(updatedSettings);
+
+    return { success: true };
 }

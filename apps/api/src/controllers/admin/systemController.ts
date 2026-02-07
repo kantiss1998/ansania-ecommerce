@@ -22,6 +22,16 @@ export async function retryEmail(req: Request, res: Response, next: NextFunction
     }
 }
 
+export async function getEmailDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const result = await adminSystemService.getEmailDetail(Number(id));
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+}
+
 // Activity Logs
 export async function getActivityLogs(req: Request, res: Response, next: NextFunction) {
     try {
@@ -32,11 +42,50 @@ export async function getActivityLogs(req: Request, res: Response, next: NextFun
     }
 }
 
+export async function getActivityLogDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const result = await adminSystemService.getActivityLogDetail(Number(id));
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+}
+
 // Sync Logs
 export async function getSyncLogs(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminSystemService.listSyncLogs(req.query);
         res.json({ success: true, ...result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getSyncLogDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const result = await adminSystemService.getSyncLogDetail(Number(id));
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Sync Settings
+export async function getSyncSettings(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const data = await adminSystemService.getSyncSettings();
+        res.json({ success: true, data });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateSyncSettings(req: Request, res: Response, next: NextFunction) {
+    try {
+        const result = await adminSystemService.updateSyncSettings(req.body);
+        res.json({ ...result }); // result already has success: true
     } catch (error) {
         next(error);
     }

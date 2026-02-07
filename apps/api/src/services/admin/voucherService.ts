@@ -62,3 +62,40 @@ export async function getVoucherDetail(id: number) {
     if (!voucher) throw new NotFoundError('Voucher');
     return voucher;
 }
+
+export async function toggleVoucherActive(id: number) {
+    const voucher = await Voucher.findByPk(id);
+    if (!voucher) throw new NotFoundError('Voucher');
+    await voucher.update({ is_active: !voucher.is_active });
+    return voucher;
+}
+
+export async function getVoucherStats(id: number) {
+    const { VoucherUsage } = require('@repo/database');
+    const usageCount = await VoucherUsage.count({ where: { voucher_id: id } });
+    return { usageCount };
+}
+
+export async function getVoucherUsageHistory(id: number, query: any) {
+    const { VoucherUsage, Order, User } = require('@repo/database');
+    const { page = 1, limit = 20 } = query;
+    const offset = (Number(page) - 1) * Number(limit);
+
+    const { count, rows } = await VoucherUsage.findAndCountAll({
+        where: { voucher_id: id },
+        limit: Number(limit),
+        offset,
+        order: [['created_at', 'DESC']],
+        include: [
+            { model: Order, as: 'order', attributes: ['order_number', 'total_amount', 'status'] },
+            { model: User, as: 'user', attributes: ['id', 'first_name', 'last_name', 'email'] }
+        ]
+    });
+
+    return { data: rows, meta: { total: count, page, limit } };
+}
+
+export async function bulkDeleteVouchers(ids: number[]) {
+    await Voucher.destroy({ where: { id: { [Op.in]: ids } } });
+    return { success: true };
+}

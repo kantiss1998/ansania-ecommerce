@@ -158,3 +158,22 @@ export async function setPrimaryImage(productId: number, imageId: number) {
 
     return image;
 }
+
+/**
+ * Get variants for a product
+ */
+export async function getProductVariants(productId: number) {
+    return ProductVariant.findAll({ where: { product_id: productId } });
+}
+
+/**
+ * Get detailed variant info
+ */
+export async function getVariantDetail(variantId: number) {
+    const variant = await ProductVariant.findByPk(variantId, {
+        include: [{ model: Product, as: 'product', attributes: ['name', 'slug'] }]
+    });
+
+    if (!variant) throw new NotFoundError('ProductVariant');
+    return variant;
+}

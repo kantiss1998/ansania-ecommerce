@@ -44,6 +44,22 @@ export const syncStock = async (_req: Request, res: Response, next: NextFunction
 };
 
 /**
+ * Sync categories from Odoo
+ */
+export const syncCategories = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await productService.syncCategories();
+        res.json({
+            success: true,
+            message: 'Category sync completed successfully',
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * Sync customer to Odoo
  */
 export const syncCustomer = async (req: Request, res: Response, next: NextFunction) => {

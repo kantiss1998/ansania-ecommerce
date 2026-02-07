@@ -8,6 +8,7 @@ const router = Router();
 router.use(authenticate, authorizeAdmin);
 
 router.get('/', adminReviewController.getAllReviews);
+router.get('/pending', adminReviewController.getPending);
 router.patch('/:id/moderate', adminReviewController.moderateReview);
 router.patch('/:id/approve', adminReviewController.moderateReview); // Alias
 router.patch('/:id/reject', adminReviewController.moderateReview);  // Alias

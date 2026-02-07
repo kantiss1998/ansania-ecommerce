@@ -149,3 +149,27 @@ export function removeEmptyValues<T extends Record<string, any>>(obj: T): Partia
         return acc;
     }, {} as Partial<T>);
 }
+/**
+ * Convert array of objects to CSV string
+ */
+export function toCSV(data: any[]): string {
+    if (data.length === 0) return '';
+
+    const headers = Object.keys(data[0]);
+    const csvRows = [];
+
+    // Add header row
+    csvRows.push(headers.join(','));
+
+    // Add data rows
+    for (const row of data) {
+        const values = headers.map((header) => {
+            const val = row[header];
+            const escaped = ('' + val).replace(/"/g, '""'); // Escape double quotes
+            return `"${escaped}"`; // Wrap in double quotes
+        });
+        csvRows.push(values.join(','));
+    }
+
+    return csvRows.join('\n');
+}

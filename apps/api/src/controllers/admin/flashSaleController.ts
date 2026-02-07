@@ -65,6 +65,36 @@ export async function deleteFlashSale(req: Request, res: Response, next: NextFun
     }
 }
 
+export async function toggleFlashSaleActive(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const flashSale = await adminFlashSaleService.toggleFlashSaleActive(Number(id));
+        res.json({ success: true, data: flashSale });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getFlashSaleProducts(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const products = await adminFlashSaleService.getFlashSaleProducts(Number(id));
+        res.json({ success: true, data: products });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateFlashSaleProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const product = await adminFlashSaleService.updateFlashSaleProduct(Number(id), req.body);
+        res.json({ success: true, data: product });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export async function addProducts(req: Request, res: Response, next: NextFunction) {
     try {
         const { id } = req.params;
@@ -81,7 +111,7 @@ export async function addProducts(req: Request, res: Response, next: NextFunctio
 
 export async function removeProduct(req: Request, res: Response, next: NextFunction) {
     try {
-        const { id } = req.params; // FlashSaleProduct ID
+        const { id } = req.params;
         await adminFlashSaleService.removeProductFromFlashSale(Number(id));
         res.json({
             success: true,

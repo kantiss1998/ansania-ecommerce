@@ -42,11 +42,41 @@ export async function deleteBanner(req: Request, res: Response, next: NextFuncti
     }
 }
 
+export async function toggleBannerActive(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const banner = await adminCmsService.toggleBannerActive(Number(id));
+        res.json({ success: true, data: banner });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function reorderBanners(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { orders } = req.body;
+        const result = await adminCmsService.reorderBanners(orders);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+}
+
 // Pages
 export async function getAllPages(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminCmsService.listPages(req.query);
         res.json({ success: true, ...result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getPageDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const page = await adminCmsService.getPageDetail(Number(id));
+        res.json({ success: true, data: page });
     } catch (error) {
         next(error);
     }
@@ -81,12 +111,33 @@ export async function deletePage(req: Request, res: Response, next: NextFunction
     }
 }
 
+export async function togglePagePublish(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const { publish } = req.body;
+        const page = await adminCmsService.togglePagePublish(Number(id), publish);
+        res.json({ success: true, data: page });
+    } catch (error) {
+        next(error);
+    }
+}
+
 // Settings
 export async function getAllSettings(req: Request, res: Response, next: NextFunction) {
     try {
         const { group } = req.query;
         const settings = await adminCmsService.listSettings(group as string);
         res.json({ success: true, data: settings });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getSettingByKey(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { key } = req.params;
+        const setting = await adminCmsService.getSettingByKey(key);
+        res.json({ success: true, data: setting });
     } catch (error) {
         next(error);
     }

@@ -60,3 +60,76 @@ export async function getConversionStats(startDate: Date, endDate: Date) {
         overallConversionRate: totalViews > 0 ? (totalOrders / totalViews) * 100 : 0
     };
 }
+
+export async function getAbandonedCartStats(startDate: Date, endDate: Date) {
+    // We count carts that were created in range.
+    const abandonedCarts = await Cart.findAll({
+        attributes: [
+            [fn('COUNT', col('id')), 'count'],
+            [fn('SUM', col('total')), 'potential_revenue']
+        ],
+        where: {
+            created_at: { [Op.between]: [startDate, endDate] }
+        },
+        raw: true
+    });
+
+    return abandonedCarts[0];
+}
+
+export async function getRevenueByCategory(startDate: Date, endDate: Date) {
+    const { OrderItem, ProductVariant, Product, Category } = require('@repo/database');
+
+    return OrderItem.findAll({
+        attributes: [
+            [fn('SUM', col('OrderItem.price')), 'revenue'],
+            [fn('SUM', col('OrderItem.quantity')), 'units_sold']
+        ],
+        include: [{
+            model: ProductVariant,
+            as: 'variant',
+            include: [{
+                model: Product,
+                as: 'product',
+                include: [{ model: Category, as: 'category', attributes: ['name'] }]
+            }]
+        }, {
+            model: Order,
+            as: 'order',
+            attributes: [],
+            where: {
+                payment_status: 'paid',
+                created_at: { [Op.between]: [startDate, endDate] }
+            }
+        }],
+        group: ['$variant.product.category.name$'],
+        order: [[literal('revenue'), 'DESC']]
+    });
+}
+
+export async function getRevenueByProduct(startDate: Date, endDate: Date, limit: number = 10) {
+    const { OrderItem, ProductVariant, Product } = require('@repo/database');
+
+    return OrderItem.findAll({
+        attributes: [
+            [fn('SUM', col('OrderItem.price')), 'revenue'],
+            [fn('SUM', col('OrderItem.quantity')), 'units_sold']
+        ],
+        include: [{
+            model: ProductVariant,
+            as: 'variant',
+            include: [{ model: Product, as: 'product', attributes: ['name'] }]
+        }, {
+            model: Order,
+            as: 'order',
+            attributes: [],
+            where: {
+                payment_status: 'paid',
+                created_at: { [Op.between]: [startDate, endDate] }
+            }
+        }],
+        group: ['$variant.product.name$'],
+        order: [[literal('revenue'), 'DESC']],
+        limit
+    });
+}

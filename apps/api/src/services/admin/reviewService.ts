@@ -79,3 +79,7 @@ export async function bulkReject(ids: number[]) {
     });
     return { success: true, count: ids.length };
 }
+
+export async function getPendingReviews(query: any) {
+    return listAllReviews({ ...query, status: 'pending' });
+}

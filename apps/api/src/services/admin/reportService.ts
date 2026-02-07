@@ -2,8 +2,8 @@
 import { Order, OrderItem, User, Product, ProductVariant, Category, VoucherUsage } from '@repo/database';
 import { Op, fn, col, literal } from 'sequelize';
 
-export async function getSalesReport(startDate: Date, endDate: Date, period: 'daily' | 'weekly' | 'monthly' = 'daily') {
-    const dateFormat = period === 'daily' ? '%Y-%m-%d' : period === 'weekly' ? '%Y-%u' : '%Y-%m';
+export async function getSalesReport(startDate: Date, endDate: Date, period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'daily') {
+    const dateFormat = period === 'daily' ? '%Y-%m-%d' : period === 'weekly' ? '%Y-%u' : period === 'monthly' ? '%Y-%m' : '%Y';
 
     const sales = await Order.findAll({
         attributes: [
@@ -116,4 +116,83 @@ export async function getVoucherUsageReport(startDate: Date, endDate: Date) {
         group: ['voucher_id'],
         include: ['voucher']
     });
+}
+
+export async function getNewCustomersGrowth(startDate: Date, endDate: Date, period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'daily') {
+    const dateFormat = period === 'daily' ? '%Y-%m-%d' : period === 'weekly' ? '%Y-%u' : period === 'monthly' ? '%Y-%m' : '%Y';
+
+    return User.findAll({
+        attributes: [
+            [fn('DATE_FORMAT', col('created_at'), dateFormat), 'period'],
+            [fn('COUNT', col('id')), 'count']
+        ],
+        where: {
+            created_at: { [Op.between]: [startDate, endDate] },
+            role: 'user'
+        },
+        group: ['period'],
+        order: [[literal('period'), 'ASC']],
+        raw: true
+    });
+}
+
+export async function getCustomerLTV(limit: number = 10) {
+    return Order.findAll({
+        attributes: [
+            'user_id',
+            [fn('SUM', col('total_amount')), 'lifetime_value'],
+            [fn('COUNT', col('id')), 'total_orders'],
+            [fn('MIN', col('created_at')), 'first_order'],
+            [fn('MAX', col('created_at')), 'last_order']
+        ],
+        include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }],
+        where: { payment_status: 'paid' },
+        group: ['user_id', 'user.id'],
+        order: [[literal('lifetime_value'), 'DESC']],
+        limit
+    });
+}
+
+export async function getInventoryValuation() {
+    const { ProductStock } = require('@repo/database');
+    return ProductVariant.findAll({
+        attributes: [
+            'sku',
+            'price',
+            [literal('price * inventory.available_quantity'), 'total_value']
+        ],
+        include: [
+            { model: Product, as: 'product', attributes: ['name'] },
+            { model: ProductStock, as: 'inventory', attributes: ['available_quantity'] }
+        ],
+        order: [[literal('total_value'), 'DESC']]
+    });
+}
+
+export async function getWorstSellers(startDate: Date, endDate: Date, limit: number = 10) {
+    // This is inverse of getProductPerformance
+    const performance = await OrderItem.findAll({
+        attributes: [
+            'product_variant_id',
+            [fn('SUM', col('OrderItem.quantity')), 'total_sold']
+        ],
+        include: [{
+            model: ProductVariant,
+            as: 'variant',
+            include: [{ model: Product, as: 'product', attributes: ['name'] }]
+        }, {
+            model: Order,
+            as: 'order',
+            attributes: [],
+            where: {
+                payment_status: 'paid',
+                created_at: { [Op.between]: [startDate, endDate] }
+            }
+        }],
+        group: ['product_variant_id', 'variant.id', 'variant.product.id'],
+        order: [[literal('total_sold'), 'ASC']],
+        limit
+    });
+
+    return performance;
 }

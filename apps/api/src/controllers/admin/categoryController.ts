@@ -40,6 +40,16 @@ export async function updateCategory(req: Request, res: Response, next: NextFunc
     }
 }
 
+export async function toggleActive(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const category = await adminCategoryService.toggleCategoryActive(Number(id));
+        res.json({ success: true, data: category });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export async function getCategoryStats(req: Request, res: Response, next: NextFunction) {
     try {
         const { id } = req.params;
@@ -48,6 +58,16 @@ export async function getCategoryStats(req: Request, res: Response, next: NextFu
             success: true,
             data: stats
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function reorderCategories(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { orders } = req.body;
+        const result = await adminCategoryService.reorderCategories(orders);
+        res.json(result);
     } catch (error) {
         next(error);
     }

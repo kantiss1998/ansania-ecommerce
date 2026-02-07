@@ -23,4 +23,8 @@ router.post('/:id/images', adminProductController.uploadImage);
 router.delete('/:id/images/:imageId', adminProductController.deleteImage);
 router.patch('/:id/images/:imageId/set-primary', adminProductController.setPrimaryImage);
 
+// Variants
+router.get('/:id/variants', adminProductController.getVariants);
+router.get('/:id/variants/:variantId', adminProductController.getVariantDetail);
+
 export default router;

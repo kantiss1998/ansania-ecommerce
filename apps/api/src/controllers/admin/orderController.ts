@@ -1,10 +1,26 @@
 
 import { Request, Response, NextFunction } from 'express';
 import * as adminOrderService from '../../services/admin/orderService';
+import { toCSV } from '@repo/shared/utils';
 
 export async function getAllOrders(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminOrderService.listAllOrders(req.query);
+
+        if (req.query.export === 'csv') {
+            const csv = toCSV(result.data.map((o: any) => ({
+                order_number: o.order_number,
+                customer: o.user?.full_name,
+                total: o.total_amount,
+                status: o.status,
+                payment: o.payment_status,
+                date: o.created_at
+            })));
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename=orders.csv');
+            return res.send(csv);
+        }
+
         res.json({
             success: true,
             ...result
@@ -90,6 +106,26 @@ export async function deleteOrder(req: Request, res: Response, next: NextFunctio
             success: true,
             message: 'Order deleted successfully'
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateNotes(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { orderNumber } = req.params;
+        const { notes } = req.body;
+        const order = await adminOrderService.updateOrderNotes(orderNumber, notes);
+        res.json({ success: true, data: order });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function exportOrders(req: Request, res: Response, next: NextFunction) {
+    try {
+        const orders = await adminOrderService.exportOrders(req.query);
+        res.json({ success: true, data: orders });
     } catch (error) {
         next(error);
     }

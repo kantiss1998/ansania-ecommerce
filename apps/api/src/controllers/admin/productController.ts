@@ -133,3 +133,29 @@ export async function setPrimaryImage(req: Request, res: Response, next: NextFun
         next(error);
     }
 }
+
+export async function getVariants(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const variants = await adminProductService.getProductVariants(Number(id));
+        res.json({
+            success: true,
+            data: variants
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getVariantDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { variantId } = req.params;
+        const variant = await adminProductService.getVariantDetail(Number(variantId));
+        res.json({
+            success: true,
+            data: variant
+        });
+    } catch (error) {
+        next(error);
+    }
+}

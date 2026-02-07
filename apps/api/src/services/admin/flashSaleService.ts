@@ -73,6 +73,30 @@ export async function deleteFlashSale(id: number) {
     return { success: true };
 }
 
+export async function toggleFlashSaleActive(id: number) {
+    const flashSale = await FlashSale.findByPk(id);
+    if (!flashSale) throw new NotFoundError('FlashSale');
+    await flashSale.update({ is_active: !flashSale.is_active });
+    return flashSale;
+}
+
+export async function getFlashSaleProducts(id: number) {
+    return FlashSaleProduct.findAll({
+        where: { flash_sale_id: id },
+        include: [
+            { model: Product, as: 'product' as any, attributes: ['name', 'slug'] },
+            { model: ProductVariant, as: 'variant' as any }
+        ]
+    });
+}
+
+export async function updateFlashSaleProduct(id: number, data: any) {
+    const flashSaleProduct = await FlashSaleProduct.findByPk(id);
+    if (!flashSaleProduct) throw new NotFoundError('FlashSaleProduct');
+    await flashSaleProduct.update(data);
+    return flashSaleProduct;
+}
+
 export async function addProductsToFlashSale(flashSaleId: number, products: any[]) {
     const flashSale = await FlashSale.findByPk(flashSaleId);
     if (!flashSale) throw new NotFoundError('FlashSale');

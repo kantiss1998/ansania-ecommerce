@@ -8,8 +8,10 @@ const router = Router();
 router.use(authenticate, authorizeAdmin);
 
 router.get('/', adminCategoryController.getAllCategories);
+router.post('/reorder', adminCategoryController.reorderCategories);
 router.get('/:id', adminCategoryController.getCategoryDetail);
 router.get('/:id/stats', adminCategoryController.getCategoryStats);
 router.put('/:id', adminCategoryController.updateCategory);
+router.patch('/:id/toggle-active', adminCategoryController.toggleActive);
 
 export default router;

@@ -135,6 +135,19 @@ export async function processRefund(orderNumber: string, refundReason: string) {
     return order;
 }
 
+export async function updateOrderNotes(orderNumber: string, adminNote: string) {
+    const order = await Order.findOne({ where: { order_number: orderNumber } });
+    if (!order) throw new NotFoundError('Order');
+
+    await order.update({ admin_note: adminNote });
+    return order;
+}
+
+export async function exportOrders(query: any) {
+    const orders = await listAllOrders({ ...query, limit: 1000, page: 1 });
+    return orders.data;
+}
+
 export async function deleteOrder(orderNumber: string) {
     const order = await Order.findOne({ where: { order_number: orderNumber } });
     if (!order) throw new NotFoundError('Order');

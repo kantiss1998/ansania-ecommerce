@@ -61,6 +61,68 @@ export class OdooProductService {
         }
     }
 
+    async syncCategories() {
+        try {
+            console.log("📂 Starting category sync from Odoo...");
+            const categories = await this.safeSearchRead(
+                "product.category",
+                [],
+                ["id", "name", "parent_id"]
+            );
+
+            let createdCount = 0;
+            let updatedCount = 0;
+
+            // First pass: upsert names and basic data
+            for (const cat of categories) {
+                let category = await Category.findOne({ where: { odoo_id: cat.id } });
+
+                if (category) {
+                    await category.update({
+                        name: cat.name,
+                        slug: slugify(cat.name),
+                        synced_at: new Date()
+                    });
+                    updatedCount++;
+                } else {
+                    category = await Category.create({
+                        odoo_id: cat.id,
+                        name: cat.name,
+                        slug: slugify(cat.name),
+                        is_active: true,
+                        synced_at: new Date()
+                    });
+                    createdCount++;
+                }
+            }
+
+            // Second pass: update parent_id
+            for (const cat of categories) {
+                if (Array.isArray(cat.parent_id)) {
+                    const odooParentId = cat.parent_id[0];
+                    const parent = await Category.findOne({ where: { odoo_id: odooParentId } });
+
+                    if (parent) {
+                        await Category.update(
+                            { parent_id: parent.id },
+                            { where: { odoo_id: cat.id } }
+                        );
+                    }
+                }
+            }
+
+            return {
+                success: true,
+                created: createdCount,
+                updated: updatedCount,
+                total: categories.length
+            };
+        } catch (error) {
+            console.error("❌ Category sync failed:", error);
+            throw error;
+        }
+    }
+
     // Get products filtered by "internal" category
     async getFilteredProducts() {
         try {

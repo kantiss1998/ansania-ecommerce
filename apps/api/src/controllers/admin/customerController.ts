@@ -1,10 +1,26 @@
 
 import { Request, Response, NextFunction } from 'express';
 import * as adminCustomerService from '../../services/admin/customerService';
+import { toCSV } from '@repo/shared/utils';
 
 export async function getAllCustomers(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminCustomerService.listCustomers(req.query);
+
+        if (req.query.export === 'csv') {
+            const csv = toCSV(result.data.map((c: any) => ({
+                name: c.full_name,
+                email: c.email,
+                phone: c.phone,
+                orders: c.orders_count,
+                spent: c.total_spent,
+                date: c.created_at
+            })));
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename=customers.csv');
+            return res.send(csv);
+        }
+
         res.json({
             success: true,
             ...result
@@ -100,6 +116,25 @@ export async function getStats(req: Request, res: Response, next: NextFunction) 
             success: true,
             data: stats
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getActivity(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const result = await adminCustomerService.getCustomerActivity(Number(id), req.query);
+        res.json({ success: true, ...result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function exportCustomers(req: Request, res: Response, next: NextFunction) {
+    try {
+        const result = await adminCustomerService.exportCustomers(req.query);
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }

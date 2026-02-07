@@ -40,6 +40,20 @@ export async function deleteBanner(id: number) {
     return { success: true };
 }
 
+export async function toggleBannerActive(id: number) {
+    const banner = await CmsBanner.findByPk(id);
+    if (!banner) throw new NotFoundError('Banner');
+    await banner.update({ is_active: !banner.is_active });
+    return banner;
+}
+
+export async function reorderBanners(orders: { id: number, order: number }[]) {
+    for (const item of orders) {
+        await CmsBanner.update({ display_order: item.order }, { where: { id: item.id } });
+    }
+    return { success: true };
+}
+
 // Pages
 export async function listPages(query: any) {
     const { page = 1, limit = 10, search, published } = query;
@@ -75,11 +89,24 @@ export async function updatePage(id: number, data: any) {
     return page;
 }
 
+export async function getPageDetail(id: number) {
+    const page = await CmsPage.findByPk(id);
+    if (!page) throw new NotFoundError('Page');
+    return page;
+}
+
 export async function deletePage(id: number) {
     const page = await CmsPage.findByPk(id);
     if (!page) throw new NotFoundError('Page');
     await page.destroy();
     return { success: true };
+}
+
+export async function togglePagePublish(id: number, publish: boolean) {
+    const page = await CmsPage.findByPk(id);
+    if (!page) throw new NotFoundError('Page');
+    await page.update({ is_published: publish });
+    return page;
 }
 
 // Settings
@@ -105,4 +132,10 @@ export async function bulkUpdateSettings(settings: Record<string, any>, adminId?
         await updateSetting(key, value, adminId);
     }
     return { success: true };
+}
+
+export async function getSettingByKey(key: string) {
+    const setting = await CmsSetting.findOne({ where: { setting_key: key } });
+    if (!setting) throw new NotFoundError('Setting');
+    return setting;
 }

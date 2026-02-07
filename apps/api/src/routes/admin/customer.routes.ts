@@ -8,11 +8,13 @@ const router = Router();
 router.use(authenticate, authorizeAdmin);
 
 router.get('/', adminCustomerController.getAllCustomers);
+router.post('/export', adminCustomerController.exportCustomers);
 router.get('/:id', adminCustomerController.getCustomerDetail);
 router.get('/:id/orders', adminCustomerController.getOrders);
 router.get('/:id/addresses', adminCustomerController.getAddresses);
 router.get('/:id/reviews', adminCustomerController.getReviews);
 router.get('/:id/stats', adminCustomerController.getStats);
+router.get('/:id/activity', adminCustomerController.getActivity);
 router.put('/:id', adminCustomerController.updateCustomer);
 router.patch('/:id/toggle-status', adminCustomerController.toggleStatus);
 
