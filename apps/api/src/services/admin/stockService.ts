@@ -1,8 +1,10 @@
 
 import { ProductVariant, Product, ProductStock } from '@repo/database';
 import { Op } from 'sequelize';
-import { NotFoundError } from '@repo/shared/errors';
 
+/**
+ * List stock levels with filtering for low/out of stock
+ */
 export async function listStockLevels(query: any) {
     const {
         page = 1,
@@ -22,20 +24,22 @@ export async function listStockLevels(query: any) {
         ];
     }
 
+    const includeStock: any = { model: ProductStock, as: 'inventory' };
+
     if (status === 'low') {
-        where['$stock.available_quantity$'] = { [Op.lte]: lowStockThreshold };
+        includeStock.where = { available_quantity: { [Op.lte]: lowStockThreshold, [Op.gt]: 0 } };
     } else if (status === 'out') {
-        where['$stock.available_quantity$'] = { [Op.lte]: 0 };
+        includeStock.where = { available_quantity: { [Op.lte]: 0 } };
     }
 
     const { count, rows } = await ProductVariant.findAndCountAll({
         where,
         limit: Number(limit),
         offset,
-        order: [['$stock.available_quantity$', 'ASC']],
+        order: [['sku', 'ASC']],
         include: [
             { model: Product, as: 'product', attributes: ['name'] },
-            { model: ProductStock, as: 'stock' }
+            includeStock
         ],
         distinct: true
     });
@@ -51,24 +55,6 @@ export async function listStockLevels(query: any) {
     };
 }
 
-export async function updateStock(variantId: number, quantity: number) {
-    const variant = await ProductVariant.findByPk(variantId);
-    if (!variant) throw new NotFoundError('Variant');
-
-    const [stock] = await ProductStock.findOrCreate({
-        where: { product_variant_id: variantId },
-        defaults: {
-            product_variant_id: variantId,
-            quantity: 0,
-            reserved_quantity: 0,
-            available_quantity: 0
-        } as any
-    });
-
-    await stock.update({ quantity });
-
-    // Also update variant cache for searchability
-    await variant.update({ stock: stock.available_quantity });
-
-    return stock;
-}
+/**
+ * Note: Manual update is removed. All stock must be synced from Odoo.
+ */

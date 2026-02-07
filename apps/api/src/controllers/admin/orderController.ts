@@ -41,6 +41,47 @@ export async function updateOrder(req: Request, res: Response, next: NextFunctio
     }
 }
 
+export async function updatePaymentStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { orderNumber } = req.params;
+        const { payment_status } = req.body;
+        const order = await adminOrderService.updatePaymentStatus(orderNumber, payment_status);
+        res.json({
+            success: true,
+            data: order
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateShippingStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { orderNumber } = req.params;
+        const order = await adminOrderService.updateShippingInfo(orderNumber, req.body);
+        res.json({
+            success: true,
+            data: order
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function processRefund(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { orderNumber } = req.params;
+        const { reason } = req.body;
+        const order = await adminOrderService.processRefund(orderNumber, reason);
+        res.json({
+            success: true,
+            data: order
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export async function deleteOrder(req: Request, res: Response, next: NextFunction) {
     try {
         const { orderNumber } = req.params;

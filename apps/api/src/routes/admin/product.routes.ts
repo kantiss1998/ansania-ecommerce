@@ -7,11 +7,20 @@ const router = Router();
 
 router.use(authenticate, authorizeAdmin);
 
+// Product Browsing
 router.get('/', adminProductController.getAllProducts);
-router.post('/', adminProductController.createProduct);
-router.put('/:id', adminProductController.updateProduct);
-router.delete('/:id', adminProductController.deleteProduct);
+router.get('/:id', adminProductController.getProductDetail);
 
-router.post('/:id/variants', adminProductController.addVariant);
+// Limited Local Updates
+router.patch('/:id/toggle-active', adminProductController.toggleActive);
+router.patch('/:id/toggle-featured', adminProductController.toggleFeatured);
+router.put('/:id/seo', adminProductController.updateSEO);
+router.put('/:id/description', adminProductController.updateDescription);
+
+// Image Management
+router.get('/:id/images', adminProductController.getImages);
+router.post('/:id/images', adminProductController.uploadImage);
+router.delete('/:id/images/:imageId', adminProductController.deleteImage);
+router.patch('/:id/images/:imageId/set-primary', adminProductController.setPrimaryImage);
 
 export default router;

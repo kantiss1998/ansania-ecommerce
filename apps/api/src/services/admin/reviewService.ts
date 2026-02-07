@@ -65,3 +65,17 @@ export async function deleteReview(id: number) {
     await review.destroy();
     return { success: true };
 }
+
+export async function bulkApprove(ids: number[]) {
+    await Review.update({ is_approved: true }, {
+        where: { id: { [Op.in]: ids } }
+    });
+    return { success: true, count: ids.length };
+}
+
+export async function bulkReject(ids: number[]) {
+    await Review.update({ is_approved: false }, {
+        where: { id: { [Op.in]: ids } }
+    });
+    return { success: true, count: ids.length };
+}

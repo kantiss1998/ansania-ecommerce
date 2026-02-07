@@ -33,6 +33,13 @@ import adminProductRoutes from './routes/admin/product.routes';
 import adminReviewRoutes from './routes/admin/review.routes';
 import adminStockRoutes from './routes/admin/stock.routes';
 import adminMarketingRoutes from './routes/admin/marketing.routes';
+import adminCategoryRoutes from './routes/admin/category.routes';
+import adminVoucherRoutes from './routes/admin/voucher.routes';
+import adminFlashSaleRoutes from './routes/admin/flashSale.routes';
+import adminCmsRoutes from './routes/admin/cms.routes';
+import adminReportRoutes from './routes/admin/report.routes';
+import adminAnalyticsRoutes from './routes/admin/analytics.routes';
+import adminSystemRoutes from './routes/admin/system.routes';
 
 // Note: Environment variables are loaded in server.ts before this module is imported
 
@@ -93,6 +100,13 @@ app.use('/admin/products', adminProductRoutes);
 app.use('/admin/reviews', adminReviewRoutes);
 app.use('/admin/stock', adminStockRoutes);
 app.use('/admin/marketing', adminMarketingRoutes);
+app.use('/admin/categories', adminCategoryRoutes);
+app.use('/admin/vouchers', adminVoucherRoutes);
+app.use('/admin/flash-sales', adminFlashSaleRoutes);
+app.use('/admin/cms', adminCmsRoutes);
+app.use('/admin/reports', adminReportRoutes);
+app.use('/admin/analytics', adminAnalyticsRoutes);
+app.use('/admin/system', adminSystemRoutes);
 
 // 404 handler
 app.use((_req, res) => {

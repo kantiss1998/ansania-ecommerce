@@ -96,6 +96,22 @@ export const syncOrder = async (req: Request, res: Response, next: NextFunction)
 };
 
 /**
+ * Poll Odoo for order status updates
+ */
+export const syncOrderStatus = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await orderService.syncOrderStatusFromOdoo();
+        res.json({
+            success: true,
+            message: 'Order status sync completed',
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * Get sync status
  */
 export const getSyncStatus = async (_req: Request, res: Response, next: NextFunction) => {

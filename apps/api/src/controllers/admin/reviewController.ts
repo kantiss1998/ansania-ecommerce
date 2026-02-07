@@ -40,3 +40,27 @@ export async function deleteReview(req: Request, res: Response, next: NextFuncti
         next(error);
     }
 }
+
+export async function bulkApprove(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { ids } = req.body;
+        const result = await adminReviewService.bulkApprove(ids);
+        res.json({
+            ...result
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function bulkReject(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { ids } = req.body;
+        const result = await adminReviewService.bulkReject(ids);
+        res.json({
+            ...result
+        });
+    } catch (error) {
+        next(error);
+    }
+}

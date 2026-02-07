@@ -89,6 +89,52 @@ export async function updateOrderStatus(orderNumber: string, status: string, adm
     return order;
 }
 
+export async function updatePaymentStatus(orderNumber: string, payment_status: string) {
+    const order = await Order.findOne({ where: { order_number: orderNumber } });
+    if (!order) throw new NotFoundError('Order');
+
+    await order.update({ payment_status: payment_status as any });
+
+    if (payment_status === 'paid') {
+        await order.update({ status: 'paid', paid_at: new Date() } as any);
+    }
+
+    return order;
+}
+
+export async function updateShippingInfo(orderNumber: string, shippingData: { tracking_number: string; shipped_at?: Date }) {
+    const order = await Order.findOne({
+        where: { order_number: orderNumber },
+        include: [{ model: Shipping, as: 'shipping' }]
+    });
+
+    if (!order || !order.shipping) throw new NotFoundError('Shipping record for this order');
+
+    await order.shipping.update({
+        tracking_number: shippingData.tracking_number,
+        shipped_at: shippingData.shipped_at || new Date()
+    });
+
+    if (order.status === 'paid') {
+        await order.update({ status: 'shipped', shipped_at: shippingData.shipped_at || new Date() });
+    }
+
+    return order;
+}
+
+export async function processRefund(orderNumber: string, refundReason: string) {
+    const order = await Order.findOne({ where: { order_number: orderNumber } });
+    if (!order) throw new NotFoundError('Order');
+
+    await order.update({
+        status: 'refunded' as any,
+        payment_status: 'refunded' as any,
+        admin_note: order.admin_note ? `${order.admin_note}\nRefund Reason: ${refundReason}` : `Refund Reason: ${refundReason}`
+    });
+
+    return order;
+}
+
 export async function deleteOrder(orderNumber: string) {
     const order = await Order.findOne({ where: { order_number: orderNumber } });
     if (!order) throw new NotFoundError('Order');

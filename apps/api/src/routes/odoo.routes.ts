@@ -20,6 +20,9 @@ router.post('/sync/customer/:userId', odooController.syncCustomer);
 // Sync order to Odoo (manual re-sync)
 router.post('/sync/order/:orderId', odooController.syncOrder);
 
+// Sync order status from Odoo (polling)
+router.post('/sync/order-status', odooController.syncOrderStatus);
+
 // Get sync status
 router.get('/sync/status', odooController.getSyncStatus);
 

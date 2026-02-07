@@ -8,6 +8,6 @@ const router = Router();
 router.use(authenticate, authorizeAdmin);
 
 router.get('/', adminStockController.getStockLevels);
-router.put('/:variantId', adminStockController.updateStock);
+router.post('/sync', adminStockController.syncFromOdoo);
 
 export default router;

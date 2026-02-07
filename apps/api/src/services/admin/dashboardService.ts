@@ -66,10 +66,37 @@ export async function getRecentActivity() {
 }
 
 export async function getInventoryStatus() {
-    // This assumes we have stock information. Let's check ProductVariant.
-    // Actually, let's just count low stock products if we have a threshold.
+    const { ProductStock } = require('@repo/database');
+    const lowStockCount = await ProductStock.count({
+        where: { available_quantity: { [Op.gt]: 0, [Op.lte]: 10 } }
+    });
+    const outOfStockCount = await ProductStock.count({
+        where: { available_quantity: { [Op.lte]: 0 } }
+    });
+
     return {
-        lowStockCount: 0, // Placeholder
-        outOfStockCount: 0 // Placeholder
+        lowStockCount,
+        outOfStockCount
     };
+}
+
+export async function getTopProducts(limit: number = 5) {
+    const { OrderItem, ProductVariant, Product } = require('@repo/database');
+    const items = await OrderItem.findAll({
+        attributes: [
+            'product_variant_id',
+            [fn('SUM', col('quantity')), 'total_quantity'],
+            [fn('SUM', col('price')), 'total_revenue']
+        ],
+        group: ['product_variant_id'],
+        order: [[literal('total_quantity'), 'DESC']],
+        limit,
+        include: [{
+            model: ProductVariant,
+            as: 'variant',
+            include: [{ model: Product, as: 'product', attributes: ['name', 'slug'] }]
+        }]
+    });
+
+    return items;
 }

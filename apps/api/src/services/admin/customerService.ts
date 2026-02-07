@@ -77,3 +77,53 @@ export async function toggleCustomerStatus(id: number) {
     await user.update({ email_verified: !user.email_verified });
     return user;
 }
+
+export async function getCustomerOrders(id: number, query: any) {
+    const { page = 1, limit = 10 } = query;
+    const offset = (Number(page) - 1) * Number(limit);
+
+    const { count, rows } = await Order.findAndCountAll({
+        where: { user_id: id },
+        limit: Number(limit),
+        offset,
+        order: [['created_at', 'DESC']]
+    });
+
+    return {
+        data: rows,
+        meta: { total: count, page, limit }
+    };
+}
+
+export async function getCustomerAddresses(id: number) {
+    return Address.findAll({ where: { user_id: id } });
+}
+
+export async function getCustomerReviews(id: number, query: any) {
+    const { page = 1, limit = 10 } = query;
+    const offset = (Number(page) - 1) * Number(limit);
+
+    const { count, rows } = await Review.findAndCountAll({
+        where: { user_id: id },
+        limit: Number(limit),
+        offset,
+        order: [['created_at', 'DESC']]
+    });
+
+    return {
+        data: rows,
+        meta: { total: count, page, limit }
+    };
+}
+
+export async function getCustomerStats(id: number) {
+    const totalOrders = await Order.count({ where: { user_id: id } });
+    const totalSpent = await Order.sum('total_amount', { where: { user_id: id, status: { [Op.notIn]: ['cancelled', 'refunded'] } } });
+    const totalReviews = await Review.count({ where: { user_id: id } });
+
+    return {
+        totalOrders,
+        totalSpent: totalSpent || 0,
+        totalReviews
+    };
+}

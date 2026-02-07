@@ -8,5 +8,8 @@ const router = Router();
 router.use(authenticate, authorizeAdmin);
 
 router.get('/stats', dashboardController.getDashboardStats);
+router.get('/recent-activity', dashboardController.getRecentActivity);
+router.get('/top-products', dashboardController.getTopProducts);
+router.get('/performance', dashboardController.getSalesPerformance);
 
 export default router;

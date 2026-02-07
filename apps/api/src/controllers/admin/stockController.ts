@@ -1,6 +1,9 @@
 
 import { Request, Response, NextFunction } from 'express';
 import * as adminStockService from '../../services/admin/stockService';
+import { OdooProductService } from '../../services/odoo/product.service';
+
+const odooProductService = new OdooProductService();
 
 export async function getStockLevels(req: Request, res: Response, next: NextFunction) {
     try {
@@ -14,14 +17,13 @@ export async function getStockLevels(req: Request, res: Response, next: NextFunc
     }
 }
 
-export async function updateStock(req: Request, res: Response, next: NextFunction) {
+export async function syncFromOdoo(_req: Request, res: Response, next: NextFunction) {
     try {
-        const { variantId } = req.params;
-        const { quantity } = req.body;
-        const stock = await adminStockService.updateStock(Number(variantId), quantity);
+        const result = await odooProductService.syncStock();
         res.json({
             success: true,
-            data: stock
+            message: 'Stock sync initiated successfully',
+            data: result
         });
     } catch (error) {
         next(error);

@@ -1,9 +1,11 @@
 
-import { Product, ProductVariant, ProductImage, Category, sequelize } from '@repo/database';
+import { Product, ProductVariant, ProductImage, Category } from '@repo/database';
 import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
-import { slugify } from '@repo/shared/utils';
 
+/**
+ * List products for admin with filtering and pagination
+ */
 export async function listAdminProducts(query: any) {
     const {
         page = 1,
@@ -34,7 +36,7 @@ export async function listAdminProducts(query: any) {
         order: [['created_at', 'DESC']],
         include: [
             { model: Category, as: 'category', attributes: ['name'] },
-            { model: ProductImage, as: 'images', where: { is_primary: true }, required: false }
+            { model: ProductImage, as: 'images', attributes: ['id', 'image_url', 'is_primary'] }
         ],
         distinct: true
     });
@@ -50,65 +52,109 @@ export async function listAdminProducts(query: any) {
     };
 }
 
-export async function createProduct(data: any) {
-    const transaction = await sequelize.transaction();
-    try {
-        const product = await Product.create({
-            ...data,
-            slug: data.slug || slugify(data.name),
-            is_active: data.is_active ?? true
-        }, { transaction });
+/**
+ * Get product details for admin
+ */
+export async function getProductDetail(id: number) {
+    const product = await Product.findByPk(id, {
+        include: [
+            { model: Category, as: 'category' },
+            { model: ProductVariant, as: 'variants' },
+            { model: ProductImage, as: 'images' }
+        ]
+    });
 
-        if (data.images && data.images.length > 0) {
-            for (const img of data.images) {
-                await ProductImage.create({
-                    ...img,
-                    product_id: product.id
-                }, { transaction });
-            }
-        }
-
-        await transaction.commit();
-        return product;
-    } catch (error) {
-        await transaction.rollback();
-        throw error;
-    }
-}
-
-export async function updateProduct(id: number, data: any) {
-    const product = await Product.findByPk(id);
     if (!product) throw new NotFoundError('Product');
-
-    await product.update(data);
     return product;
 }
 
-export async function deleteProduct(id: number) {
+/**
+ * Toggle product active status (local visibility)
+ */
+export async function toggleActive(id: number) {
     const product = await Product.findByPk(id);
     if (!product) throw new NotFoundError('Product');
 
-    // Soft delete or hide
-    await product.update({ is_active: false });
+    await product.update({ is_active: !product.is_active });
+    return product;
+}
+
+/**
+ * Toggle product featured status
+ */
+export async function toggleFeatured(id: number) {
+    const product = await Product.findByPk(id);
+    if (!product) throw new NotFoundError('Product');
+
+    await product.update({ is_featured: !product.is_featured });
+    return product;
+}
+
+/**
+ * Update product SEO fields
+ */
+export async function updateSEO(id: number, seoData: { meta_title?: string; meta_description?: string; slug?: string }) {
+    const product = await Product.findByPk(id);
+    if (!product) throw new NotFoundError('Product');
+
+    await product.update(seoData);
+    return product;
+}
+
+/**
+ * Update product short description (Managed locally if Odoo doesn't provide enough detail)
+ */
+export async function updateDescription(id: number, short_description: string) {
+    const product = await Product.findByPk(id);
+    if (!product) throw new NotFoundError('Product');
+
+    await product.update({ short_description });
+    return product;
+}
+
+/**
+ * Image Management - Get all images for a product
+ */
+export async function getProductImages(productId: number) {
+    return ProductImage.findAll({ where: { product_id: productId } });
+}
+
+/**
+ * Image Management - Add new image
+ */
+export async function addProductImage(productId: number, imageUrl: string, is_primary: boolean = false) {
+    if (is_primary) {
+        // Reset existing primary images
+        await ProductImage.update({ is_primary: false }, { where: { product_id: productId } });
+    }
+
+    return ProductImage.create({
+        product_id: productId,
+        image_url: imageUrl,
+        is_primary
+    } as any);
+}
+
+/**
+ * Image Management - Delete image
+ */
+export async function deleteProductImage(imageId: number) {
+    const image = await ProductImage.findByPk(imageId);
+    if (!image) throw new NotFoundError('ProductImage');
+
+    await image.destroy();
     return { success: true };
 }
 
-export async function addVariant(productId: number, data: any) {
-    const product = await Product.findByPk(productId);
-    if (!product) throw new NotFoundError('Product');
+/**
+ * Image Management - Set image as primary
+ */
+export async function setPrimaryImage(productId: number, imageId: number) {
+    const image = await ProductImage.findByPk(imageId);
+    if (!image || image.product_id !== productId) throw new NotFoundError('ProductImage');
 
-    const variant = await ProductVariant.create({
-        ...data,
-        product_id: productId
-    });
+    await ProductImage.update({ is_primary: false }, { where: { product_id: productId } });
+    await image.update({ is_primary: true });
 
-    return variant;
-}
-
-export async function updateVariant(variantId: number, data: any) {
-    const variant = await ProductVariant.findByPk(variantId);
-    if (!variant) throw new NotFoundError('Variant');
-
-    await variant.update(data);
-    return variant;
+    return image;
 }
