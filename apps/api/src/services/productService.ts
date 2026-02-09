@@ -194,7 +194,7 @@ export async function getNewArrivals(limit: number = 10, days: number = 30) {
 }
 
 // Get all variants for a product
-export async function getProductVariants(productId: number) {
+export async function getProductVariants(productId: number): Promise<any> {
     const product = await Product.findByPk(productId);
     if (!product) return null;
 

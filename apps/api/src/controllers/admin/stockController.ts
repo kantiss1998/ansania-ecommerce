@@ -37,7 +37,7 @@ export async function getLowStock(req: Request, res: Response, next: NextFunctio
     }
 }
 
-export async function getOutOfStock(req: Request, res: Response, next: NextFunction) {
+export async function getOutOfStock(_req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminStockService.getOutOfStock();
         res.json({ success: true, ...result });

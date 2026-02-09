@@ -162,8 +162,6 @@ export async function getAnalyticsOverview(startDate: Date, endDate: Date) {
 }
 
 export async function getCustomerBehavior(startDate: Date, endDate: Date) {
-    const { SearchHistory, ProductView, User } = require('@repo/database');
-
     const topSearches = await getSearchAnalytics(startDate, endDate);
     const topViews = await getProductViewStats(startDate, endDate);
 

@@ -5,35 +5,34 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/utils';
+import { orderService, Order } from '@/services/orderService';
 
-/**
- * Order confirmation page
- */
 export default function OrderConfirmationPage() {
     const params = useParams();
-    const orderId = params.id as string;
-    const [countdown, setCountdown] = useState(3600); // 1 hour in seconds
+    const orderNumber = params.id as string;
+    const [order, setOrder] = useState<Order | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [countdown, setCountdown] = useState(3600); // 1 hour for VA / payment deadline simulation
 
-    // Mock order data - will be replaced with API call
-    const mockOrder = {
-        id: orderId,
-        order_number: `ORD-${orderId}`,
-        status: 'pending_payment',
-        total: 2450000,
-        payment_method: 'BCA Virtual Account',
-        va_number: '8277012345678901',
-        payment_deadline: new Date(Date.now() + 3600000), // 1 hour from now
-        items: [
-            {
-                product_name: 'Kursi Minimalis Modern',
-                variant_info: 'Putih, Medium, Glossy',
-                quantity: 2,
-                subtotal: 2400000,
-            },
-        ],
-    };
+    useEffect(() => {
+        const fetchOrder = async () => {
+            try {
+                const data = await orderService.getOrder(orderNumber);
+                setOrder(data);
+            } catch (err) {
+                console.error('Failed to fetch order:', err);
+                setError('Gagal memuat data pesanan.');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    // Countdown timer
+        if (orderNumber) {
+            fetchOrder();
+        }
+    }, [orderNumber]);
+
     useEffect(() => {
         const timer = setInterval(() => {
             setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
@@ -51,16 +50,37 @@ export default function OrderConfirmationPage() {
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        // Show toast notification
+        alert('Disalin ke clipboard!'); // Simple feedback
     };
 
+    if (loading) {
+        return <div className="container mx-auto p-12 text-center text-gray-500">Memuat status pesanan...</div>;
+    }
+
+    if (error || !order) {
+        return (
+            <div className="container mx-auto p-12 text-center">
+                <div className="rounded-2xl border-2 border-dashed border-error-200 bg-error-50 p-8">
+                    <h2 className="text-xl font-bold text-error-700">Terjadi Kesalahan</h2>
+                    <p className="mt-2 text-gray-600">{error || 'Pesanan tidak ditemukan.'}</p>
+                    <Link href="/">
+                        <Button variant="primary" className="mt-6">Kembali ke Beranda</Button>
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    // Mock VA Number if not present in order data (since backend might not generate it yet)
+    const vaNumber = '8277081234567890';
+
     return (
-        <div className="container mx-auto px-4 py-8">
-            {/* Success Icon */}
-            <div className="mb-8 flex flex-col items-center text-center">
-                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-success-light">
+        <div className="container mx-auto px-4 py-12">
+            {/* Success Header */}
+            <div className="mb-12 flex flex-col items-center text-center">
+                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-success-50 ring-8 ring-success-50/50">
                     <svg
-                        className="h-10 w-10 text-success-DEFAULT"
+                        className="h-12 w-12 text-success-600"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -73,188 +93,142 @@ export default function OrderConfirmationPage() {
                         />
                     </svg>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-gray-900">
                     Pesanan Berhasil Dibuat!
                 </h1>
-                <p className="mt-2 text-gray-600">
-                    Nomor Pesanan: <span className="font-semibold">{mockOrder.order_number}</span>
+                <p className="mt-2 text-lg text-gray-600">
+                    Terima kasih telah berbelanja di Ansania.
                 </p>
+                <div className="mt-4 rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-800">
+                    Order ID: {order.order_number}
+                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                {/* Payment Instructions */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Payment Countdown */}
-                    <div className="rounded-lg border-2 border-warning-DEFAULT bg-warning-light p-4">
-                        <div className="flex items-start gap-3">
-                            <svg
-                                className="h-6 w-6 flex-shrink-0 text-warning-DEFAULT"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                            <div className="flex-1">
-                                <p className="font-semibold text-gray-900">
-                                    Segera Selesaikan Pembayaran
-                                </p>
-                                <p className="mt-1 text-sm text-gray-600">
-                                    Batas waktu pembayaran dalam
-                                </p>
-                                <p className="mt-2 text-2xl font-bold text-warning-DEFAULT">
-                                    {formatTime(countdown)}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Payment Details */}
-                    <div className="rounded-lg border border-gray-200 bg-white p-6">
-                        <h2 className="mb-4 text-lg font-semibold text-gray-900">
-                            Detail Pembayaran
-                        </h2>
-
-                        <div className="space-y-4">
-                            <div>
-                                <p className="text-sm text-gray-600">Metode Pembayaran</p>
-                                <p className="mt-1 font-semibold text-gray-900">
-                                    {mockOrder.payment_method}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-sm text-gray-600">Nomor Virtual Account</p>
-                                <div className="mt-2 flex items-center gap-2">
-                                    <p className="flex-1 rounded-lg bg-gray-100 p-3 font-mono text-lg font-bold text-gray-900">
-                                        {mockOrder.va_number}
-                                    </p>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => copyToClipboard(mockOrder.va_number)}
-                                    >
-                                        Salin
-                                    </Button>
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Payment Instruction Card */}
+                    {order.status === 'pending_payment' && (
+                        <>
+                            <div className="rounded-2xl border border-warning-200 bg-warning-50 p-6">
+                                <div className="flex items-start gap-4">
+                                    <div className="rounded-full bg-warning-100 p-2 text-warning-600">
+                                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-lg font-bold text-gray-900">Selesaikan Pembayaran</h3>
+                                        <p className="mt-1 text-sm text-gray-600">
+                                            Mohon lakukan pembayaran sebelum batas waktu berakhir agar pesanan tidak dibatalkan otomatis.
+                                        </p>
+                                        <div className="mt-4 flex items-center gap-3">
+                                            <div className="text-3xl font-bold text-warning-700 font-mono tracking-tight">
+                                                {formatTime(countdown)}
+                                            </div>
+                                            <span className="text-sm font-medium text-warning-600/80">Sisa Waktu</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <p className="text-sm text-gray-600">Total Pembayaran</p>
-                                <div className="mt-2 flex items-center gap-2">
-                                    <p className="flex-1 rounded-lg bg-primary-50 p-3 text-xl font-bold text-primary-700">
-                                        {formatCurrency(mockOrder.total)}
-                                    </p>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => copyToClipboard(mockOrder.total.toString())}
-                                    >
-                                        Salin
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
+                                <h3 className="mb-6 text-xl font-bold text-gray-900">Intruksi Pembayaran</h3>
 
-                    {/* Payment Instructions */}
-                    <div className="rounded-lg border border-gray-200 bg-white p-6">
-                        <h2 className="mb-4 text-lg font-semibold text-gray-900">
-                            Cara Pembayaran
-                        </h2>
+                                <div className="space-y-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-6">
+                                        <span className="text-gray-500">Metode Pembayaran</span>
+                                        <span className="font-bold text-gray-900 text-lg">{order.payment_method?.toUpperCase().replace('_', ' ') || 'BANK TRANSFER'}</span>
+                                    </div>
 
-                        <div className="space-y-3">
-                            <div className="flex gap-3">
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-700 text-xs font-bold text-white">
-                                    1
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-6">
+                                        <span className="text-gray-500">Nomor Virtual Account</span>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-mono text-xl font-bold text-gray-900 bg-gray-50 px-3 py-1 rounded-lg border border-gray-200">{vaNumber}</span>
+                                            <button
+                                                onClick={() => copyToClipboard(vaNumber)}
+                                                className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                                            >
+                                                Salin
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <span className="text-gray-500">Total Tagihan</span>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-2xl font-bold text-primary-700">{formatCurrency(order.total_amount)}</span>
+                                            <button
+                                                onClick={() => copyToClipboard(order.total_amount.toString())}
+                                                className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                                            >
+                                                Salin
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p className="text-sm text-gray-700">
-                                    Buka aplikasi BCA Mobile atau m-BCA
-                                </p>
-                            </div>
-                            <div className="flex gap-3">
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-700 text-xs font-bold text-white">
-                                    2
+
+                                <div className="mt-8 rounded-xl bg-blue-50 p-6">
+                                    <h4 className="font-bold text-blue-900 mb-4">Langkah Pembayaran (M-Banking)</h4>
+                                    <ol className="space-y-3 text-sm text-blue-800 list-decimal list-inside">
+                                        <li>Buka aplikasi Mobile Banking Anda</li>
+                                        <li>Pilih menu <strong>m-Transfer</strong> atau <strong>Transfer</strong></li>
+                                        <li>Pilih <strong>BCA Virtual Account</strong></li>
+                                        <li>Masukkan nomor Virtual Account: <strong>{vaNumber}</strong></li>
+                                        <li>Pastikan detail tagihan sudah benar</li>
+                                        <li>Masukkan PIN m-BCA Anda</li>
+                                        <li>Pembayaran Selesai! Simpan bukti transaksi Anda.</li>
+                                    </ol>
                                 </div>
-                                <p className="text-sm text-gray-700">
-                                    Pilih menu <span className="font-semibold">Transfer</span> → <span className="font-semibold">Virtual Account</span>
-                                </p>
                             </div>
-                            <div className="flex gap-3">
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-700 text-xs font-bold text-white">
-                                    3
-                                </div>
-                                <p className="text-sm text-gray-700">
-                                    Masukkan nomor Virtual Account <span className="font-mono font-semibold">{mockOrder.va_number}</span>
-                                </p>
-                            </div>
-                            <div className="flex gap-3">
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-700 text-xs font-bold text-white">
-                                    4
-                                </div>
-                                <p className="text-sm text-gray-700">
-                                    Pastikan detail pembayaran sudah benar, lalu konfirmasi
-                                </p>
-                            </div>
-                            <div className="flex gap-3">
-                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary-700 text-xs font-bold text-white">
-                                    5
-                                </div>
-                                <p className="text-sm text-gray-700">
-                                    Pembayaran selesai! Pesanan akan diproses otomatis
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        </>
+                    )}
                 </div>
 
-                {/* Order Summary */}
                 <div className="lg:col-span-1">
-                    <div className="sticky top-20 rounded-lg border border-gray-200 bg-white p-6">
-                        <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                            Detail Pesanan
-                        </h3>
+                    <div className="sticky top-24 space-y-6">
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                            <h3 className="mb-4 font-bold text-gray-900">Ringkasan Pesanan</h3>
+                            <div className="space-y-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+                                {order.items?.map((item, index) => (
+                                    <div key={index} className="flex gap-4 border-b border-gray-50 pb-4 last:border-0 last:pb-0">
+                                        {/* Mock image since API might not return it in items yet */}
+                                        <div className="h-16 w-16 shrink-0 rounded-lg bg-gray-100 overflow-hidden">
+                                            <img src="/placeholder-product.svg" className="h-full w-full object-cover" alt="" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-gray-900 line-clamp-2 text-sm">{item.product_name}</p>
+                                            <p className="text-xs text-gray-500 mt-1">{item.variant_info || 'Standard'}</p>
+                                            <div className="mt-2 flex justify-between items-center text-xs">
+                                                <span className="text-gray-500">Qty: {item.quantity}</span>
+                                                <span className="font-semibold text-gray-900">{formatCurrency(item.subtotal)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
 
-                        <div className="space-y-3 border-b border-gray-200 pb-4">
-                            {mockOrder.items.map((item, index) => (
-                                <div key={index}>
-                                    <p className="text-sm font-medium text-gray-900">
-                                        {item.product_name}
-                                    </p>
-                                    {item.variant_info && (
-                                        <p className="text-xs text-gray-500">
-                                            {item.variant_info}
-                                        </p>
-                                    )}
-                                    <p className="mt-1 text-sm text-gray-600">
-                                        Qty: {item.quantity} × {formatCurrency(item.subtotal / item.quantity)}
-                                    </p>
+                            <div className="mt-6 space-y-3 pt-6 border-t border-gray-100 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Subtotal</span>
+                                    <span className="font-medium">{formatCurrency((order.total_amount - order.shipping_cost))}</span>
                                 </div>
-                            ))}
-                        </div>
-
-                        <div className="mt-4 space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Total</span>
-                                <span className="font-bold text-primary-700">
-                                    {formatCurrency(mockOrder.total)}
-                                </span>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">Ongkos Kirim</span>
+                                    <span className="font-medium">{formatCurrency(order.shipping_cost)}</span>
+                                </div>
+                                <div className="flex justify-between pt-3 border-t border-gray-100 text-base">
+                                    <span className="font-bold text-gray-900">Total</span>
+                                    <span className="font-bold text-primary-700">{formatCurrency(order.total_amount)}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="mt-6 space-y-2">
-                            <Link href={`/orders/${orderId}`} className="block">
-                                <Button variant="primary" size="md" fullWidth>
-                                    Lihat Detail Pesanan
-                                </Button>
+                        <div className="space-y-3">
+                            <Link href="/">
+                                <Button variant="outline" fullWidth>Ke Beranda</Button>
                             </Link>
-                            <Link href="/products" className="block">
-                                <Button variant="outline" size="md" fullWidth>
-                                    Lanjut Belanja
-                                </Button>
+                            <Link href="/products">
+                                <Button variant="ghost" fullWidth className="text-gray-500 hover:text-primary-600">Beli Lagi</Button>
                             </Link>
                         </div>
                     </div>

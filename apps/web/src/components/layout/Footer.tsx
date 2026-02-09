@@ -7,14 +7,14 @@ export function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="border-t border-gray-200 bg-gray-50">
-            <div className="container mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <footer className="border-t border-gray-200 bg-white">
+            <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8">
                     {/* Company Info */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-primary-700">
+                    <div className="space-y-6">
+                        <Link href="/" className="text-2xl font-heading font-bold text-primary-900">
                             Ansania
-                        </h3>
+                        </Link>
                         <p className="text-sm text-gray-600">
                             Premium furniture e-commerce with quality products
                             for your home and office.
@@ -22,38 +22,26 @@ export function Footer() {
                     </div>
 
                     {/* Shop Links */}
-                    <div className="space-y-4">
-                        <h4 className="font-semibold text-gray-900">Shop</h4>
-                        <ul className="space-y-2 text-sm">
+                    <div>
+                        <h3 className="font-heading font-bold text-gray-900">Shop</h3>
+                        <ul className="mt-4 space-y-3 text-sm">
                             <li>
-                                <Link
-                                    href="/products"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/products" className="text-gray-600 transition hover:text-primary-700">
                                     All Products
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/categories"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/categories" className="text-gray-600 transition hover:text-primary-700">
                                     Categories
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/products?filter=featured"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/products?filter=featured" className="text-gray-600 transition hover:text-primary-700">
                                     Featured Products
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/flash-sales"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/flash-sales" className="text-gray-600 transition hover:text-primary-700">
                                     Flash Sales
                                 </Link>
                             </li>
@@ -61,40 +49,26 @@ export function Footer() {
                     </div>
 
                     {/* Customer Service */}
-                    <div className="space-y-4">
-                        <h4 className="font-semibold text-gray-900">
-                            Customer Service
-                        </h4>
-                        <ul className="space-y-2 text-sm">
+                    <div>
+                        <h3 className="font-heading font-bold text-gray-900">Customer Service</h3>
+                        <ul className="mt-4 space-y-3 text-sm">
                             <li>
-                                <Link
-                                    href="/contact-us"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/contact-us" className="text-gray-600 transition hover:text-primary-700">
                                     Contact Us
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/faq"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/faq" className="text-gray-600 transition hover:text-primary-700">
                                     FAQ
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/shipping-info"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/shipping-info" className="text-gray-600 transition hover:text-primary-700">
                                     Shipping Info
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/returns-and-exchanges"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/returns-and-exchanges" className="text-gray-600 transition hover:text-primary-700">
                                     Returns & Exchanges
                                 </Link>
                             </li>
@@ -102,38 +76,26 @@ export function Footer() {
                     </div>
 
                     {/* Account Links */}
-                    <div className="space-y-4">
-                        <h4 className="font-semibold text-gray-900">Account</h4>
-                        <ul className="space-y-2 text-sm">
+                    <div>
+                        <h3 className="font-heading font-bold text-gray-900">Account</h3>
+                        <ul className="mt-4 space-y-3 text-sm">
                             <li>
-                                <Link
-                                    href="/profile"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/profile" className="text-gray-600 transition hover:text-primary-700">
                                     My Profile
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/orders"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/orders" className="text-gray-600 transition hover:text-primary-700">
                                     Order History
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/wishlist"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/wishlist" className="text-gray-600 transition hover:text-primary-700">
                                     Wishlist
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/addresses"
-                                    className="text-gray-600 hover:text-primary-700"
-                                >
+                                <Link href="/addresses" className="text-gray-600 transition hover:text-primary-700">
                                     Addresses
                                 </Link>
                             </li>

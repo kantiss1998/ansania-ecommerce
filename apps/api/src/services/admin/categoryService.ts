@@ -39,8 +39,8 @@ export async function updateCategory(id: number, data: any) {
     if (!category) throw new NotFoundError('Category');
 
     // Limited updates: description, image_url, sort_order, is_active
-    const { description, image_url, sort_order, is_active, meta_title, meta_description } = data;
-    await category.update({ description, image_url, sort_order, is_active, meta_title, meta_description });
+    const { description, image_url, sort_order, is_active } = data;
+    await category.update({ description, image_url, sort_order, is_active });
     return category;
 }
 

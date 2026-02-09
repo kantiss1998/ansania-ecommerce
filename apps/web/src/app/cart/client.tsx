@@ -1,16 +1,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Suspense } from 'react';
-import { CartItem } from '@/components/features/cart/CartItem';
+import { Suspense, useEffect } from 'react';
+import { CartItem as CartItemComponent } from '@/components/features/cart/CartItem';
 import { CartSummary } from '@/components/features/cart/CartSummary';
 import { VoucherInput } from '@/components/features/cart/VoucherInput';
 import { useCartStore } from '@/store/cartStore';
 import { useToast } from '@/components/ui/Toast';
+import { Button } from '@/components/ui/Button';
 
 function CartContent() {
     const router = useRouter();
     const {
+        cart,
+        fetchCart,
         updateItemQuantity,
         removeItem,
         applyVoucher,
@@ -19,41 +22,9 @@ function CartContent() {
     } = useCartStore();
     const { success, error } = useToast();
 
-    // Mock cart data - will be replaced with actual cart from store
-    const mockCartItems = [
-        {
-            id: 1,
-            product_variant_id: 1,
-            product_name: 'Kursi Minimalis Modern',
-            product_slug: 'kursi-minimalis-modern',
-            variant_info: 'Putih, Medium, Glossy',
-            product_image: '/placeholder-product.svg',
-            price: 1200000,
-            quantity: 2,
-            subtotal: 2400000,
-            stock: 10,
-        },
-        {
-            id: 2,
-            product_variant_id: 3,
-            product_name: 'Meja Makan Kayu Jati',
-            product_slug: 'meja-makan-kayu-jati',
-            variant_info: 'Natural, Large',
-            product_image: '/placeholder-product.svg',
-            price: 3500000,
-            quantity: 1,
-            subtotal: 3500000,
-            stock: 5,
-        },
-    ];
-
-    const mockSummary = {
-        subtotal: 5900000,
-        discount: 590000,
-        shipping: 0,
-        total: 5310000,
-        voucher_code: undefined,
-    };
+    useEffect(() => {
+        fetchCart();
+    }, [fetchCart]);
 
     const handleUpdateQuantity = async (itemId: number, quantity: number) => {
         try {
@@ -91,63 +62,86 @@ function CartContent() {
         }
     };
 
-    const handleCheckout = () => {
-        router.push('/checkout');
+    // Map store cart items to component props
+    const cartItems = cart?.items.map((item) => ({
+        id: item.id,
+        product_variant_id: item.variant.id,
+        product_name: item.product.name,
+        product_slug: item.product.slug,
+        variant_info: [item.variant.color, item.variant.size, item.variant.finishing].filter(Boolean).join(', '),
+        product_image: item.product.image || '/placeholder-product.svg',
+        price: item.price,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+        stock: item.stock_available,
+    })) || [];
+
+    const summary = {
+        subtotal: cart?.subtotal || 0,
+        discount: cart?.discount_amount || 0,
+        shipping: 0, // Calculated at checkout
+        total: cart?.total || 0,
+        voucher_code: cart?.voucher?.code,
     };
 
-    // Empty cart state
-    if (mockCartItems.length === 0) {
+    if (isLoading && !cart) {
+        return <div className="container mx-auto p-12 text-center text-gray-500">Memuat keranjang...</div>;
+    }
+
+    if (!cart || cart.items.length === 0) {
         return (
             <div className="container mx-auto px-4 py-16">
-                <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-                    <svg
-                        className="mb-4 h-20 w-20 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                        />
-                    </svg>
+                <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 bg-gray-50/50 p-12 text-center">
+                    <div className="mb-6 rounded-full bg-white p-6 shadow-sm">
+                        <svg
+                            className="h-16 w-16 text-gray-300"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                            />
+                        </svg>
+                    </div>
                     <h2 className="text-2xl font-bold text-gray-900">
                         Keranjang Belanja Kosong
                     </h2>
-                    <p className="mt-2 text-gray-600">
-                        Anda belum menambahkan produk ke keranjang
+                    <p className="mt-2 text-gray-600 max-w-md">
+                        Wah, keranjangmu masih kosong nih. Yuk, cari furnitur impianmu di katalog kami!
                     </p>
-                    <button
+                    <Button
                         onClick={() => router.push('/products')}
-                        className="mt-6 rounded-lg bg-primary-700 px-6 py-3 text-sm font-medium text-white hover:bg-primary-800"
+                        variant="primary"
+                        size="lg"
+                        className="mt-8"
                     >
                         Mulai Belanja
-                    </button>
+                    </Button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">
+        <div className="container mx-auto px-4 py-12">
+            <div className="mb-10">
+                <h1 className="text-4xl font-bold text-gray-900">
                     Keranjang Belanja
                 </h1>
                 <p className="mt-2 text-gray-600">
-                    {mockCartItems.length} item dalam keranjang
+                    Anda memiliki <span className="font-semibold text-primary-700">{cart.items.length} item</span> di dalam keranjang
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                {/* Cart Items */}
-                <div className="lg:col-span-2">
-                    <div className="rounded-lg border border-gray-200 bg-white p-6">
-                        {mockCartItems.map((item) => (
-                            <CartItem
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                        {cartItems.map((item) => (
+                            <CartItemComponent
                                 key={item.id}
                                 item={item}
                                 onUpdateQuantity={handleUpdateQuantity}
@@ -157,25 +151,33 @@ function CartContent() {
                         ))}
                     </div>
 
-                    {/* Voucher Input */}
-                    <div className="mt-6">
+                    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                        <h3 className="mb-4 font-semibold text-gray-900">Kode Voucher / Promo</h3>
                         <VoucherInput
                             onApply={handleApplyVoucher}
                             onRemove={handleRemoveVoucher}
-                            appliedCode={mockSummary.voucher_code}
+                            appliedCode={summary.voucher_code}
                             isLoading={isLoading}
                         />
                     </div>
                 </div>
 
-                {/* Cart Summary */}
                 <div className="lg:col-span-1">
-                    <div className="sticky top-20">
+                    <div className="sticky top-24">
                         <CartSummary
-                            summary={mockSummary}
-                            onCheckout={handleCheckout}
-                            isCheckoutDisabled={mockCartItems.length === 0}
+                            summary={summary}
+                            onCheckout={() => router.push('/checkout')}
+                            isCheckoutDisabled={cartItems.length === 0}
                         />
+
+                        <div className="mt-6 rounded-xl bg-blue-50 p-4 text-sm text-blue-700 border border-blue-100">
+                            <div className="flex gap-3">
+                                <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p>Ongkos kirim akan dihitung pada langkah selanjutnya (Checkout).</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -185,7 +187,7 @@ function CartContent() {
 
 export default function CartClient() {
     return (
-        <Suspense fallback={<div>Loading cart...</div>}>
+        <Suspense fallback={<div className="container mx-auto p-12 text-center text-gray-400">Memuat keranjang...</div>}>
             <CartContent />
         </Suspense>
     );

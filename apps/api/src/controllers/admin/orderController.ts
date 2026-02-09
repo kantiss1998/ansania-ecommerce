@@ -21,12 +21,12 @@ export async function getAllOrders(req: Request, res: Response, next: NextFuncti
             return res.send(csv);
         }
 
-        res.json({
+        return res.json({
             success: true,
             ...result
         });
     } catch (error) {
-        next(error);
+        return next(error);
     }
 }
 

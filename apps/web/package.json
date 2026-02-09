@@ -23,12 +23,14 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-hook-form": "^7.71.1",
+        "tailwind-merge": "^3.4.0",
         "zod": "^3.25.76",
         "zustand": "^5.0.11"
     },
     "devDependencies": {
         "@repo/config-eslint": "*",
         "@repo/config-typescript": "*",
+        "@tailwindcss/typography": "^0.5.19",
         "@types/node": "^20.11.0",
         "@types/react": "^18.2.48",
         "@types/react-dom": "^18.2.18",

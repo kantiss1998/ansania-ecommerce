@@ -5,7 +5,7 @@ import Link from 'next/link';
 /**
  * Cart summary data type
  */
-interface CartSummaryData {
+export interface CartSummaryData {
     subtotal: number;
     discount: number;
     shipping: number;
@@ -28,39 +28,39 @@ export function CartSummary({
     isCheckoutDisabled = false,
 }: CartSummaryProps) {
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sticky top-24">
+            <h2 className="mb-6 text-lg font-bold text-gray-900 font-heading">
                 Ringkasan Belanja
             </h2>
 
-            <div className="space-y-3 border-b border-gray-200 pb-4">
-                <div className="flex justify-between text-sm">
+            <div className="space-y-4 border-b border-gray-100 pb-6 mb-6">
+                <div className="flex justify-between text-base">
                     <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-semibold text-gray-900">
                         {formatCurrency(summary.subtotal)}
                     </span>
                 </div>
 
                 {summary.discount > 0 && (
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-base">
                         <span className="text-gray-600">
                             Diskon
                             {summary.voucher_code && (
-                                <span className="ml-1 text-xs text-primary-700">
-                                    ({summary.voucher_code})
+                                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">
+                                    {summary.voucher_code}
                                 </span>
                             )}
                         </span>
-                        <span className="font-medium text-success-DEFAULT">
+                        <span className="font-semibold text-success-600">
                             -{formatCurrency(summary.discount)}
                         </span>
                     </div>
                 )}
 
                 {summary.shipping > 0 && (
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-base">
                         <span className="text-gray-600">Ongkir</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-semibold text-gray-900">
                             {formatCurrency(summary.shipping)}
                         </span>
                     </div>
@@ -68,22 +68,23 @@ export function CartSummary({
             </div>
 
             {/* Total */}
-            <div className="mt-4 flex justify-between">
-                <span className="text-lg font-semibold text-gray-900">Total</span>
-                <span className="text-lg font-bold text-primary-700">
+            <div className="flex justify-between items-end mb-8">
+                <span className="text-lg font-bold text-gray-900">Total</span>
+                <span className="text-2xl font-bold text-primary-700 font-heading">
                     {formatCurrency(summary.total)}
                 </span>
             </div>
 
             {/* Checkout Button */}
             {onCheckout && (
-                <div className="mt-6">
+                <div className="mb-4">
                     <Button
                         variant="primary"
                         size="lg"
                         fullWidth
                         onClick={onCheckout}
                         disabled={isCheckoutDisabled}
+                        className="shadow-lg shadow-primary-500/20"
                     >
                         Lanjut ke Pembayaran
                     </Button>
@@ -91,12 +92,12 @@ export function CartSummary({
             )}
 
             {/* Continue Shopping */}
-            <div className="mt-4 text-center">
+            <div className="text-center">
                 <Link
                     href="/products"
-                    className="text-sm font-medium text-primary-700 hover:text-primary-800"
+                    className="text-sm font-semibold text-gray-500 hover:text-primary-600 hover:underline transition-colors"
                 >
-                    ← Lanjut Belanja
+                    Lanjut Belanja
                 </Link>
             </div>
         </div>

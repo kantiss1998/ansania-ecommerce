@@ -13,5 +13,20 @@ export * from './utils';
 // Export errors
 export * from './errors';
 
-// Export response types
-export * from './types/responses';
+// Export specific response types that don't conflict
+export type {
+    Wishlist,
+    Notification,
+    CmsBanner,
+    CmsPage,
+    CmsSetting,
+    ShippingRate,
+    OrderDetail,
+    AuthResponse,
+    ProductDetail,
+    FilterColor,
+    FilterSize,
+    FilterFinishing,
+    ListOrdersQuery,
+    ListNotificationsQuery,
+} from './types/responses';

@@ -21,12 +21,12 @@ export async function getAllCustomers(req: Request, res: Response, next: NextFun
             return res.send(csv);
         }
 
-        res.json({
+        return res.json({
             success: true,
             ...result
         });
     } catch (error) {
-        next(error);
+        return next(error);
     }
 }
 

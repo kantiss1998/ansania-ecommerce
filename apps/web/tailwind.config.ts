@@ -18,9 +18,15 @@ const config: Config = {
                 error: colors.error,
                 info: colors.info,
             },
+            fontFamily: {
+                heading: ['var(--font-heading)', 'sans-serif'],
+                body: ['var(--font-body)', 'sans-serif'],
+            },
         },
     },
-    plugins: [],
+    plugins: [
+        require('@tailwindcss/typography'),
+    ],
 };
 
 export default config;

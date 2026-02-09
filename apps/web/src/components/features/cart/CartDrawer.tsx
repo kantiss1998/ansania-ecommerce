@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useUiStore } from '@/store/uiStore';
 import { useCartStore } from '@/store/cartStore';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 
 /**
@@ -13,28 +13,12 @@ import { Button } from '@/components/ui/Button';
  */
 export function CartDrawer() {
     const { isCartDrawerOpen, closeCartDrawer } = useUiStore();
-    const { removeItem } = useCartStore();
+    const { cart, removeItem } = useCartStore();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
-
-    // Mock cart items for display
-    const mockCartItems = [
-        {
-            id: 1,
-            product_name: 'Kursi Minimalis Modern',
-            product_slug: 'kursi-minimalis-modern',
-            variant_info: 'Putih, Medium',
-            product_image: '/placeholder-product.svg',
-            price: 1200000,
-            quantity: 2,
-            subtotal: 2400000,
-        },
-    ];
-
-    const mockTotal = 2400000;
 
     // Prevent body scroll when drawer is open
     useEffect(() => {
@@ -50,77 +34,79 @@ export function CartDrawer() {
 
     if (!mounted) return null;
 
+    const hasItems = cart && cart.items && cart.items.length > 0;
+
     return (
         <>
             {/* Backdrop */}
-            {isCartDrawerOpen && (
-                <div
-                    className="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity"
-                    onClick={closeCartDrawer}
-                />
-            )}
+            <div
+                className={cn(
+                    "fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300",
+                    isCartDrawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                )}
+                onClick={closeCartDrawer}
+                aria-hidden="true"
+            />
 
             {/* Drawer */}
             <div
-                className={`fixed right-0 top-0 z-50 h-full w-full max-w-md transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${isCartDrawerOpen ? 'translate-x-0' : 'translate-x-full'
-                    }`}
+                className={cn(
+                    "fixed right-0 top-0 z-50 h-full w-full max-w-md transform bg-white shadow-2xl transition-transform duration-300 ease-out",
+                    isCartDrawerOpen ? "translate-x-0" : "translate-x-full"
+                )}
             >
                 <div className="flex h-full flex-col">
                     {/* Header */}
-                    <div className="flex items-center justify-between border-b border-gray-200 p-4">
-                        <h2 className="text-lg font-semibold text-gray-900">
+                    <div className="flex items-center justify-between border-b border-gray-100 p-5">
+                        <h2 className="text-xl font-bold text-gray-900 font-heading">
                             Keranjang Belanja
+                            {hasItems && (
+                                <span className="ml-2 text-sm font-normal text-gray-500">
+                                    ({cart.items.length} item)
+                                </span>
+                            )}
                         </h2>
                         <button
                             onClick={closeCartDrawer}
-                            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                            className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+                            aria-label="Tutup keranjang"
                         >
-                            <svg
-                                className="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
 
-                    {/* Empty State */}
-                    {mockCartItems.length === 0 ? (
+                    {/* Content */}
+                    {!hasItems ? (
                         <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
-                            <svg
-                                className="mb-4 h-16 w-16 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={1.5}
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                                />
-                            </svg>
-                            <p className="text-lg font-medium text-gray-900">
+                            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-50 mb-6">
+                                <svg
+                                    className="h-10 w-10 text-gray-400"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={1.5}
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                    />
+                                </svg>
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900 font-heading">
                                 Keranjang Kosong
-                            </p>
-                            <p className="mt-1 text-sm text-gray-600">
-                                Mulai belanja sekarang!
+                            </h3>
+                            <p className="mt-2 text-gray-500 max-w-xs mx-auto">
+                                Wah, keranjangmu masih kosong nih. Yuk mulai belanja sekarang!
                             </p>
                             <Button
                                 variant="primary"
-                                size="md"
-                                className="mt-6"
-                                onClick={() => {
-                                    closeCartDrawer();
-                                    // Will navigate to products
-                                }}
+                                size="lg"
+                                className="mt-8"
+                                href="/products"
+                                onClick={closeCartDrawer}
                             >
                                 Jelajahi Produk
                             </Button>
@@ -128,108 +114,105 @@ export function CartDrawer() {
                     ) : (
                         <>
                             {/* Cart Items */}
-                            <div className="flex-1 overflow-y-auto p-4">
-                                <div className="space-y-4">
-                                    {mockCartItems.map((item) => (
+                            <div className="flex-1 overflow-y-auto p-5 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                                <div className="space-y-6">
+                                    {cart.items.map((item) => (
                                         <div
                                             key={item.id}
-                                            className="flex gap-3 rounded-lg border border-gray-200 p-3"
+                                            className="flex gap-4 group"
                                         >
                                             {/* Image */}
                                             <Link
-                                                href={`/products/${item.product_slug}`}
-                                                className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-gray-100"
+                                                href={`/products/${item.product.slug}`}
+                                                className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-gray-50"
                                                 onClick={closeCartDrawer}
                                             >
                                                 <Image
-                                                    src={item.product_image}
-                                                    alt={item.product_name}
+                                                    src={item.product.image}
+                                                    alt={item.product.name}
                                                     fill
-                                                    className="object-cover"
-                                                    sizes="80px"
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    sizes="96px"
                                                 />
                                             </Link>
 
                                             {/* Info */}
-                                            <div className="flex flex-1 flex-col">
-                                                <Link
-                                                    href={`/products/${item.product_slug}`}
-                                                    className="line-clamp-2 text-sm font-medium text-gray-900 hover:text-primary-700"
-                                                    onClick={closeCartDrawer}
-                                                >
-                                                    {item.product_name}
-                                                </Link>
-                                                {item.variant_info && (
-                                                    <p className="mt-1 text-xs text-gray-500">
-                                                        {item.variant_info}
-                                                    </p>
-                                                )}
-                                                <div className="mt-2 flex items-center justify-between">
-                                                    <span className="text-sm font-semibold text-primary-700">
-                                                        {formatCurrency(item.price)}
-                                                    </span>
-                                                    <span className="text-sm text-gray-600">
+                                            <div className="flex flex-1 flex-col justify-between py-1">
+                                                <div>
+                                                    <div className="flex justify-between items-start gap-2">
+                                                        <Link
+                                                            href={`/products/${item.product.slug}`}
+                                                            className="text-sm font-bold text-gray-900 hover:text-primary-700 hover:underline line-clamp-2"
+                                                            onClick={closeCartDrawer}
+                                                        >
+                                                            {item.product.name}
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => removeItem(item.id)}
+                                                            className="text-gray-400 hover:text-error-600 transition-colors p-0.5"
+                                                            aria-label="Hapus item"
+                                                        >
+                                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+
+                                                    {item.variant && (
+                                                        <p className="mt-1 text-xs text-gray-500 font-medium">
+                                                            {[item.variant.size, item.variant.color, item.variant.finishing]
+                                                                .filter(Boolean)
+                                                                .join(', ')}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex items-end justify-between">
+                                                    <div className="text-xs text-gray-500 font-medium bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
                                                         Qty: {item.quantity}
+                                                    </div>
+                                                    <span className="text-sm font-bold text-primary-700">
+                                                        {formatCurrency(item.price)}
                                                     </span>
                                                 </div>
                                             </div>
-
-                                            {/* Remove Button */}
-                                            <button
-                                                onClick={() => removeItem(item.id)}
-                                                className="text-gray-400 hover:text-error-DEFAULT"
-                                            >
-                                                <svg
-                                                    className="h-5 w-5"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M6 18L18 6M6 6l12 12"
-                                                    />
-                                                </svg>
-                                            </button>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Footer */}
-                            <div className="border-t border-gray-200 p-4">
+                            <div className="border-t border-gray-100 p-5 bg-gray-50/50 space-y-4">
                                 {/* Total */}
-                                <div className="mb-4 flex items-center justify-between">
-                                    <span className="text-base font-medium text-gray-900">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-base font-semibold text-gray-700">
                                         Total
                                     </span>
-                                    <span className="text-xl font-bold text-primary-700">
-                                        {formatCurrency(mockTotal)}
+                                    <span className="text-xl font-bold text-primary-700 font-heading">
+                                        {formatCurrency(cart.total)}
                                     </span>
                                 </div>
 
                                 {/* Buttons */}
-                                <div className="space-y-2">
-                                    <Link
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        className="w-full bg-white"
                                         href="/cart"
                                         onClick={closeCartDrawer}
-                                        className="block w-full"
                                     >
-                                        <Button variant="primary" size="lg" fullWidth>
-                                            Lihat Keranjang
-                                        </Button>
-                                    </Link>
-                                    <Link
+                                        Lihat Keranjang
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        size="lg"
+                                        className="w-full shadow-lg shadow-primary-500/20"
                                         href="/checkout"
                                         onClick={closeCartDrawer}
-                                        className="block w-full"
                                     >
-                                        <Button variant="outline" size="lg" fullWidth>
-                                            Checkout
-                                        </Button>
-                                    </Link>
+                                        Checkout
+                                    </Button>
                                 </div>
                             </div>
                         </>

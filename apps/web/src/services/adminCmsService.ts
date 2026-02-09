@@ -1,66 +1,86 @@
-import apiClient from '@/lib/api';
-import { CMSPage } from './cmsService';
+import apiClient, { ApiResponse } from '@/lib/api';
+import { Banner, CMSPage } from '@repo/shared';
 
-export interface UpdatePageRequest {
+// Remove local interfaces that are duplicates of @repo/shared
+export interface BannerData {
     title: string;
-    content: string;
-    meta_title: string;
-    meta_description: string;
+    image_url: string;
+    link_url?: string;
+    position: 'home_hero' | 'home_sidebar' | 'promo_page';
+    sequence: number;
+    is_active: boolean;
 }
 
-const adminCmsService = {
+export const adminCmsService = {
+    // --- PAGES ---
     async getAllPages(): Promise<CMSPage[]> {
-        const response = await apiClient.get<{ data: any[] }>('/cms/pages');
-        return response.data.data.map(mapToCMSPage);
+        try {
+            const response = await apiClient.get<ApiResponse<CMSPage[]>>('/admin/pages');
+            return response.data.data || [];
+        } catch (error) {
+            console.error('Fetch pages error:', error);
+            return [];
+        }
     },
 
-    async getPage(slug: string): Promise<CMSPage | null> {
-        // Reuse existing endpoint but typically admin might want ID-based or specific admin endpoint
-        // For now, slug works if we don't change slugs. Or we can filter from getAllPages if needed by ID.
-        // Actually, the edit page usually takes an ID. 
-        // Let's implement getPageById if possible or just use getAllPages and find, 
-        // OR simpler: just fetch by slug if we only have slug link.
-        // But the plan said `PUT /pages/:id`. We need to know the ID.
-        // The list view will have IDs.
-        // The edit page will be /admin/pages/[id].
-
-        // We probably need getPageById in backend or just use the existing getPage logic if we can.
-        // Wait, existing getPage takes SLUG.
-        // Let's rely on passing data or finding it. 
-        // actually, let's just add getPageById to backend to be clean?
-        // OR, just fetch all and find (easier for now if list is small). All pages = 6 pages. Safe.
-        const pages = await this.getAllPages();
-        // This is a workaround to get by ID without new backend endpoint for GET /:id
-        // But wait, I added GET /pages/:slug.
-        return pages.find(p => p.slug === slug) || null;
+    async getPage(id: number): Promise<CMSPage | null> {
+        try {
+            const response = await apiClient.get<ApiResponse<CMSPage>>(`/admin/pages/${id}`);
+            return response.data.data || null;
+        } catch (error) {
+            console.error(`Fetch page ${id} error:`, error);
+            return null;
+        }
     },
 
-    async getPageById(id: number): Promise<CMSPage | null> {
-        const response = await apiClient.get<{ data: any[] }>('/cms/pages');
-        const page = response.data.data.find((p: any) => p.id === id);
-        if (!page) return null;
-        return mapToCMSPage(page);
+    async createPage(data: Omit<CMSPage, 'id' | 'updated_at' | 'published_at' | 'created_at' | 'publishedAt'>): Promise<CMSPage> {
+        const response = await apiClient.post<ApiResponse<CMSPage>>('/admin/pages', data);
+        return response.data.data!;
     },
 
-    async updatePage(id: number, data: UpdatePageRequest): Promise<CMSPage> {
-        const response = await apiClient.put<{ data: any }>(`/cms/pages/${id}`, data);
-        return mapToCMSPage(response.data.data);
+    async updatePage(id: number, data: Partial<Omit<CMSPage, 'id' | 'updated_at' | 'created_at'>>): Promise<CMSPage> {
+        const response = await apiClient.put<ApiResponse<CMSPage>>(`/admin/pages/${id}`, data);
+        return response.data.data!;
+    },
+
+    async deletePage(id: number): Promise<void> {
+        await apiClient.delete(`/admin/pages/${id}`);
+    },
+
+    // --- BANNERS ---
+    async getAllBanners(): Promise<Banner[]> {
+        try {
+            const response = await apiClient.get<ApiResponse<Banner[]>>('/admin/banners');
+            return response.data.data || [];
+        } catch (error) {
+            console.error('Fetch banners error:', error);
+            return [];
+        }
+    },
+
+    async getBanner(id: number): Promise<Banner | null> {
+        try {
+            const response = await apiClient.get<ApiResponse<Banner>>(`/admin/banners/${id}`);
+            return response.data.data || null;
+        } catch (error) {
+            console.error(`Fetch banner ${id} error:`, error);
+            return null;
+        }
+    },
+
+    async createBanner(data: BannerData): Promise<Banner> {
+        const response = await apiClient.post<ApiResponse<Banner>>('/admin/banners', data);
+        return response.data.data!;
+    },
+
+    async updateBanner(id: number, data: Partial<BannerData>): Promise<Banner> {
+        const response = await apiClient.put<ApiResponse<Banner>>(`/admin/banners/${id}`, data);
+        return response.data.data!;
+    },
+
+    async deleteBanner(id: number): Promise<void> {
+        await apiClient.delete(`/admin/banners/${id}`);
     }
 };
-
-function mapToCMSPage(data: any): CMSPage {
-    return {
-        id: data.id,
-        slug: data.slug,
-        title: data.title,
-        content: data.content,
-        // Backend returns snake_case usually, need to check if mapToCMSPage handles it
-        // existing cmsService does: publishedAt: data.published_at.
-        updated_at: data.updated_at || new Date().toISOString(), // Fallback if missing
-        publishedAt: data.published_at,
-        meta_title: data.meta_title,
-        meta_description: data.meta_description
-    };
-}
 
 export default adminCmsService;

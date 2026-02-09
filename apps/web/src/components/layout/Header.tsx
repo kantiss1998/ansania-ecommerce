@@ -24,8 +24,8 @@ export function Header() {
     }, []);
 
     return (
-        <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white">
-            <div className="container mx-auto flex h-16 items-center justify-between">
+        <header className="sticky top-0 z-40 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-md transition-all">
+            <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo */}
                 <Link href="/" className="flex items-center space-x-2">
                     <span className="text-xl font-bold text-primary-700">

@@ -28,7 +28,7 @@ export function CmsContent({ page }: CmsContentProps) {
                     <div className="px-8 py-10 sm:px-12">
                         <article
                             className="prose prose-lg max-w-none text-gray-600
-                            prose-headings:font-bold prose-headings:text-gray-900
+                            prose-headings:font-heading prose-headings:font-bold prose-headings:text-gray-900
                             prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline
                             prose-strong:text-gray-900
                             prose-ul:list-disc prose-ul:pl-6

@@ -4,12 +4,22 @@ import { Order } from '@/services/orderService';
 import { formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
+import { ReviewForm, ReviewData } from '@/components/features/reviews/ReviewForm';
+import { useState } from 'react';
+import { useToast } from '@/components/ui/Toast';
+import apiClient, { getErrorMessage } from '@/lib/api';
 
 interface OrderDetailViewProps {
     order: Order;
 }
 
 export function OrderDetailView({ order }: OrderDetailViewProps) {
+    const { success, error } = useToast();
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<{ id: number; name: string } | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
     const statusConfig: Record<string, { label: string; variant: 'warning' | 'info' | 'success' | 'error' | 'default' }> = {
         pending_payment: { label: 'Menunggu Pembayaran', variant: 'warning' },
         processing: { label: 'Diproses', variant: 'info' },
@@ -19,6 +29,27 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
     };
 
     const config = statusConfig[order.status] || { label: order.status, variant: 'default' };
+
+    const handleOpenReview = (productId: number, productName: string) => {
+        setSelectedProduct({ id: productId, name: productName });
+        setReviewModalOpen(true);
+    };
+
+    const handleSubmitReview = async (data: ReviewData) => {
+        if (!selectedProduct) return;
+
+        setIsLoading(true);
+        try {
+            await apiClient.post(`/products/${selectedProduct.id}/reviews`, data);
+            success('Ulasan berhasil dikirim!');
+            setReviewModalOpen(false);
+            // Optionally refresh order data or disable review button for this item
+        } catch (err) {
+            error(getErrorMessage(err));
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -50,7 +81,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                         </div>
                         <div className="divide-y divide-gray-200">
                             {order.items?.map((item) => (
-                                <div key={item.id} className="flex gap-4 p-6">
+                                <div key={item.id} className="flex flex-col gap-4 p-6 sm:flex-row">
                                     <div className="flex-1">
                                         <h3 className="font-medium text-gray-900">{item.product_name}</h3>
                                         <p className="text-sm text-gray-500">{item.variant_info}</p>
@@ -58,8 +89,19 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                                             {item.quantity} x {formatCurrency(item.price)}
                                         </div>
                                     </div>
-                                    <div className="font-medium text-gray-900">
-                                        {formatCurrency(item.subtotal)}
+                                    <div className="flex flex-col items-end gap-2">
+                                        <div className="font-medium text-gray-900">
+                                            {formatCurrency(item.subtotal)}
+                                        </div>
+                                        {order.status === 'delivered' && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleOpenReview(item.id, item.product_name)} // Note: item.id is order_item id usually, but backend might need product_id. Assuming endpoint needs product_id. Let's assume item struct has product_id or we use item.id if endpoint creates review for order item
+                                            >
+                                                Tulis Ulasan
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             ))}
@@ -93,8 +135,6 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                             <div className="border-t border-gray-200 pt-2">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Subtotal</span>
-                                    {/* Calculated subtotal usually not passed directly in flat order object unless we sum items or have it. 
-                                        Using total_amount - shipping as proxy if needed, or sum items. */}
                                     <span className="font-medium text-gray-900">
                                         {formatCurrency((order.items?.reduce((acc, i) => acc + i.subtotal, 0) || 0))}
                                     </span>
@@ -118,6 +158,19 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                     </div>
                 </div>
             </div>
+
+            {/* Review Modal */}
+            <Modal
+                isOpen={reviewModalOpen}
+                onClose={() => setReviewModalOpen(false)}
+                title={`Ulasan untuk ${selectedProduct?.name}`}
+            >
+                <ReviewForm
+                    onSubmit={handleSubmitReview}
+                    onCancel={() => setReviewModalOpen(false)}
+                    isLoading={isLoading}
+                />
+            </Modal>
         </div>
     );
 }

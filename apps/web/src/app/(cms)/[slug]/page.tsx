@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
+
+    // Ignore common static file requests
+    if (slug.includes('.') || slug === 'favicon.ico' || slug.includes('apple-touch-icon')) return { title: 'Not Found' };
+
     const page = await cmsClient.getPage(slug);
     if (!page) return { title: 'Page Not Found' };
 
@@ -13,6 +17,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CMSPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
+
+    // Ignore common static file requests and return 404 immediately
+    if (slug.includes('.') || slug === 'favicon.ico' || slug.includes('apple-touch-icon')) {
+        notFound();
+    }
+
     const page = await cmsClient.getPage(slug);
 
     if (!page) {

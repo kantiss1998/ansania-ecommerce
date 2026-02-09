@@ -60,7 +60,7 @@ export async function searchProducts(query: {
 }
 
 // Autocomplete search (returns product names only)
-export async function autocompleteSearch(query: string, limit: number = 10) {
+export async function autocompleteSearch(query: string, limit: number = 10): Promise<{ id: number, name: string, slug: string, price: number }[]> {
     const products = await Product.findAll({
         where: {
             is_active: true,

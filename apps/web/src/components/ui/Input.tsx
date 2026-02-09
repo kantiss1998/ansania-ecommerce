@@ -9,12 +9,9 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     error?: string;
     helperText?: string;
     fullWidth?: boolean;
+    endAdornment?: React.ReactNode;
 }
 
-/**
- * Reusable Input component for forms
- * Supports label, error messages, and helper text
- */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
     (
         {
@@ -24,6 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             helperText,
             fullWidth = true,
             id,
+            endAdornment,
             ...props
         },
         ref
@@ -39,24 +37,33 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                     >
                         {label}
                         {props.required && (
-                            <span className="ml-1 text-error-DEFAULT">*</span>
+                            <span className="ml-1 text-error-500">*</span>
                         )}
                     </label>
                 )}
 
-                <input
-                    ref={ref}
-                    id={inputId}
-                    className={cn(
-                        'flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm',
-                        'placeholder:text-gray-400',
-                        'focus:outline-none focus:ring-2 focus:ring-primary-700 focus:border-transparent',
-                        'disabled:cursor-not-allowed disabled:opacity-50',
-                        error && 'border-error-DEFAULT focus:ring-error-DEFAULT',
-                        className
+                <div className="relative">
+                    <input
+                        ref={ref}
+                        id={inputId}
+                        className={cn(
+                            'flex h-11 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm transition-all duration-200',
+                            'placeholder:text-gray-400',
+                            'hover:bg-white hover:border-gray-300',
+                            'focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500',
+                            'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100',
+                            error && 'border-error-300 bg-error-50/30 focus:border-error-500 focus:ring-error-100',
+                            endAdornment && 'pr-10',
+                            className
+                        )}
+                        {...props}
+                    />
+                    {endAdornment && (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                            {endAdornment}
+                        </div>
                     )}
-                    {...props}
-                />
+                </div>
 
                 {error && (
                     <p className="text-sm text-error-DEFAULT">{error}</p>

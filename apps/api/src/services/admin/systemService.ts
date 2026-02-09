@@ -85,7 +85,7 @@ export async function listActivityLogsByUser(userId: number, query: any) {
     return listActivityLogs({ ...query, user_id: userId });
 }
 
-export async function listActivityLogsByEntity(entityType: string, entityId: string, query: any) {
+export async function listActivityLogsByEntity(entityType: string, _entityId: string, query: any) {
     const { page = 1, limit = 50 } = query;
     const offset = (Number(page) - 1) * Number(limit);
 

@@ -23,14 +23,19 @@ export const metadata: Metadata = {
     },
 };
 
+import { Outfit, Inter } from 'next/font/google';
+
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-heading' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
+
 export default function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     return (
-        <html lang="id">
-            <body className="antialiased" suppressHydrationWarning>
+        <html lang="id" className={`${outfit.variable} ${inter.variable}`}>
+            <body className="font-body antialiased text-gray-800 bg-gray-50 selection:bg-primary-100 selection:text-primary-900" suppressHydrationWarning>
                 <QueryProvider>
                     <div className="flex min-h-screen flex-col">
                         <Header />
