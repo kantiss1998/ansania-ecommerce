@@ -9,6 +9,7 @@ import { setTokens, clearTokens } from '@/lib/auth';
 interface User {
     id: number;
     email: string;
+    role: string;
     phone?: string;
     full_name?: string;
     odoo_user_id?: number;
@@ -64,10 +65,10 @@ export const useAuthStore = create<AuthState>()(
                         remember_me: rememberMe,
                     });
 
-                    const { user, access_token, refresh_token } = response.data.data;
+                    const { user, token, refresh_token } = response.data.data;
 
                     // Store tokens
-                    setTokens(access_token, refresh_token);
+                    setTokens(token, refresh_token);
 
                     // Update state
                     set({
@@ -94,10 +95,10 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     const response = await apiClient.post('/auth/register', data);
 
-                    const { user, access_token, refresh_token } = response.data.data;
+                    const { user, token, refresh_token } = response.data.data;
 
                     // Store tokens
-                    setTokens(access_token, refresh_token);
+                    setTokens(token, refresh_token);
 
                     // Update state
                     set({

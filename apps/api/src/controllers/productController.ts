@@ -9,7 +9,7 @@ import { NotFoundError } from '@repo/shared/errors';
 
 export async function getProducts(req: Request, res: Response, next: NextFunction) {
     try {
-        const query = req.query as unknown as ListProductsQuery;
+        const query = req.body as ListProductsQuery;
         // Middleware `validateRequest(productSchemas.listProducts)` ensures usage of coerced types.
         // req.query by default is ParsedQs (string | string[] | ParsedQs | ParsedQs[]).
         // validation middleware assigns validated data to req.body currently in strict standards, 
@@ -45,7 +45,7 @@ export async function getProductDetail(req: Request, res: Response, next: NextFu
         res.json({
             success: true,
             data: {
-                ...product.toJSON(),
+                ...product,
                 related_products: related
             },
         });

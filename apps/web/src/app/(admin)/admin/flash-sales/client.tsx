@@ -83,9 +83,9 @@ function FlashSalesContent({ initialData }: AdminFlashSalesClientProps) {
                                     </TableCell>
                                     <TableCell>
                                         <div className="text-xs text-gray-600">
-                                            <p>{new Date(sale.start_time).toLocaleString('id-ID')}</p>
+                                            <p>{new Date(sale.start_date).toLocaleString('id-ID')}</p>
                                             <p className="text-gray-400">s/d</p>
-                                            <p>{new Date(sale.end_time).toLocaleString('id-ID')}</p>
+                                            <p>{new Date(sale.end_date).toLocaleString('id-ID')}</p>
                                         </div>
                                     </TableCell>
                                     <TableCell>
@@ -93,8 +93,8 @@ function FlashSalesContent({ initialData }: AdminFlashSalesClientProps) {
                                     </TableCell>
                                     <TableCell>
                                         <StatusBadge
-                                            start={sale.start_time}
-                                            end={sale.end_time}
+                                            start={sale.start_date}
+                                            end={sale.end_date}
                                             active={sale.is_active}
                                         />
                                     </TableCell>

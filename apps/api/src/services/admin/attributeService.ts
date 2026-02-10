@@ -67,3 +67,54 @@ export async function deleteFinishing(id: number) {
     await finishing.destroy();
     return { success: true };
 }
+
+export async function listAllAttributes() {
+    const [colors, sizes, finishing] = await Promise.all([
+        listColors(),
+        listSizes(),
+        listFinishing()
+    ]);
+
+    return [
+        {
+            id: 1,
+            name: 'Warna',
+            code: 'color',
+            type: 'select',
+            is_required: true,
+            values: colors.map((c: any) => ({
+                id: c.id,
+                attribute_id: 1,
+                label: c.name,
+                value: c.name.toLowerCase(),
+                extra_data: c.hex_code
+            }))
+        },
+        {
+            id: 2,
+            name: 'Ukuran',
+            code: 'size',
+            type: 'select',
+            is_required: true,
+            values: sizes.map((s: any) => ({
+                id: s.id,
+                attribute_id: 2,
+                label: s.name,
+                value: s.name.toLowerCase()
+            }))
+        },
+        {
+            id: 3,
+            name: 'Finishing',
+            code: 'finishing',
+            type: 'select',
+            is_required: false,
+            values: finishing.map((f: any) => ({
+                id: f.id,
+                attribute_id: 3,
+                label: f.name,
+                value: f.name.toLowerCase()
+            }))
+        }
+    ];
+}

@@ -7,7 +7,7 @@ export async function getAllFlashSales(req: Request, res: Response, next: NextFu
         const result = await adminFlashSaleService.listFlashSales(req.query);
         res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         next(error);

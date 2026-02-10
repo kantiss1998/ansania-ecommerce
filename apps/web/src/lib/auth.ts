@@ -1,29 +1,35 @@
-/**
- * Authentication utilities for JWT token management
- * Handles token storage, retrieval, and validation
- */
+import Cookies from 'js-cookie';
 
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
 /**
- * Store authentication tokens in localStorage
+ * Store authentication tokens in localStorage and cookies for middleware
  */
 export function setTokens(accessToken: string, refreshToken?: string): void {
     if (typeof window === 'undefined') return;
 
     localStorage.setItem(TOKEN_KEY, accessToken);
+
+    // Set cookie for middleware access
+    // Expires in 7 days by default, or you can parse JWT to get actual exp
+    Cookies.set(TOKEN_KEY, accessToken, {
+        expires: 7,
+        path: '/',
+        sameSite: 'lax'
+    });
+
     if (refreshToken) {
         localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     }
 }
 
 /**
- * Get access token from localStorage
+ * Get access token from localStorage or cookies
  */
 export function getAccessToken(): string | null {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY) || Cookies.get(TOKEN_KEY) || null;
 }
 
 /**
@@ -35,13 +41,14 @@ export function getRefreshToken(): string | null {
 }
 
 /**
- * Remove all tokens from localStorage
+ * Remove all tokens from localStorage and cookies
  */
 export function clearTokens(): void {
     if (typeof window === 'undefined') return;
 
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    Cookies.remove(TOKEN_KEY, { path: '/' });
 }
 
 /**

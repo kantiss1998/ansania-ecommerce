@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/utils';
+import { Minus, Plus, Trash2 } from 'lucide-react';
 
 /**
  * Cart item type
@@ -43,7 +44,7 @@ export function CartItem({
     };
 
     return (
-        <div className="flex gap-4 border-b border-gray-100 py-6 last:border-0 hover:bg-gray-50/50 transition-colors px-2 -mx-2 rounded-xl">
+        <div className="flex gap-4 border-b border-gray-100 py-6 last:border-0 hover:bg-gray-50/50 transition-colors px-2 -mx-2 rounded-xl group/item">
             {/* Product Image */}
             <Link
                 href={`/products/${item.product_slug}`}
@@ -53,7 +54,7 @@ export function CartItem({
                     src={item.product_image}
                     alt={item.product_name}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="96px"
                 />
             </Link>
@@ -89,9 +90,7 @@ export function CartItem({
                             className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                             type="button"
                         >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                            </svg>
+                            <Minus className="h-4 w-4" />
                         </button>
                         <input
                             type="text"
@@ -110,9 +109,7 @@ export function CartItem({
                             className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                             type="button"
                         >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                            </svg>
+                            <Plus className="h-4 w-4" />
                         </button>
                     </div>
 
@@ -124,13 +121,11 @@ export function CartItem({
                         <button
                             onClick={() => onRemove(item.id)}
                             disabled={isUpdating}
-                            className="rounded-full p-2 text-gray-400 hover:bg-error-50 hover:text-error-600 disabled:opacity-50 transition-all"
+                            className="rounded-full p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50 transition-all opacity-0 group-hover/item:opacity-100"
                             aria-label="Hapus item"
                             type="button"
                         >
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <Trash2 className="h-5 w-5" />
                         </button>
                     </div>
                 </div>

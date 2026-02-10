@@ -10,16 +10,16 @@ async function getReportsOverview() {
 
         if (!token) return null;
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
         const [salesRes, customersRes, inventoryRes] = await Promise.all([
-            fetch(`${baseUrl}/api/admin/reports/sales?period=this_month`, {
+            fetch(`${baseUrl}/admin/reports/sales?period=this_month`, {
                 headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${baseUrl}/api/admin/reports/customers?period=this_month`, {
+            fetch(`${baseUrl}/admin/reports/customers?period=this_month`, {
                 headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${baseUrl}/api/admin/reports/inventory`, {
+            fetch(`${baseUrl}/admin/reports/inventory`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
         ]);

@@ -17,7 +17,8 @@ async function getReviews(searchParams: { page?: string; status?: string }): Pro
             ...(searchParams.status && { status: searchParams.status }),
         });
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/reviews?${query.toString()}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/reviews?${query.toString()}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

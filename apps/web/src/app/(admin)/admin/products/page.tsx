@@ -18,7 +18,8 @@ async function getProducts(searchParams: { page?: string; search?: string; categ
             ...(searchParams.category && { category: searchParams.category }),
         });
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/products?${query.toString()}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/products?${query.toString()}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

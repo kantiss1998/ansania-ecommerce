@@ -10,12 +10,15 @@ async function getCategories() {
 
         if (!token) return [];
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${baseUrl}/api/categories`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/categories`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!response.ok) return [];
+        if (!response.ok) {
+            console.error('Failed to fetch categories:', response.statusText);
+            return [];
+        }
 
         const result = await response.json();
         return result.data || [];

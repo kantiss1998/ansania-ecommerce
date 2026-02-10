@@ -40,7 +40,7 @@ export async function listAllReviews(query: any) {
     });
 
     return {
-        data: rows,
+        items: rows,
         meta: {
             total: count,
             page: Number(page),

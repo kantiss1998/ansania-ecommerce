@@ -17,7 +17,8 @@ async function getCustomers(searchParams: { page?: string; search?: string }): P
             ...(searchParams.search && { search: searchParams.search }),
         });
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/customers?${query.toString()}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/customers?${query.toString()}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

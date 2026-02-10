@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { shippingService, Province, City } from '@/services/shippingService';
 import { Address, CreateAddressData } from '@/services/addressService';
+import { Save, X } from 'lucide-react';
 
 // Define schema locally since shared schema differs slightly (address_line vs address_line1)
 // Ideally, we should unify this in the future
@@ -132,22 +133,26 @@ export function AddressForm({
     };
 
     return (
-        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-            <Input
-                label="Nama Penerima"
-                {...register('recipient_name')}
-                error={errors.recipient_name?.message}
-                required
-            />
+        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6 animate-in fade-in zoom-in duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                    label="Nama Penerima"
+                    {...register('recipient_name')}
+                    error={errors.recipient_name?.message}
+                    required
+                    className="bg-gray-50/50"
+                />
 
-            <Input
-                label="Nomor Telepon"
-                type="tel"
-                {...register('phone')}
-                error={errors.phone?.message}
-                helperText="Contoh: 08123456789"
-                required
-            />
+                <Input
+                    label="Nomor Telepon"
+                    type="tel"
+                    {...register('phone')}
+                    error={errors.phone?.message}
+                    helperText="Contoh: 08123456789"
+                    required
+                    className="bg-gray-50/50"
+                />
+            </div>
 
             <Input
                 label="Alamat Lengkap"
@@ -155,6 +160,7 @@ export function AddressForm({
                 error={errors.address_line?.message}
                 helperText="Nama jalan, nomor rumah, RT/RW"
                 required
+                className="bg-gray-50/50"
             />
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -165,6 +171,7 @@ export function AddressForm({
                         onChange={handleProvinceChange}
                         disabled={isProvincesLoading}
                         error={errors.province_id?.message}
+                        className="bg-gray-50/50"
                     >
                         <option value="">Pilih Provinsi</option>
                         {provinces.map(p => (
@@ -189,6 +196,7 @@ export function AddressForm({
                                 }}
                                 disabled={!watchedProvinceId || isCitiesLoading}
                                 error={errors.city_id?.message}
+                                className="bg-gray-50/50"
                             >
                                 <option value="">Pilih Kota/Kabupaten</option>
                                 {cities.map(c => (
@@ -206,41 +214,44 @@ export function AddressForm({
                 error={errors.postal_code?.message}
                 maxLength={5}
                 required
+                className="bg-gray-50/50"
             />
 
-            <div className="flex items-center">
+            <div className="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-100">
                 <input
                     type="checkbox"
                     id="is_default"
                     {...register('is_default')}
-                    className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                 />
                 <label
                     htmlFor="is_default"
-                    className="ml-2 text-sm text-gray-700"
+                    className="ml-3 text-sm text-gray-700 font-medium cursor-pointer select-none"
                 >
-                    Jadikan alamat utama
+                    Jadikan sebagai alamat utama
                 </label>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-3 pt-4 border-t border-gray-100">
                 <Button
                     type="submit"
                     variant="primary"
-                    size="md"
+                    size="lg"
                     isLoading={isLoading}
-                    className="flex-1"
+                    className="flex-1 shadow-lg shadow-primary-500/20"
                 >
+                    <Save className="h-4 w-4 mr-2" />
                     Simpan Alamat
                 </Button>
                 {onCancel && (
                     <Button
                         type="button"
                         variant="ghost"
-                        size="md"
+                        size="lg"
                         onClick={onCancel}
                         disabled={isLoading}
                     >
+                        <X className="h-4 w-4 mr-2" />
                         Batal
                     </Button>
                 )}

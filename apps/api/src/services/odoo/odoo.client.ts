@@ -17,7 +17,7 @@ export class OdooClient {
         this.baseUrl = process.env.ODOO_URL || '';
         this.db = process.env.ODOO_DATABASE || '';
         this.username = process.env.ODOO_USERNAME || '';
-        this.password = process.env.ODOO_PASSWORD || '';
+        this.password = process.env.ODOO_PASSWORD || process.env.ODOO_API_KEY || '';
 
         this.useMock = !this.baseUrl || !this.db || !this.username || !this.password;
 

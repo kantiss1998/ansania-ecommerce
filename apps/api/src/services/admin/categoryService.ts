@@ -15,11 +15,13 @@ export async function listAdminCategories(query: any) {
         where.is_active = is_active === 'true';
     }
 
-    return Category.findAll({
+    const items = await Category.findAll({
         where,
         order: [['sort_order', 'ASC'], ['name', 'ASC']],
         include: [{ model: Category, as: 'parent', attributes: ['name'] }]
     });
+
+    return { items };
 }
 
 export async function getCategoryDetail(id: number) {

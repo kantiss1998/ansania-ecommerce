@@ -16,20 +16,24 @@ export interface FlashSale {
     id: number;
     name: string;
     description?: string;
-    start_time: string; // ISO string 2026-06-01T00:00:00Z
-    end_time: string;
+    start_date: string; // ISO string 2026-06-01T00:00:00Z
+    end_date: string;
     is_active: boolean;
     products: FlashSaleProduct[];
 }
 
 export const flashSaleService = {
-    async getAllFlashSales(params?: { page?: number; limit?: number; status?: 'active' | 'upcoming' | 'expired' | 'all' }): Promise<{ items: FlashSale[]; meta: any }> {
+    async getAllFlashSales(
+        params?: { page?: number; limit?: number; status?: 'active' | 'upcoming' | 'expired' | 'all' },
+        token?: string
+    ): Promise<{ items: FlashSale[]; meta: any }> {
         const query = new URLSearchParams();
         if (params?.page) query.append('page', params.page.toString());
         if (params?.limit) query.append('limit', params.limit.toString());
         if (params?.status) query.append('status', params.status);
 
-        const response = await apiClient.get<ApiResponse<{ items: FlashSale[]; meta: any }>>(`/admin/flash-sales?${query.toString()}`);
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const response = await apiClient.get<ApiResponse<{ items: FlashSale[]; meta: any }>>(`/admin/flash-sales?${query.toString()}`, config);
         return response.data.data!;
     },
 
@@ -43,9 +47,12 @@ export const flashSaleService = {
         }
     },
 
-    async getFlashSale(id: number): Promise<FlashSale | null> {
+    async getFlashSale(id: number, token?: string): Promise<FlashSale | null> {
         try {
-            const response = await apiClient.get<ApiResponse<FlashSale>>(`/flash-sales/${id}`); // Or /admin/flash-sales/${id} for full details
+            const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+            // Use admin endpoint if token is present, otherwise use public endpoint
+            const endpoint = token ? `/admin/flash-sales/${id}` : `/flash-sales/${id}`;
+            const response = await apiClient.get<ApiResponse<FlashSale>>(endpoint, config);
             return response.data.data || null;
         } catch (error) {
             console.error(`Failed to fetch flash sale ${id}:`, error);

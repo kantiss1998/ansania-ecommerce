@@ -7,6 +7,7 @@ import { useUiStore } from '@/store/uiStore';
 import { useCartStore } from '@/store/cartStore';
 import { formatCurrency, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
+import { X, ShoppingBag, Trash2 } from 'lucide-react';
 
 /**
  * Cart drawer component that slides from right
@@ -71,9 +72,7 @@ export function CartDrawer() {
                             className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
                             aria-label="Tutup keranjang"
                         >
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                            <X className="h-6 w-6" />
                         </button>
                     </div>
 
@@ -81,19 +80,7 @@ export function CartDrawer() {
                     {!hasItems ? (
                         <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-50 mb-6">
-                                <svg
-                                    className="h-10 w-10 text-gray-400"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={1.5}
-                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                                    />
-                                </svg>
+                                <ShoppingBag className="h-10 w-10 text-gray-400" />
                             </div>
                             <h3 className="text-lg font-bold text-gray-900 font-heading">
                                 Keranjang Kosong
@@ -152,9 +139,7 @@ export function CartDrawer() {
                                                             className="text-gray-400 hover:text-error-600 transition-colors p-0.5"
                                                             aria-label="Hapus item"
                                                         >
-                                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                            </svg>
+                                                            <Trash2 className="h-4 w-4" />
                                                         </button>
                                                     </div>
 

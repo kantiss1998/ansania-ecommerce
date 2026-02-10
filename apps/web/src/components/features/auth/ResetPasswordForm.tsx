@@ -101,7 +101,7 @@ export function ResetPasswordForm() {
                     error={errors.password?.message}
                     {...register('password')}
                     required
-                    endAdornment={
+                    rightIcon={
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
@@ -128,7 +128,7 @@ export function ResetPasswordForm() {
                     error={errors.password_confirmation?.message}
                     {...register('password_confirmation')}
                     required
-                    endAdornment={
+                    rightIcon={
                         <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}

@@ -11,8 +11,8 @@ async function getCategory(id: string) {
 
         if (!token) return null;
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${baseUrl}/api/admin/categories/${id}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/categories/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 

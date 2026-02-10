@@ -10,8 +10,8 @@ async function getCMSPage(id: string) {
 
         if (!token) return null;
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${baseUrl}/api/admin/cms/pages/${id}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/cms/pages/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 

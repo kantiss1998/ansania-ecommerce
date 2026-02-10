@@ -1,10 +1,14 @@
 import { VoucherForm } from '@/components/features/admin/vouchers/VoucherForm';
 import { adminVoucherService } from '@/services/adminVoucherService';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export default async function VoucherDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('auth_token')?.value;
+
     const { id } = await params;
-    const voucher = await adminVoucherService.getVoucher(parseInt(id));
+    const voucher = await adminVoucherService.getVoucher(parseInt(id), token);
     if (!voucher) notFound();
 
     return (

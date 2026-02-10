@@ -5,7 +5,7 @@ import * as marketingService from '../../services/marketingService';
 export async function processAbandonedCarts(_req: Request, res: Response, next: NextFunction) {
     try {
         const result = await marketingService.processAbandonedCarts();
-        res.json(result);
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }
@@ -14,7 +14,7 @@ export async function processAbandonedCarts(_req: Request, res: Response, next: 
 export async function sendPromotions(_req: Request, res: Response, next: NextFunction) {
     try {
         const result = await marketingService.sendPromotionalOffers();
-        res.json(result);
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }

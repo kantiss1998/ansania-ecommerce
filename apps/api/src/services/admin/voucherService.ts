@@ -27,7 +27,7 @@ export async function listVouchers(query: any) {
     });
 
     return {
-        data: rows,
+        items: rows,
         meta: {
             total: count,
             page: Number(page),
@@ -92,7 +92,7 @@ export async function getVoucherUsageHistory(id: number, query: any) {
         ]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
 }
 
 export async function bulkDeleteVouchers(ids: number[]) {

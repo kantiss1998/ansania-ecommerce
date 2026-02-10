@@ -1,6 +1,14 @@
 
 import { odooClient } from './odoo.client';
-import { Product, ProductVariant, Category, FlashSale, FlashSaleProduct, ProductStock, FilterColor, FilterSize, FilterFinishing } from '@repo/database';
+import {
+    Product,
+    ProductVariant,
+    Category,
+    ProductStock,
+    FilterColor,
+    FilterSize,
+    FilterFinishing
+} from '@repo/database';
 import { slugify } from '@repo/shared/utils';
 
 export class OdooProductService {
@@ -29,15 +37,11 @@ export class OdooProductService {
             // Step 4: Get attribute values for variant mapping
             const attributeValues = await this.getAttributeValues();
 
-            // Step 5: Get pricelist data for different pricing
-            const pricelistData = await this.getPricelistData();
-
-            // Step 6: Process and save to local database
+            // Step 5: Process and save to local database
             const syncResult = await this.processAndSaveProducts(
                 products,
                 variants,
                 attributeValues,
-                pricelistData,
                 warehouseId
             );
 
@@ -123,14 +127,32 @@ export class OdooProductService {
         }
     }
 
-    // Get products filtered by "internal" category
     async getFilteredProducts() {
         try {
-            console.log("📦 Fetching products with 'internal' category...");
+            console.log("📦 Fetching 'INTERNAL' categories from Odoo...");
 
+            // 1. Find categories with "INTERNAL" in the name
+            const categories = await this.safeSearchRead(
+                "product.category",
+                [["name", "ilike", "INTERNAL"]],
+                ["id", "name"]
+            );
+
+            if (!categories || categories.length === 0) {
+                console.warn("⚠️ No category named 'INTERNAL' found in Odoo.");
+                return [];
+            }
+
+            const categoryIds = categories.map(c => c.id);
+            console.log(`📂 Found ${categories.length} Internal categories: ${categories.map(c => c.name).join(', ')}`);
+
+            // 2. Fetch products belonging to these categories
             const products = await this.safeSearchRead(
                 "product.template",
-                [["categ_id.name", "ilike", "internal"]],
+                [
+                    ["categ_id", "in", categoryIds],
+                    ["active", "=", true]
+                ],
                 [
                     "id",
                     "name",
@@ -140,18 +162,16 @@ export class OdooProductService {
                     "image_1920",
                     "active",
                     "product_variant_ids",
-                    "weight", // Added likely needed fields
-                    "default_code" // Added for SKU mapping
-                ],
+                    "weight",
+                    "default_code"
+                ]
             );
 
-            console.log(
-                `✅ Found ${products.length} products with 'internal' category`,
-            );
+            console.log(`✅ Found ${products.length} products in INTERNAL categories`);
             return products;
         } catch (error) {
-            console.error("❌ Failed to get filtered products:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get filtered products: ${error instanceof Error ? error.message : String(error)}`);
+            console.error("❌ Failed to get filtered products:", error);
+            throw error;
         }
     }
 
@@ -199,9 +219,9 @@ export class OdooProductService {
     // Get attribute values for variant names and hex codes
     async getAttributeValues() {
         try {
-            console.log("🎨 Fetching attribute values...");
+            console.log("🎨 Fetching attribute values from Odoo...");
 
-            // Get template attribute values
+            // Get template attribute values (Large limit to ensure we get all)
             const templateAttrValues = await this.safeSearchRead(
                 "product.template.attribute.value",
                 [],
@@ -212,6 +232,7 @@ export class OdooProductService {
                     "product_attribute_value_id",
                     "html_color",
                 ],
+                { limit: 10000 }
             );
 
             // Get attribute values details
@@ -219,6 +240,7 @@ export class OdooProductService {
                 "product.attribute.value",
                 [],
                 ["id", "name", "attribute_id", "html_color"],
+                { limit: 10000 }
             );
 
             // Get attributes for names
@@ -226,9 +248,10 @@ export class OdooProductService {
                 "product.attribute",
                 [],
                 ["id", "name"],
+                { limit: 1000 }
             );
 
-            console.log(`✅ Found ${attributeValues.length} attribute values`);
+            console.log(`✅ Loaded ${templateAttrValues.length} template values, ${attributeValues.length} attribute values, ${attributes.length} attributes`);
 
             return {
                 templateAttrValues,
@@ -241,79 +264,25 @@ export class OdooProductService {
         }
     }
 
-    // Get pricelist data for different pricing (Flash sale only)
-    async getPricelistData() {
-        try {
-            console.log("💰 Fetching pricelist data for flash sales...");
-
-            // Get pricelists
-            const pricelists = await this.safeSearchRead(
-                "product.pricelist",
-                [],
-                ["id", "name"],
-            );
-
-            // Get pricelist items (only for flash sales with date range)
-            const pricelistItems = await this.safeSearchRead(
-                "product.pricelist.item",
-                [
-                    ["date_start", "!=", false],
-                    ["date_end", "!=", false],
-                ],
-                [
-                    "id",
-                    "pricelist_id",
-                    "product_tmpl_id",
-                    "product_id",
-                    "fixed_price",
-                    "price_discount",
-                    "date_start",
-                    "date_end",
-                ],
-            );
-
-            console.log(
-                `✅ Found ${pricelistItems.length} flash sale pricelist items`,
-            );
-
-            return {
-                pricelists,
-                pricelistItems,
-            };
-        } catch (error) {
-            console.error("❌ Failed to get pricelist data:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get pricelist data: ${error instanceof Error ? error.message : String(error)}`);
-        }
-    }
-
     async getValidWarehouse() {
         try {
             console.log("🏭 Fetching 'GUDANG ONLINE'...");
-            // 1. Try to find "GUDANG ONLINE" specifically
-            let warehouses = await this.safeSearchRead(
+            const warehouses = await this.safeSearchRead(
                 "stock.warehouse",
                 [["name", "=", "GUDANG ONLINE"]],
                 ["id", "name", "code"],
                 { limit: 1 }
             );
 
-            // 2. Fallback to any valid warehouse if not found
-            if (!warehouses || warehouses.length === 0) {
-                console.log("⚠️ 'GUDANG ONLINE' not found, falling back to any warehouse...");
-                warehouses = await this.safeSearchRead(
-                    "stock.warehouse",
-                    [["name", "!=", false]],
-                    ["id", "name", "code"],
-                    { limit: 1 }
-                );
-            }
-
             if (warehouses && warehouses.length > 0) {
+                console.log(`✅ Found Warehouse: ${warehouses[0].name} (ID: ${warehouses[0].id})`);
                 return warehouses[0];
+            } else {
+                console.error("❌ CRITICAL: 'GUDANG ONLINE' warehouse not found in Odoo.");
+                return null;
             }
-            return null;
         } catch (error) {
-            console.warn("⚠️ Failed to fetch warehouses, proceeding without specific warehouse context:", error instanceof Error ? error.message : String(error));
+            console.error("❌ Failed to fetch warehouse:", error);
             return null;
         }
     }
@@ -323,7 +292,6 @@ export class OdooProductService {
         products: any[],
         variants: any[],
         attributeData: any,
-        pricelistData: any,
         warehouseId?: number
     ) {
         try {
@@ -340,13 +308,6 @@ export class OdooProductService {
 
             for (const odooProduct of products) {
                 try {
-                    // Process pricing data
-                    const pricing = this.processPricing(
-                        odooProduct.id,
-                        odooProduct.list_price,
-                        pricelistData,
-                    );
-
                     // Handle Category
                     let categoryId: number;
                     let odooCategoryName: string;
@@ -354,7 +315,7 @@ export class OdooProductService {
                     if (odooProduct.categ_id && Array.isArray(odooProduct.categ_id) && odooProduct.categ_id.length > 1) {
                         odooCategoryName = odooProduct.categ_id[1];
                         const [category] = await Category.findOrCreate({
-                            where: { odoo_id: odooProduct.categ_id[0] }, // Use odoo_id for finding
+                            where: { odoo_id: odooProduct.categ_id[0] },
                             defaults: {
                                 name: odooCategoryName,
                                 slug: slugify(odooCategoryName),
@@ -363,7 +324,6 @@ export class OdooProductService {
                         });
                         categoryId = category.id;
                     } else {
-                        // Fallback category if none or malformed
                         const [category] = await Category.findOrCreate({
                             where: { name: 'Uncategorized' },
                             defaults: {
@@ -376,14 +336,12 @@ export class OdooProductService {
                     }
 
                     // Prepare product data for local DB
-                    // Note: We map priceMitra to selling_price
                     const productData = {
                         odoo_id: odooProduct.id,
                         name: odooProduct.name,
                         slug: slugify(odooProduct.name + '-' + odooProduct.id),
                         description: odooProduct.description || null,
                         category_id: categoryId,
-                        selling_price: pricing.priceMitra, // Base price/Mitra price is the selling price
                         sku: odooProduct.default_code || null,
                         weight: odooProduct.weight || null,
                         is_active: odooProduct.active || false,
@@ -393,101 +351,52 @@ export class OdooProductService {
                     // Create or update product
                     const [localProduct, created] = await Product.findOrCreate({
                         where: { odoo_id: odooProduct.id },
-                        defaults: productData as any,
+                        defaults: {
+                            ...productData,
+                            selling_price: odooProduct.list_price || 0,
+                            compare_price: 0
+                        } as any,
                     });
 
                     if (!created) {
+                        // Update basic info but EXCLUDE selling_price and compare_price for manual control
                         await localProduct.update(productData as any);
                     }
 
-                    // --- Flash Sale Handling ---
-                    // If we have flash sale data, we should try to record it
-                    // NOTE: This is a best-effort mapping to the FlashSale/FlashSaleProduct tables
-                    if (pricing.flashsalePriceMitra && pricing.flashsaleDateStart && pricing.flashsaleDateEnd) {
-                        const [flashSale] = await FlashSale.findOrCreate({
-                            where: {
-                                start_date: new Date(pricing.flashsaleDateStart),
-                                end_date: new Date(pricing.flashsaleDateEnd)
-                            },
-                            defaults: {
-                                name: `Flash Sale ${pricing.flashsaleDateStart}`,
-                                start_date: new Date(pricing.flashsaleDateStart),
-                                end_date: new Date(pricing.flashsaleDateEnd),
-                                is_active: true
-                            } as any
-                        });
-
-                        await FlashSaleProduct.upsert({
-                            flash_sale_id: flashSale.id,
-                            product_id: localProduct.id,
-                            original_price: productData.selling_price,
-                            flash_sale_price: pricing.flashsalePriceMitra,
-                            is_active: true
-                        } as any);
-                    }
-                    // ---------------------------
-
-
                     processedProducts++;
 
-                    // Process variants for this product
+                    // Process variants
                     const productVariants = variants.filter(
                         (v) => v.product_tmpl_id[0] === odooProduct.id,
                     );
 
                     for (const odooVariant of productVariants) {
                         try {
-                            // Process variant attributes
-                            const variantInfo = this.processVariantAttributes(
-                                odooVariant,
-                                attributeData,
-                            );
+                            const variantInfo = this.processVariantAttributes(odooVariant, attributeData);
 
-                            // Parse color, size, finishing from variantValue or separate attributes
-                            // The user provided logic combines them into 'variantValue', we might need to separate them if we want to store in specific columns
-                            // For now we will try to infer them or just store what we can. 
-                            // The processVariantAttributes returns `variantValue` string like "Red, XL". 
-                            // We need to parse this if we want to fill `color`, `size`, `finishing`.
-
-                            // Better approach: Re-use the resolving logic from original service or trust the user's logic?
-                            // User's logic gets all attributes. Let's try to map them to our specific columns if possible.
-
-                            // Let's refine `processVariantAttributes` to return specific map if possible, 
-                            // but for now let's stick to user's function signature and parse the result if needed
-                            // or modify the function slightly to return structured data.
-
-                            // I will modify processVariantAttributes slightly to return structured info as well 
-                            // so we can fill the DB columns correctly.
-
-                            // Prepare variant data for local DB
                             const variantData = {
                                 product_id: localProduct.id,
                                 odoo_product_id: odooVariant.id,
                                 sku: odooVariant.default_code || `VAR-${odooVariant.id}`,
-                                price: odooVariant.lst_price || localProduct.selling_price, // Variant price
+                                price: odooVariant.lst_price ?? 0,
                                 stock: odooVariant.qty_available || 0,
                                 is_visible: odooVariant.active || false,
-
-                                // Map attributes
                                 color: variantInfo.attributes.color || null,
                                 size: variantInfo.attributes.size || null,
                                 finishing: variantInfo.attributes.finishing || null,
-
                                 synced_at: new Date(),
                             };
 
-                            // Create or update variant
-                            const [localVariant, variantCreated] =
-                                await ProductVariant.findOrCreate({
-                                    where: { odoo_product_id: odooVariant.id },
-                                    defaults: variantData as any,
-                                });
+                            const [localVariant, variantCreated] = await ProductVariant.findOrCreate({
+                                where: { odoo_product_id: odooVariant.id },
+                                defaults: variantData as any,
+                            });
 
                             if (!variantCreated) {
                                 await localVariant.update(variantData as any);
                             }
 
-                            // Update ProductStock (Safe update to preserve reserved_quantity)
+                            // Update ProductStock
                             const [stockEntry, stockEntryCreated] = await ProductStock.findOrCreate({
                                 where: { product_variant_id: localVariant.id },
                                 defaults: {
@@ -501,8 +410,6 @@ export class OdooProductService {
                             });
 
                             if (!stockEntryCreated) {
-                                // Only update quantity, preserve reserved_quantity
-                                // Hook will recalculate available_quantity
                                 stockEntry.quantity = odooVariant.qty_available || 0;
                                 if (warehouseId) stockEntry.odoo_warehouse_id = warehouseId;
                                 stockEntry.last_synced_at = new Date();
@@ -510,6 +417,7 @@ export class OdooProductService {
                             }
 
                             processedVariants++;
+
                             // Collect attributes for Filter Sync
                             if (variantInfo.attributes.color) {
                                 collectedColors.set(variantInfo.attributes.color, variantInfo.hexCode || null);
@@ -520,98 +428,30 @@ export class OdooProductService {
                             if (variantInfo.attributes.finishing) {
                                 collectedFinishings.add(variantInfo.attributes.finishing);
                             }
-                        } catch (variantError) {
-                            console.error(
-                                `❌ Error processing variant ${odooVariant.id}:`,
-                                variantError instanceof Error ? variantError.message : String(variantError),
-                            );
-                            errors.push(`Variant ${odooVariant.id}: ${variantError instanceof Error ? variantError.message : String(variantError)}`);
+                        } catch (vErr) {
+                            errors.push(`Variant ${odooVariant.id}: ${vErr instanceof Error ? vErr.message : String(vErr)}`);
                         }
                     }
-                } catch (productError) {
-                    console.error(
-                        `❌ Error processing product ${odooProduct.id}:`,
-                        productError instanceof Error ? productError.message : String(productError),
-                    );
-                    errors.push(`Product ${odooProduct.id}: ${productError instanceof Error ? productError.message : String(productError)}`);
+                } catch (pErr) {
+                    errors.push(`Product ${odooProduct.id}: ${pErr instanceof Error ? pErr.message : String(pErr)}`);
                 }
             }
 
-            // Sync Collected Attributes to Filter Tables
+            console.log(`📊 Collected for Filter Sync: ${collectedColors.size} colors, ${collectedSizes.size} sizes, ${collectedFinishings.size} finishings`);
             await this.syncFilterAttributes(collectedColors, collectedSizes, collectedFinishings);
 
-            console.log(
-                `✅ Processed ${processedProducts} products and ${processedVariants} variants`,
-            );
+            console.log(`✅ Processed ${processedProducts} products and ${processedVariants} variants`);
 
             return {
                 processedProducts,
                 processedVariants,
                 totalErrors: errors.length,
-                errors: errors.slice(0, 10), // Return first 10 errors only
+                errors: errors.slice(0, 10),
             };
         } catch (error) {
-            console.error("❌ Failed to process and save products:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to process and save products: ${error instanceof Error ? error.message : String(error)}`);
+            console.error("❌ Failed to process and save products:", error);
+            throw error;
         }
-    }
-
-    // Process pricing based on list_price from Odoo
-    processPricing(productId: number, listPrice: number, pricelistData: any) {
-        const { pricelists, pricelistItems } = pricelistData;
-
-        // Calculate pricing based on list_price
-        let basePrice = listPrice || 0;
-
-        // If price is below 4 digits (less than 1000), set to 10000
-        if (basePrice < 1000) {
-            basePrice = 10000;
-        }
-
-        let pricing: any = {
-            priceMitra: basePrice, // Same as base price (min 10000)
-            priceTele: basePrice + 1000, // Base price + 1000
-            priceMobile: basePrice + 2000, // Base price + 2000
-            flashsalePriceMitra: null,
-            flashsalePriceTele: null,
-            flashsalePriceMobile: null,
-            flashsaleDateStart: null,
-            flashsaleDateEnd: null,
-        };
-
-        // Find flash sale pricelist items for this product
-        const productFlashSaleItems = pricelistItems.filter(
-            (item: any) => item.product_tmpl_id && item.product_tmpl_id[0] === productId,
-        );
-
-        // Map pricelist names to flash sale pricing fields
-        const flashsaleMapping: Record<string, string> = {
-            Mitra: "flashsalePriceMitra",
-            Tele: "flashsalePriceTele",
-            Kanvas: "flashsalePriceMobile",
-        };
-
-        for (const priceItem of productFlashSaleItems) {
-            const pricelist = pricelists.find(
-                (pl: any) => pl.id === priceItem.pricelist_id[0],
-            );
-
-            if (pricelist && priceItem.fixed_price) {
-                const pricelistName = pricelist.name;
-
-                // Map to flash sale pricing
-                for (const [key, field] of Object.entries(flashsaleMapping)) {
-                    if (pricelistName.toLowerCase().includes(key.toLowerCase())) {
-                        pricing[field] = priceItem.fixed_price;
-                        pricing.flashsaleDateStart = priceItem.date_start;
-                        pricing.flashsaleDateEnd = priceItem.date_end;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return pricing;
     }
 
     // Process variant attributes to get variant name, value, and hex code
@@ -622,45 +462,32 @@ export class OdooProductService {
             variantName: variant.display_name,
             variantValue: "",
             hexCode: null,
-            attributes: { // Helper to map to specific DB columns
+            attributes: {
                 color: null,
                 size: null,
                 finishing: null
             }
         };
 
-        if (
-            variant.product_template_attribute_value_ids &&
-            variant.product_template_attribute_value_ids.length > 0
-        ) {
+        if (variant.product_template_attribute_value_ids && variant.product_template_attribute_value_ids.length > 0) {
             const attrValueIds = variant.product_template_attribute_value_ids;
-
-            // Get template attribute values for this variant
-            const variantAttrValues = templateAttrValues.filter((tav: any) =>
-                attrValueIds.includes(tav.id),
-            );
-
+            const variantAttrValues = templateAttrValues.filter((tav: any) => attrValueIds.includes(tav.id));
             const variantValueNames = [];
 
             for (const tav of variantAttrValues) {
-                // Find the attribute value details
-                const attrValue = attributeValues.find(
-                    (av: any) => av.id === tav.product_attribute_value_id[0],
-                );
-
+                const attrValue = attributeValues.find((av: any) => av.id === tav.product_attribute_value_id[0]);
                 if (attrValue) {
                     variantValueNames.push(attrValue.name);
-
-                    // Infer Type based on Attribute Name (Need to fetch Attribute Name)
-                    // tav.attribute_id is [id, name]
                     let attrName = "";
                     if (tav.attribute_id && Array.isArray(tav.attribute_id)) {
                         attrName = tav.attribute_id[1].toLowerCase();
                     } else {
-                        // Try finding in attributes list if only ID
                         const attrDef = attributes.find((a: any) => a.id === (Array.isArray(tav.attribute_id) ? tav.attribute_id[0] : tav.attribute_id));
                         if (attrDef) attrName = attrDef.name.toLowerCase();
                     }
+
+                    // Debug log to console to see what Odoo provides
+                    console.log(`🔍 Mapping Attribute: "${attrName}" Value: "${attrValue.name}"`);
 
                     if (attrName) {
                         if (attrName.includes('color') || attrName.includes('warna')) {
@@ -672,23 +499,12 @@ export class OdooProductService {
                         }
                     }
 
-                    // Get hex code if available
-                    if (attrValue.html_color && !variantInfo.hexCode) {
-                        variantInfo.hexCode = attrValue.html_color;
-                    }
-
-                    // Also check template attribute value for hex code
-                    if (tav.html_color && !variantInfo.hexCode) {
-                        variantInfo.hexCode = tav.html_color;
-                    }
+                    if (attrValue.html_color && !variantInfo.hexCode) variantInfo.hexCode = attrValue.html_color;
+                    if (tav.html_color && !variantInfo.hexCode) variantInfo.hexCode = tav.html_color;
                 }
             }
-
-            if (variantValueNames.length > 0) {
-                variantInfo.variantValue = variantValueNames.join(", ");
-            }
+            if (variantValueNames.length > 0) variantInfo.variantValue = variantValueNames.join(", ");
         }
-
         return variantInfo;
     }
 
@@ -701,7 +517,7 @@ export class OdooProductService {
 
         // For now, return as data URL
         if (imageData) {
-            return `data:image/jpeg;base64,${imageData}`;
+            return `data: image / jpeg; base64, ${imageData} `;
         }
         return null;
     }
@@ -727,7 +543,7 @@ export class OdooProductService {
             };
         } catch (error) {
             console.error("❌ Failed to get sync status:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get sync status: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Failed to get sync status: ${error instanceof Error ? error.message : String(error)} `);
         }
     }
 
@@ -763,7 +579,7 @@ export class OdooProductService {
     // Get single product by Odoo ID
     async getProductByOdooId(odooProductId: number) {
         try {
-            console.log(`📖 Getting Odoo product with ID: ${odooProductId}`);
+            console.log(`📖 Getting Odoo product with ID: ${odooProductId} `);
 
             const products = await this.safeSearchRead(
                 "product.template",
@@ -784,11 +600,11 @@ export class OdooProductService {
                 return null;
             }
 
-            console.log(`✅ Found Odoo product: ${products[0].name}`);
+            console.log(`✅ Found Odoo product: ${products[0].name} `);
             return products[0];
         } catch (error) {
             console.error("❌ Failed to get Odoo product:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get product: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Failed to get product: ${error instanceof Error ? error.message : String(error)} `);
         }
     }
 
@@ -867,9 +683,9 @@ export class OdooProductService {
                             syncedCount++;
                         }
                     }
-                    console.log(`[ODOO_SYNC] Synced stock for chunk ${i}-${i + chunk.length}`);
+                    console.log(`[ODOO_SYNC] Synced stock for chunk ${i} - ${i + chunk.length} `);
                 } catch (chunkError) {
-                    console.error(`[ODOO_SYNC] ❌ Failed to sync stock for chunk ${i}-${i + chunk.length}:`, chunkError);
+                    console.error(`[ODOO_SYNC] ❌ Failed to sync stock for chunk ${i} - ${i + chunk.length}: `, chunkError);
                 }
             }
 
@@ -889,49 +705,51 @@ export class OdooProductService {
         finishings: Set<string>
     ) {
         try {
-            console.log('🎨 Syncing Filter Attributes...');
+            console.log(`🎨 Syncing Filter Attributes: ${colors.size} colors, ${sizes.size} sizes, ${finishings.size} finishings`);
 
             // Sync Colors
             for (const [name, hex] of colors.entries()) {
+                console.log(`  - Syncing Color: "${name}"(${hex || 'no hex'})`);
                 await FilterColor.findOrCreate({
                     where: { name },
                     defaults: {
                         name,
-                        hex_code: hex || '#000000', // Default if missing
-                        display_order: 0
+                        hex_code: hex || '#000000',
+                        display_order: 0,
+                        is_active: true
                     } as any
                 });
-                // Optional: Update hex if user wants latest from Odoo? 
-                // For now, respect existing unless we want to force update. Defaults to keeping local override if any.
             }
 
             // Sync Sizes
             for (const name of sizes) {
+                console.log(`  - Syncing Size: "${name}"`);
                 await FilterSize.findOrCreate({
                     where: { name },
                     defaults: {
                         name,
-                        display_order: 0
+                        display_order: 0,
+                        is_active: true
                     } as any
                 });
             }
 
             // Sync Finishings
             for (const name of finishings) {
+                console.log(`  - Syncing Finishing: "${name}"`);
                 await FilterFinishing.findOrCreate({
                     where: { name },
                     defaults: {
                         name,
-                        display_order: 0
+                        display_order: 0,
+                        is_active: true
                     } as any
                 });
             }
-            console.log('✅ Filter Attributes synced.');
+            console.log('✅ Filter Attributes sync process completed.');
 
         } catch (error) {
-            console.error('❌ Failed to sync filter attributes', error);
-            // Non-fatal
+            console.error('❌ Failed to sync filter attributes:', error);
         }
     }
 }
-

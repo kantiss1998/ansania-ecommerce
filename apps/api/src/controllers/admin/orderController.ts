@@ -8,7 +8,7 @@ export async function getAllOrders(req: Request, res: Response, next: NextFuncti
         const result = await adminOrderService.listAllOrders(req.query);
 
         if (req.query.export === 'csv') {
-            const csv = toCSV(result.data.map((o: any) => ({
+            const csv = toCSV(result.items.map((o: any) => ({
                 order_number: o.order_number,
                 customer: o.user?.full_name,
                 total: o.total_amount,
@@ -23,7 +23,7 @@ export async function getAllOrders(req: Request, res: Response, next: NextFuncti
 
         return res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         return next(error);

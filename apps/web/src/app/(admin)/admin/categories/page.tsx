@@ -11,7 +11,8 @@ async function getCategories(): Promise<PaginatedResponse<Category> | null> {
 
         if (!token) return null;
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/categories`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/categories`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

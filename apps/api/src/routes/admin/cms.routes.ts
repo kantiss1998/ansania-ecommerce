@@ -9,6 +9,7 @@ router.use(authenticate, authorizeAdmin);
 
 // Banners
 router.get('/banners', adminCmsController.getAllBanners);
+router.get('/banners/:id', adminCmsController.getBannerDetail);
 router.post('/banners', adminCmsController.createBanner);
 router.put('/banners/:id', adminCmsController.updateBanner);
 router.delete('/banners/:id', adminCmsController.deleteBanner);

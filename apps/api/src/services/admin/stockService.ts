@@ -46,7 +46,7 @@ export async function listStockLevels(query: any) {
     });
 
     return {
-        data: rows,
+        items: rows,
         meta: {
             total: count,
             page: Number(page),
@@ -77,5 +77,5 @@ export async function getOutOfStock() {
 
 export async function exportStock(query: any) {
     const result = await listStockLevels({ ...query, limit: 1000, page: 1 });
-    return result.data;
+    return result.items;
 }

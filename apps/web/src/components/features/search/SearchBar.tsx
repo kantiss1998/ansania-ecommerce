@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
+import { Search } from 'lucide-react';
 
 export function SearchBar() {
     const router = useRouter();
@@ -17,26 +18,14 @@ export function SearchBar() {
     };
 
     return (
-        <form onSubmit={handleSearch} className="flex w-full items-center gap-2">
+        <form onSubmit={handleSearch} className="flex w-full items-center gap-2 group">
             <div className="relative w-full">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg
-                        className="h-5 w-5 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                    </svg>
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 transition-colors group-focus-within:text-primary-600">
+                    <Search className="h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                 </div>
                 <input
                     type="search"
-                    className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-10 text-sm text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-primary-500"
+                    className="block w-full rounded-full border border-gray-200 bg-gray-50/50 p-2.5 pl-11 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-500/10 shadow-sm"
                     placeholder="Cari produk..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -46,8 +35,9 @@ export function SearchBar() {
                 type="submit"
                 variant="primary"
                 size="sm"
-                className="hidden md:block"
+                className="hidden md:flex items-center gap-2 rounded-full px-5 shadow-lg shadow-primary-500/20"
             >
+                <Search className="h-4 w-4" />
                 Cari
             </Button>
         </form>

@@ -16,7 +16,8 @@ async function getEmailQueue(params: { page?: string; search?: string }) {
             limit: '20'
         }).toString();
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/system/email-queue?${query}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/system/email-queue?${query}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 

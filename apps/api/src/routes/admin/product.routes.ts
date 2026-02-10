@@ -12,6 +12,7 @@ router.get('/', adminProductController.getAllProducts);
 router.get('/:id', adminProductController.getProductDetail);
 
 // Limited Local Updates
+router.put('/:id', adminProductController.updateProduct);
 router.patch('/:id/toggle-active', adminProductController.toggleActive);
 router.patch('/:id/toggle-featured', adminProductController.toggleFeatured);
 router.put('/:id/seo', adminProductController.updateSEO);

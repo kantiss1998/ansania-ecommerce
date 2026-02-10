@@ -11,11 +11,11 @@ async function getStock(searchParams: { page?: string; search?: string; type?: s
 
         if (!token) return null;
 
-        let endpoint = '/api/admin/stock';
+        let endpoint = '/admin/stock';
         if (searchParams.type === 'low_stock') {
-            endpoint = '/api/admin/stock/low-stock';
+            endpoint = '/admin/stock/low-stock';
         } else if (searchParams.type === 'out_of_stock') {
-            endpoint = '/api/admin/stock/out-of-stock';
+            endpoint = '/admin/stock/out-of-stock';
         }
 
         const query = new URLSearchParams({
@@ -24,7 +24,8 @@ async function getStock(searchParams: { page?: string; search?: string; type?: s
             ...(searchParams.search && { search: searchParams.search }),
         });
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}?${query.toString()}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}${endpoint}?${query.toString()}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

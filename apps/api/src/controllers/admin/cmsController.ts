@@ -7,7 +7,17 @@ import { AuthenticatedRequest } from '../../types/express';
 export async function getAllBanners(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminCmsService.listBanners(req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getBannerDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const banner = await adminCmsService.getBanner(Number(id));
+        res.json({ success: true, data: banner });
     } catch (error) {
         next(error);
     }
@@ -66,7 +76,7 @@ export async function reorderBanners(req: Request, res: Response, next: NextFunc
 export async function getAllPages(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminCmsService.listPages(req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }

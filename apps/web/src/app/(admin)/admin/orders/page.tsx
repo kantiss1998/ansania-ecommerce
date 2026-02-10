@@ -18,7 +18,8 @@ async function getOrders(searchParams: { page?: string; search?: string; status?
             ...(searchParams.status && { status: searchParams.status }),
         });
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/orders?${query.toString()}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/orders?${query.toString()}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

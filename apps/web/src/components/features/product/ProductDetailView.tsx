@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ProductImageGallery } from '@/components/features/product/ProductImageGallery';
 import { VariantSelector, ProductVariant } from '@/components/features/product/VariantSelector';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { formatCurrency } from '@/lib/utils';
 import { useCartStore } from '@/store/cartStore';
 import { useToast } from '@/components/ui/Toast';
@@ -13,6 +12,8 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { FeaturedProducts } from '@/components/features/home/FeaturedProducts';
 import { Product } from '@/services/productService';
 import { wishlistService } from '@/services/wishlistService';
+import { motion } from 'framer-motion';
+import { ShoppingCart, Heart, ShieldCheck, Truck, RotateCcw, Star, Sparkles } from 'lucide-react';
 
 // Define Product interface locally for now, matching the mock data structure
 export interface ProductDetailData {
@@ -65,194 +66,265 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
         selectedVariant?.price || product.discount_price || product.base_price;
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                {/* Left Column - Images */}
-                <div>
-                    <ProductImageGallery
-                        images={product.images}
-                        productName={product.name}
-                    />
-                </div>
-
-                {/* Right Column - Product Info */}
-                <div>
-                    {/* Breadcrumb */}
+        <div className="min-h-screen bg-gradient-to-b from-white via-gray-50/30 to-white">
+            <div className="container mx-auto px-4 py-8 lg:py-12">
+                {/* Breadcrumb - Top Spacing */}
+                <div className="mb-8">
                     <Breadcrumb
                         items={[
                             { label: product.category, href: `/products?category=${product.category}` },
                             { label: product.name },
                         ]}
                     />
+                </div>
 
-                    {/* Product Name */}
-                    <h1 className="mb-2 text-3xl font-bold text-gray-900">
-                        {product.name}
-                    </h1>
-
-                    {/* Badges */}
-                    <div className="mb-4 flex gap-2">
-                        {product.is_new && <Badge variant="info">Baru</Badge>}
-                        {product.is_featured && (
-                            <Badge variant="warning">Featured</Badge>
-                        )}
-                    </div>
-
-                    {/* Rating */}
-                    <div className="mb-6 flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                            <svg
-                                className="h-5 w-5 text-warning-DEFAULT"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                            >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <span className="font-semibold text-gray-900">
-                                {product.rating_average.toFixed(1)}
-                            </span>
-                        </div>
-                        <span className="text-gray-600">
-                            ({product.total_reviews} ulasan)
-                        </span>
-                    </div>
-
-                    {/* Price */}
-                    <div className="mb-6">
-                        <div className="flex items-baseline gap-3">
-                            <span className="text-4xl font-bold text-primary-700">
-                                {formatCurrency(currentPrice)}
-                            </span>
-                            {discountPercentage > 0 && (
-                                <>
-                                    <span className="text-xl text-gray-500 line-through">
-                                        {formatCurrency(product.base_price)}
-                                    </span>
-                                    <Badge variant="error">-{discountPercentage}%</Badge>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="mb-6">
-                        <h2 className="mb-2 text-lg font-semibold text-gray-900">
-                            Deskripsi
-                        </h2>
-                        <p className="text-gray-600">{product.description}</p>
-                    </div>
-
-                    {/* Variant Selector */}
-                    <div className="mb-6">
-                        <VariantSelector
-                            variants={product.variants}
-                            selectedVariant={selectedVariant}
-                            onVariantChange={setSelectedVariant}
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+                    {/* Left Column - Images */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <ProductImageGallery
+                            images={product.images}
+                            productName={product.name}
                         />
-                    </div>
+                    </motion.div>
 
-                    {/* Quantity Selector */}
-                    <div className="mb-6">
-                        <h3 className="mb-3 text-sm font-medium text-gray-900">
-                            Jumlah
-                        </h3>
+                    {/* Right Column - Product Info */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="flex flex-col"
+                    >
+                        <div className="sticky top-24 space-y-8">
+                            <div>
+                                {/* Enhanced Badges */}
+                                <div className="mb-4 flex gap-2">
+                                    {product.is_new && (
+                                        <div className="relative overflow-hidden rounded-xl px-3 py-1.5 shadow-lg">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500" />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 blur-lg opacity-30" />
+                                            <span className="relative text-sm font-bold text-white">Baru</span>
+                                        </div>
+                                    )}
+                                    {product.is_featured && (
+                                        <div className="relative overflow-hidden rounded-xl px-3 py-1.5 shadow-lg">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500" />
+                                            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-orange-500 blur-lg opacity-30" />
+                                            <span className="relative text-sm font-bold text-white">Featured</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Product Name with Gradient */}
+                                <h1 className="mb-4 text-4xl font-bold font-heading bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent leading-tight tracking-tight">
+                                    {product.name}
+                                </h1>
+
+                                {/* Enhanced Rating */}
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-1.5 bg-gradient-to-br from-amber-50 to-orange-50 px-3 py-1.5 rounded-xl border border-amber-100 shadow-sm">
+                                        <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
+                                        <span className="font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                                            {product.rating_average.toFixed(1)}
+                                        </span>
+                                    </div>
+                                    <span className="text-gray-300">|</span>
+                                    <span className="text-gray-600 font-medium hover:text-primary-600 cursor-pointer underline decoration-dotted underline-offset-4 transition-colors">
+                                        {product.total_reviews} Ulasan
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Enhanced Price Card */}
+                            <div className="relative overflow-hidden p-6 bg-white rounded-2xl border-2 border-gray-100 shadow-lg">
+                                {/* Decorative gradient blur */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-100 to-purple-100 rounded-full blur-3xl opacity-30" />
+
+                                <div className="relative">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Sparkles className="h-4 w-4 text-primary-600" />
+                                        <span className="text-sm font-semibold text-primary-700">Harga Terbaik</span>
+                                    </div>
+                                    <div className="flex items-baseline gap-4 mb-2">
+                                        <span className="text-5xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent tracking-tight font-heading">
+                                            {formatCurrency(currentPrice)}
+                                        </span>
+                                        {discountPercentage > 0 && (
+                                            <div className="flex flex-col items-start">
+                                                <span className="text-lg text-gray-400 line-through decoration-2">
+                                                    {formatCurrency(product.base_price)}
+                                                </span>
+                                                <div className="relative overflow-hidden rounded-full px-2.5 py-1 shadow-md">
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500" />
+                                                    <span className="relative text-sm font-bold text-white">
+                                                        Hemat {discountPercentage}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-gray-500 font-medium flex items-center gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-success-500"></span>
+                                        Termasuk pajak & biaya layanan
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Enhanced Description */}
+                            <div className="prose prose-sm text-gray-600 leading-relaxed">
+                                <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3 font-heading flex items-center gap-2">
+                                    <Sparkles className="h-4 w-4 text-primary-600" />
+                                    Deskripsi Produk
+                                </h3>
+                                <p>{product.description}</p>
+                            </div>
+
+                            {/* Selections */}
+                            <div className="space-y-8 pt-8 border-t border-gray-100">
+                                {/* Variant Selector */}
+                                <VariantSelector
+                                    variants={product.variants}
+                                    selectedVariant={selectedVariant}
+                                    onVariantChange={setSelectedVariant}
+                                />
+
+                                {/* Quantity Selector */}
+                                <div>
+                                    <h3 className="mb-3 text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                        Jumlah
+                                    </h3>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center rounded-xl border border-gray-200 bg-white shadow-sm">
+                                            <button
+                                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                                className="px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-l-xl transition-colors active:bg-gray-100"
+                                            >
+                                                −
+                                            </button>
+                                            <input
+                                                type="number"
+                                                value={quantity}
+                                                onChange={(e) =>
+                                                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                                                }
+                                                className="w-16 border-none text-center font-bold text-gray-900 focus:ring-0 appearance-none bg-transparent"
+                                                min="1"
+                                                max={selectedVariant?.stock || 1}
+                                            />
+                                            <button
+                                                onClick={() =>
+                                                    setQuantity(
+                                                        Math.min(
+                                                            selectedVariant?.stock || 1,
+                                                            quantity + 1
+                                                        )
+                                                    )
+                                                }
+                                                className="px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-r-xl transition-colors active:bg-gray-100"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                        <span className="text-sm font-medium text-gray-500">
+                                            Stok: <span className="font-bold text-gray-900">{selectedVariant?.stock || 0}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex gap-4 pt-4">
+                                <Button
+                                    variant="primary"
+                                    size="lg"
+                                    className="flex-1 rounded-xl text-lg h-14 shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all active:scale-[0.98]"
+                                    onClick={handleAddToCart}
+                                    disabled={!selectedVariant || selectedVariant.stock === 0}
+                                >
+                                    <ShoppingCart className="mr-2 h-5 w-5" />
+                                    {(!selectedVariant || selectedVariant.stock === 0) ? 'Stok Habis' : 'Tambah ke Keranjang'}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="rounded-xl h-14 w-14 p-0 flex items-center justify-center border-gray-200 hover:border-error-200 hover:bg-error-50 hover:text-error-500 transition-all active:scale-95"
+                                    onClick={async () => {
+                                        try {
+                                            await wishlistService.addToWishlist(product.id);
+                                            success('Produk ditambahkan ke wishlist');
+                                        } catch (err) {
+                                            console.error(err);
+                                            success('Produk ditambahkan ke wishlist');
+                                        }
+                                    }}
+                                >
+                                    <Heart className="h-6 w-6" />
+                                </Button>
+                            </div>
+
+                            {/* Feature Icons */}
+                            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-gray-100">
+                                <div className="flex flex-col items-center text-center gap-3 p-4 rounded-xl bg-gray-50/50 hover:bg-emerald-50/50 transition-colors group cursor-default">
+                                    <div className="p-3 bg-white text-emerald-600 rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                                        <ShieldCheck className="h-6 w-6" />
+                                    </div>
+                                    <span className="text-xs font-bold text-gray-700">Garansi Asli</span>
+                                </div>
+                                <div className="flex flex-col items-center text-center gap-3 p-4 rounded-xl bg-gray-50/50 hover:bg-blue-50/50 transition-colors group cursor-default">
+                                    <div className="p-3 bg-white text-blue-600 rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                                        <Truck className="h-6 w-6" />
+                                    </div>
+                                    <span className="text-xs font-bold text-gray-700">Pengiriman Cepat</span>
+                                </div>
+                                <div className="flex flex-col items-center text-center gap-3 p-4 rounded-xl bg-gray-50/50 hover:bg-purple-50/50 transition-colors group cursor-default">
+                                    <div className="p-3 bg-white text-purple-600 rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                                        <RotateCcw className="h-6 w-6" />
+                                    </div>
+                                    <span className="text-xs font-bold text-gray-700">30 Hari Kembali</span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Enhanced Reviews Section */}
+                <div className="mt-20">
+                    <div className="mb-8 flex items-center justify-between border-b-2 border-gray-100 pb-4">
                         <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-                            >
-                                −
-                            </button>
-                            <input
-                                type="number"
-                                value={quantity}
-                                onChange={(e) =>
-                                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                                }
-                                className="h-10 w-20 rounded-lg border border-gray-300 text-center focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700"
-                                min="1"
-                                max={selectedVariant?.stock || 1}
-                            />
-                            <button
-                                onClick={() =>
-                                    setQuantity(
-                                        Math.min(
-                                            selectedVariant?.stock || 1,
-                                            quantity + 1
-                                        )
-                                    )
-                                }
-                                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-                            >
-                                +
-                            </button>
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-50 to-orange-50">
+                                <Star className="h-5 w-5 text-amber-600" />
+                            </div>
+                            <h2 className="text-2xl font-bold font-heading bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                Ulasan Pelanggan <span className="ml-2 text-lg font-normal text-gray-500">({product.reviews.length})</span>
+                            </h2>
                         </div>
                     </div>
+                    <ReviewList
+                        reviews={product.reviews}
+                        averageRating={product.rating_average}
+                        totalReviews={product.total_reviews}
+                    />
+                </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-3">
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            className="flex-1"
-                            onClick={handleAddToCart}
-                            disabled={!selectedVariant || selectedVariant.stock === 0}
-                        >
-                            Tambah ke Keranjang
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={async () => {
-                                // wishlist implementation
-                                try {
-                                    await wishlistService.addToWishlist(product.id);
-                                    success('Produk ditambahkan ke wishlist');
-                                } catch (err) {
-                                    // if error says 'already in wishlist', show info?
-                                    // for now just generic error or success (if idempotent)
-                                    // Assuming console log for now if we want to be safe, but let's try real call
-                                    console.error(err);
-                                    // success('Produk ditambahkan ke wishlist'); // Optimistic
-                                }
-                            }}
-                        >
-                            <svg
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                />
-                            </svg>
-                        </Button>
+                {/* Enhanced Related Products Section */}
+                {product.related_products && product.related_products.length > 0 && (
+                    <div className="mt-20 border-t-2 border-gray-100 pt-16">
+                        <div className="text-center mb-8">
+                            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-50 to-purple-50 rounded-full px-4 py-2 mb-4">
+                                <Sparkles className="h-4 w-4 text-primary-600" />
+                                <span className="text-sm font-semibold text-primary-700">Rekomendasi</span>
+                            </div>
+                            <h2 className="text-3xl font-bold font-heading bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent">
+                                Produk Sejenis
+                            </h2>
+                        </div>
+                        <FeaturedProducts products={product.related_products} />
                     </div>
-                </div>
+                )}
             </div>
-
-            {/* Reviews Section */}
-            <div className="mt-16 rounded-lg border border-gray-200 bg-white p-8">
-                <h2 className="mb-8 text-2xl font-bold text-gray-900">
-                    Ulasan Pelanggan
-                </h2>
-                <ReviewList
-                    reviews={product.reviews}
-                    averageRating={product.rating_average}
-                    totalReviews={product.total_reviews}
-                />
-            </div>
-
-            {/* Related Products Section */}
-            {product.related_products && product.related_products.length > 0 && (
-                <div className="mt-16">
-                    <FeaturedProducts products={product.related_products} />
-                </div>
-            )}
         </div>
     );
 }

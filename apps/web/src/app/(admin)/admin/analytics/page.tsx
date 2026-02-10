@@ -10,17 +10,17 @@ async function getAnalyticsSummary() {
 
         if (!token) return null;
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
         // Parallel fetch for different analytics metrics
         const [viewsRes, convRes, cartsRes] = await Promise.all([
-            fetch(`${baseUrl}/api/admin/analytics/product-views?period=this_month`, {
+            fetch(`${baseUrl}/admin/analytics/product-views?period=this_month`, {
                 headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${baseUrl}/api/admin/analytics/conversion?period=this_month`, {
+            fetch(`${baseUrl}/admin/analytics/conversion?period=this_month`, {
                 headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${baseUrl}/api/admin/analytics/abandoned-carts?period=this_month`, {
+            fetch(`${baseUrl}/admin/analytics/abandoned-carts?period=this_month`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
         ]);

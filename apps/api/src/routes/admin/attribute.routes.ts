@@ -7,6 +7,8 @@ const router = Router();
 
 router.use(authenticate, authorizeAdmin);
 
+router.get('/', adminAttributeController.getAllAttributes);
+
 // Colors
 router.get('/colors', adminAttributeController.getColors);
 router.post('/colors', adminAttributeController.createColor);

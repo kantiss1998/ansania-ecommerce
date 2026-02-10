@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { SearchX } from 'lucide-react';
 
 interface EmptyStateProps {
     title?: string;
@@ -19,31 +20,19 @@ export function EmptyState({
     icon,
 }: EmptyStateProps) {
     return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 rounded-full bg-gray-100 p-6 text-gray-400">
+        <div className="flex flex-col items-center justify-center py-16 text-center animate-in fade-in zoom-in duration-500">
+            <div className="mb-4 rounded-full bg-gray-50 p-6 text-gray-400 ring-8 ring-gray-50/50">
                 {icon ? (
                     icon
                 ) : (
-                    <svg
-                        className="h-12 w-12"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                    </svg>
+                    <SearchX className="h-12 w-12 text-gray-300" />
                 )}
             </div>
-            <h2 className="mb-2 text-xl font-semibold text-gray-900">{title}</h2>
-            <p className="mb-6 max-w-sm text-gray-600">{description}</p>
+            <h2 className="mb-2 text-xl font-bold text-gray-900 font-heading">{title}</h2>
+            <p className="mb-8 max-w-sm text-gray-500 leading-relaxed">{description}</p>
             {actionLabel && actionHref && (
                 <Link href={actionHref}>
-                    <Button variant="primary" size="md">
+                    <Button variant="primary" size="lg" className="rounded-full px-8 shadow-lg shadow-primary-200">
                         {actionLabel}
                     </Button>
                 </Link>

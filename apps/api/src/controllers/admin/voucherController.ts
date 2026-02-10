@@ -7,7 +7,7 @@ export async function getAllVouchers(req: Request, res: Response, next: NextFunc
         const result = await adminVoucherService.listVouchers(req.query);
         res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         next(error);
@@ -89,7 +89,7 @@ export async function getVoucherHistory(req: Request, res: Response, next: NextF
     try {
         const { id } = req.params;
         const result = await adminVoucherService.getVoucherUsageHistory(Number(id), req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }

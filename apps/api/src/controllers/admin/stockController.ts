@@ -10,7 +10,7 @@ export async function getStockLevels(req: Request, res: Response, next: NextFunc
         const result = await adminStockService.listStockLevels(req.query);
         res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         next(error);
@@ -31,7 +31,7 @@ export async function getLowStock(req: Request, res: Response, next: NextFunctio
     try {
         const { threshold } = req.query;
         const result = await adminStockService.getLowStock(threshold ? Number(threshold) : 10);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }
@@ -40,7 +40,7 @@ export async function getLowStock(req: Request, res: Response, next: NextFunctio
 export async function getOutOfStock(_req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminStockService.getOutOfStock();
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }

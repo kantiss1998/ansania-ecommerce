@@ -10,13 +10,13 @@ async function getSyncData() {
 
         if (!token) return { status: null, logs: [] };
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
         const [statusRes, logsRes] = await Promise.all([
-            fetch(`${baseUrl}/api/admin/sync/status`, {
+            fetch(`${baseUrl}/admin/sync/status`, {
                 headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${baseUrl}/api/admin/sync/logs?limit=10`, {
+            fetch(`${baseUrl}/admin/sync/logs?limit=10`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
         ]);

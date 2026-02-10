@@ -2,6 +2,7 @@
 import { Product, ProductVariant, ProductImage, Category } from '@repo/database';
 import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
+import { mapProduct } from '../productService';
 
 /**
  * List products for admin with filtering and pagination
@@ -41,9 +42,11 @@ export async function listAdminProducts(query: any) {
         distinct: true
     });
 
+    const items = rows.map(p => mapProduct(p));
+
     return {
-        data: rows,
-        meta: {
+        items,
+        pagination: {
             total: count,
             page: Number(page),
             limit: Number(limit),
@@ -65,7 +68,7 @@ export async function getProductDetail(id: number) {
     });
 
     if (!product) throw new NotFoundError('Product');
-    return product;
+    return mapProduct(product);
 }
 
 /**
@@ -98,6 +101,38 @@ export async function updateSEO(id: number, seoData: { meta_title?: string; meta
     if (!product) throw new NotFoundError('Product');
 
     await product.update(seoData);
+    return product;
+}
+
+/**
+ * Update product general information
+ */
+export async function updateProduct(id: number, productData: any) {
+    const product = await Product.findByPk(id);
+    if (!product) throw new NotFoundError('Product');
+
+    // Only allow updating certain fields to prevent breaking Odoo sync logic
+    const allowedFields = [
+        'name',
+        'slug',
+        'description',
+        'short_description',
+        'selling_price',
+        'compare_price',
+        'category_id',
+        'weight',
+        'is_active',
+        'is_featured'
+    ];
+
+    const updateData: any = {};
+    for (const field of allowedFields) {
+        if (productData[field] !== undefined) {
+            updateData[field] = productData[field];
+        }
+    }
+
+    await product.update(updateData);
     return product;
 }
 

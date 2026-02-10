@@ -7,27 +7,40 @@ async function getProductAndCategories(id: string) {
     try {
         const cookieStore = await cookies();
         const token = cookieStore.get('auth_token')?.value;
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
         if (!token) return { product: null, categories: [] };
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-
+        console.log(`[DEBUG] Fetching product detail for ID: ${id}`);
         const [productRes, categoriesRes] = await Promise.all([
-            fetch(`${baseUrl}/api/admin/products/${id}`, {
+            fetch(`${baseUrl}/admin/products/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${baseUrl}/api/categories`, {
+            fetch(`${baseUrl}/categories`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
         ]);
 
-        const product = productRes.ok ? (await productRes.ok ? await productRes.json() : null)?.data : null;
-        const categories = categoriesRes.ok ? (await categoriesRes.json()).data : [];
+        console.log(`[DEBUG] Product Res Status: ${productRes.status}`);
+        console.log(`[DEBUG] Categories Res Status: ${categoriesRes.status}`);
 
-        // Re-read category data if nested
-        const resolvedProduct = product;
+        let product = null;
+        if (productRes.ok) {
+            const data = await productRes.json();
+            product = data.data;
+            console.log(`[DEBUG] Product data found: ${!!product}`);
+        } else {
+            const errorText = await productRes.text();
+            console.error(`[DEBUG] Product fetch error: ${errorText}`);
+        }
 
-        return { product: resolvedProduct, categories };
+        let categories = [];
+        if (categoriesRes.ok) {
+            const data = await categoriesRes.json();
+            categories = data.data;
+        }
+
+        return { product, categories };
     } catch (error) {
         console.error('Error fetching product edit data:', error);
         return { product: null, categories: [] };

@@ -2,6 +2,7 @@ import { formatCurrency } from '@/lib/utils';
 import { Address } from '@/services/addressService';
 import { PaymentMethod } from './PaymentMethodSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { MapPin, CreditCard, ShoppingBag, Receipt, Tag } from 'lucide-react';
 
 /**
  * Order item type
@@ -42,17 +43,21 @@ export function OrderReview({
     summary,
 }: OrderReviewProps) {
     return (
-        <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 font-heading">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h3 className="text-xl font-bold text-gray-900 font-heading flex items-center gap-2">
+                <Receipt className="h-6 w-6 text-primary-600" />
                 Review Pesanan
             </h3>
 
             {/* Shipping Address */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Alamat Pengiriman</CardTitle>
+            <Card className="overflow-hidden border-l-4 border-l-primary-500">
+                <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                        <MapPin className="h-5 w-5 text-gray-500" />
+                        Alamat Pengiriman
+                    </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                     <div className="space-y-1">
                         <p className="font-bold text-gray-900">
                             {address.recipient_name}
@@ -67,14 +72,17 @@ export function OrderReview({
             </Card>
 
             {/* Payment Method */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Metode Pembayaran</CardTitle>
+            <Card className="overflow-hidden border-l-4 border-l-primary-500">
+                <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                        <CreditCard className="h-5 w-5 text-gray-500" />
+                        Metode Pembayaran
+                    </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                     <div className="flex items-center gap-4">
                         {paymentMethod.logo ? (
-                            <div className="flex h-12 w-16 items-center justify-center rounded-lg border border-gray-100 bg-white p-2">
+                            <div className="flex h-12 w-16 items-center justify-center rounded-lg border border-gray-100 bg-white p-2 shadow-sm">
                                 <img
                                     src={paymentMethod.logo}
                                     alt={paymentMethod.name}
@@ -82,10 +90,8 @@ export function OrderReview({
                                 />
                             </div>
                         ) : (
-                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-100 text-primary-600">
-                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                </svg>
+                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
+                                <CreditCard className="h-6 w-6" />
                             </div>
                         )}
                         <div>
@@ -103,11 +109,14 @@ export function OrderReview({
             </Card>
 
             {/* Order Items */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Produk <span className="text-gray-500 font-normal text-base ml-1">({summary.items.length} item)</span></CardTitle>
+            <Card className="overflow-hidden">
+                <CardHeader className="bg-gray-50/50 border-b border-gray-100 pb-3">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                        <ShoppingBag className="h-5 w-5 text-gray-500" />
+                        Produk <span className="text-gray-500 font-normal ml-1">({summary.items.length} item)</span>
+                    </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-4">
                     <div className="space-y-4 divide-y divide-gray-100">
                         {summary.items.map((item, index) => (
                             <div
@@ -115,7 +124,7 @@ export function OrderReview({
                                 className="flex items-start justify-between pt-4 first:pt-0"
                             >
                                 <div className="space-y-1">
-                                    <p className="font-bold text-gray-900">
+                                    <p className="font-bold text-gray-900 line-clamp-2">
                                         {item.product_name}
                                     </p>
                                     {item.variant_info && (
@@ -127,7 +136,7 @@ export function OrderReview({
                                         {item.quantity} x {formatCurrency(item.price)}
                                     </p>
                                 </div>
-                                <p className="font-bold text-gray-900">
+                                <p className="font-bold text-gray-900 whitespace-nowrap">
                                     {formatCurrency(item.subtotal)}
                                 </p>
                             </div>
@@ -137,8 +146,8 @@ export function OrderReview({
             </Card>
 
             {/* Price Summary */}
-            <Card className="bg-gray-50/50 border-dashed">
-                <CardHeader>
+            <Card className="bg-gray-50/50 border-dashed border-2 shadow-none">
+                <CardHeader className="pb-2">
                     <CardTitle>Ringkasan Pembayaran</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -170,15 +179,16 @@ export function OrderReview({
 
                         {summary.discount > 0 && (
                             <div className="flex justify-between text-base">
-                                <span className="text-gray-600">
+                                <span className="text-gray-600 flex items-center">
                                     Diskon
                                     {summary.voucher_code && (
-                                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">
+                                        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">
+                                            <Tag className="h-3 w-3" />
                                             {summary.voucher_code}
                                         </span>
                                     )}
                                 </span>
-                                <span className="font-semibold text-success-600">
+                                <span className="font-semibold text-success-600 bg-success-50 px-2 py-0.5 rounded">
                                     -{formatCurrency(summary.discount)}
                                 </span>
                             </div>

@@ -6,7 +6,7 @@ import * as adminSystemService from '../../services/admin/systemService';
 export async function getEmailQueue(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminSystemService.listEmailQueue(req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }
@@ -65,7 +65,7 @@ export async function clearFailedEmails(_req: Request, res: Response, next: Next
 export async function getActivityLogs(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminSystemService.listActivityLogs(req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }
@@ -75,7 +75,7 @@ export async function getActivityLogsByUser(req: Request, res: Response, next: N
     try {
         const { userId } = req.params;
         const result = await adminSystemService.listActivityLogsByUser(Number(userId), req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }
@@ -85,7 +85,7 @@ export async function getActivityLogsByEntity(req: Request, res: Response, next:
     try {
         const { entityType, entityId } = req.params;
         const result = await adminSystemService.listActivityLogsByEntity(entityType, entityId, req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }
@@ -105,7 +105,7 @@ export async function getActivityLogDetail(req: Request, res: Response, next: Ne
 export async function getSyncLogs(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminSystemService.listSyncLogs(req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }
@@ -163,7 +163,7 @@ export async function updateSiteSettings(req: Request, res: Response, next: Next
 export async function getNotifications(req: Request, res: Response, next: NextFunction) {
     try {
         const result = await adminSystemService.listSystemNotifications(req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }

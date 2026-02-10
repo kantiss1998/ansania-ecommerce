@@ -18,7 +18,7 @@ export interface Product {
         name: string;
         slug: string;
     };
-    images?: string[];
+    images?: { image_url: string; is_primary?: boolean }[];
     variants?: any[]; // Refine type as needed
     related_products?: Product[];
 }
@@ -93,8 +93,10 @@ export const productService = {
 
     async getColors(): Promise<string[]> {
         try {
-            const response = await apiClient.get<ApiResponse<string[]>>('/attributes/colors');
-            return response.data.data!;
+            const response = await apiClient.get<ApiResponse<any[]>>('/attributes/colors');
+            return (response.data.data || []).map((item: any) =>
+                typeof item === 'object' ? item.name : item
+            );
         } catch (error) {
             console.error('Failed to fetch colors:', error);
             return [];
@@ -103,8 +105,10 @@ export const productService = {
 
     async getSizes(): Promise<string[]> {
         try {
-            const response = await apiClient.get<ApiResponse<string[]>>('/attributes/sizes');
-            return response.data.data!;
+            const response = await apiClient.get<ApiResponse<any[]>>('/attributes/sizes');
+            return (response.data.data || []).map((item: any) =>
+                typeof item === 'object' ? item.name : item
+            );
         } catch (error) {
             console.error('Failed to fetch sizes:', error);
             return [];
@@ -113,8 +117,10 @@ export const productService = {
 
     async getFinishings(): Promise<string[]> {
         try {
-            const response = await apiClient.get<ApiResponse<string[]>>('/attributes/finishings');
-            return response.data.data!;
+            const response = await apiClient.get<ApiResponse<any[]>>('/attributes/finishings');
+            return (response.data.data || []).map((item: any) =>
+                typeof item === 'object' ? item.name : item
+            );
         } catch (error) {
             console.error('Failed to fetch finishings:', error);
             return [];

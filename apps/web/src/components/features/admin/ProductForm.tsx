@@ -21,6 +21,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
         slug: '',
         description: '',
         selling_price: 0,
+        compare_price: 0,
         category_id: categories[0]?.id,
         is_visible: true,
         images: [],
@@ -34,10 +35,11 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
         try {
             setIsLoading(true);
             const token = getAccessToken();
+            const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
             const method = isEdit ? 'PUT' : 'POST';
-            const endpoint = isEdit ? `/api/admin/products/${initialData.id}` : '/api/admin/products';
+            const endpoint = isEdit ? `/admin/products/${initialData.id}` : '/admin/products';
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
+            const response = await fetch(`${baseUrl}${endpoint}`, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
@@ -124,13 +126,22 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">Price (Base)</label>
+                                    <label className="text-sm font-semibold text-gray-700">Selling Price (Harga Jual)</label>
                                     <input
                                         type="number"
                                         className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
                                         value={formData.selling_price}
                                         onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
                                         required
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-semibold text-gray-700">Compare Price (Harga Coret)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
+                                        value={formData.compare_price || 0}
+                                        onChange={(e) => setFormData({ ...formData, compare_price: Number(e.target.value) })}
                                     />
                                 </div>
                             </div>

@@ -7,8 +7,8 @@ export async function getActiveFlashSales() {
     const flashSales = await FlashSale.findAll({
         where: {
             is_active: true,
-            start_time: { [Op.lte]: now },
-            end_time: { [Op.gte]: now }
+            start_date: { [Op.lte]: now },
+            end_date: { [Op.gte]: now }
         } as any,
         include: [
             {
@@ -25,7 +25,7 @@ export async function getActiveFlashSales() {
                 order: [['display_order', 'ASC']]
             }
         ],
-        order: [['start_time', 'ASC']]
+        order: [['start_date', 'ASC']]
     });
 
     return flashSales;

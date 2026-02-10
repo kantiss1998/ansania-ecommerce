@@ -17,7 +17,7 @@ export async function listEmailQueue(query: any) {
         order: [['created_at', 'DESC']]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
 }
 
 export async function retryEmail(id: number) {
@@ -50,7 +50,7 @@ export async function listActivityLogs(query: any) {
         include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
 }
 
 export async function getActivityLogDetail(id: number) {
@@ -101,7 +101,7 @@ export async function listActivityLogsByEntity(entityType: string, _entityId: st
         include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
 }
 
 // Sync Logs
@@ -118,7 +118,7 @@ export async function listSyncLogs(query: any) {
         order: [['created_at', 'DESC']]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
 }
 
 export async function getSyncLogDetail(id: number) {
@@ -139,7 +139,7 @@ export async function listSystemNotifications(query: any) {
         include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
 }
 
 export async function createSystemNotification(data: any) {

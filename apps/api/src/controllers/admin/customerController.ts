@@ -8,7 +8,7 @@ export async function getAllCustomers(req: Request, res: Response, next: NextFun
         const result = await adminCustomerService.listCustomers(req.query);
 
         if (req.query.export === 'csv') {
-            const csv = toCSV(result.data.map((c: any) => ({
+            const csv = toCSV(result.items.map((c: any) => ({
                 name: c.full_name,
                 email: c.email,
                 phone: c.phone,
@@ -23,7 +23,7 @@ export async function getAllCustomers(req: Request, res: Response, next: NextFun
 
         return res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         return next(error);
@@ -75,7 +75,7 @@ export async function getOrders(req: Request, res: Response, next: NextFunction)
         const result = await adminCustomerService.getCustomerOrders(Number(id), req.query);
         res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         next(error);
@@ -101,7 +101,7 @@ export async function getReviews(req: Request, res: Response, next: NextFunction
         const result = await adminCustomerService.getCustomerReviews(Number(id), req.query);
         res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         next(error);
@@ -125,7 +125,7 @@ export async function getActivity(req: Request, res: Response, next: NextFunctio
     try {
         const { id } = req.params;
         const result = await adminCustomerService.getCustomerActivity(Number(id), req.query);
-        res.json({ success: true, ...result });
+        res.json({ success: true, data: result });
     } catch (error) {
         next(error);
     }

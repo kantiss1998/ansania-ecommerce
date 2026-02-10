@@ -47,8 +47,8 @@ export async function listAllOrders(query: any) {
     });
 
     return {
-        data: rows,
-        meta: {
+        items: rows,
+        pagination: {
             total: count,
             page: Number(page),
             limit: Number(limit),
@@ -145,7 +145,7 @@ export async function updateOrderNotes(orderNumber: string, adminNote: string) {
 
 export async function exportOrders(query: any) {
     const orders = await listAllOrders({ ...query, limit: 1000, page: 1 });
-    return orders.data;
+    return orders.items;
 }
 
 export async function deleteOrder(orderNumber: string) {

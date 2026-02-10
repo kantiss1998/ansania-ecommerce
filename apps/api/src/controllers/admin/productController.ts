@@ -7,7 +7,7 @@ export async function getAllProducts(req: Request, res: Response, next: NextFunc
         const result = await adminProductService.listAdminProducts(req.query);
         res.json({
             success: true,
-            ...result
+            data: result
         });
     } catch (error) {
         next(error);
@@ -71,6 +71,19 @@ export async function updateDescription(req: Request, res: Response, next: NextF
         const { id } = req.params;
         const { short_description } = req.body;
         const product = await adminProductService.updateDescription(Number(id), short_description);
+        res.json({
+            success: true,
+            data: product
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { id } = req.params;
+        const product = await adminProductService.updateProduct(Number(id), req.body);
         res.json({
             success: true,
             data: product

@@ -1,8 +1,52 @@
-
-import { Product, ProductVariant, Category, ProductImage } from '@repo/database';
+import { Product, ProductVariant, Category, ProductImage, ProductRatingsSummary } from '@repo/database';
 import { ListProductsQuery } from '@repo/shared/schemas';
 import { Op, Includeable, Order } from 'sequelize';
 import { sequelize } from '@repo/database';
+
+export function mapProduct(product: any) {
+    if (!product) return null;
+    const data = product.toJSON ? product.toJSON() : product;
+
+    // Map prices
+    // If compare_price (original) exists, then selling_price is the discount_price
+    // Otherwise, selling_price is the base_price
+    let base_price = Number(data.selling_price);
+    let discount_price = undefined;
+
+    if (data.compare_price && Number(data.compare_price) > Number(data.selling_price)) {
+        base_price = Number(data.compare_price);
+        discount_price = Number(data.selling_price);
+    }
+
+    // Map ratings from ratingsSummary association if present
+    const rating_average = Number(data.ratingsSummary?.average_rating || 0);
+    const total_reviews = Number(data.ratingsSummary?.total_reviews || 0);
+
+    // Derive is_new (created within 30 days)
+    const now = new Date();
+    const createdAt = new Date(data.created_at);
+    const diffDays = Math.ceil(Math.abs(now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+    const is_new = diffDays <= 30;
+
+    // Derive thumbnail_url
+    const thumbnail_url = data.images?.find((img: any) => img.is_primary)?.image_url ||
+        data.images?.[0]?.image_url || null;
+
+    // Map images to string array for frontend
+    const images = data.images?.map((img: any) => img.image_url) || [];
+
+    return {
+        ...data,
+        base_price,
+        discount_price,
+        rating_average,
+        total_reviews,
+        thumbnail_url,
+        is_new,
+        images,
+        stock_status: data.is_active ? 'in_stock' : 'out_of_stock',
+    };
+}
 
 export async function listProducts(query: ListProductsQuery) {
     const {
@@ -51,7 +95,7 @@ export async function listProducts(query: ListProductsQuery) {
     }
 
     if (has_discount) {
-        whereClause.discount_price = { [Op.not]: null };
+        whereClause.compare_price = { [Op.gt]: sequelize.col('selling_price') };
     }
 
     // Includes filtering
@@ -62,7 +106,8 @@ export async function listProducts(query: ListProductsQuery) {
             as: 'variants',
             where: { is_visible: true },
             required: false
-        }
+        },
+        { model: ProductRatingsSummary, as: 'ratingsSummary' }
     ];
 
     if (category) {
@@ -96,7 +141,7 @@ export async function listProducts(query: ListProductsQuery) {
     });
 
     return {
-        products: rows,
+        items: rows.map(mapProduct),
         total: count,
         page,
         limit,
@@ -124,13 +169,12 @@ export async function getProductBySlug(slug: string) {
         include: [
             { model: Category, as: 'category' },
             { model: ProductImage, as: 'images' },
-            { model: ProductVariant, as: 'variants', include: [{ model: Product, as: 'product' }] } // Nested include just to check syntax
+            { model: ProductVariant, as: 'variants' },
+            { model: ProductRatingsSummary, as: 'ratingsSummary' }
         ],
     });
 
-    // Clean up variant include if needed
-
-    return product;
+    return mapProduct(product);
 }
 
 export async function getRelatedProducts(productId: number, limit: number = 4) {
@@ -146,12 +190,13 @@ export async function getRelatedProducts(productId: number, limit: number = 4) {
         limit,
         include: [
             { model: ProductImage, as: 'images', attributes: ['image_url', 'is_primary'] },
-            { model: Category, as: 'category' } // Useful context
+            { model: Category, as: 'category' },
+            { model: ProductRatingsSummary, as: 'ratingsSummary' }
         ],
         order: sequelize.random() // Random selection for variety
     });
 
-    return related;
+    return related.map(mapProduct);
 }
 
 // Get featured products
@@ -164,12 +209,13 @@ export async function getFeaturedProducts(limit: number = 10) {
         limit,
         include: [
             { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
-            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false },
+            { model: ProductRatingsSummary, as: 'ratingsSummary' }
         ],
-        order: [['sort_order', 'ASC'], ['created_at', 'DESC']]
+        order: [['created_at', 'DESC']]
     });
 
-    return products;
+    return products.map(mapProduct);
 }
 
 // Get new arrivals (products created within last N days)
@@ -185,12 +231,13 @@ export async function getNewArrivals(limit: number = 10, days: number = 30) {
         limit,
         include: [
             { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
-            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false },
+            { model: ProductRatingsSummary, as: 'ratingsSummary' }
         ],
         order: [['created_at', 'DESC']]
     });
 
-    return products;
+    return products.map(mapProduct);
 }
 
 // Get all variants for a product
@@ -224,23 +271,22 @@ export async function getRecommendedProducts(limit: number = 10) {
         where: {
             is_active: true,
             [Op.or]: [
-                { is_featured: true },
-                { view_count: { [Op.gt]: 0 } }
+                { is_featured: true }
             ]
         } as any,
         limit,
         include: [
             { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
-            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false },
+            { model: ProductRatingsSummary, as: 'ratingsSummary' }
         ],
         order: [
             ['is_featured', 'DESC'],
-            ['view_count', 'DESC'] as any,
             sequelize.random()
         ]
     });
 
-    return products;
+    return products.map(mapProduct);
 }
 
 // Get similar products (same category, similar price range)
@@ -264,12 +310,13 @@ export async function getSimilarProducts(productId: number, limit: number = 6) {
         limit,
         include: [
             { model: ProductImage, as: 'images', where: { is_primary: true }, required: false },
-            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false }
+            { model: ProductVariant, as: 'variants', where: { is_visible: true }, required: false },
+            { model: ProductRatingsSummary, as: 'ratingsSummary' }
         ],
         order: sequelize.random()
     });
 
-    return similar;
+    return similar.map(mapProduct);
 }
 
 /**
@@ -279,10 +326,7 @@ export async function trackProductView(productId: number) {
     const product = await Product.findByPk(productId);
     if (!product) throw new NotFoundError('Product');
 
-    // Increment view_count
-    product.view_count = (product.view_count || 0) + 1;
-    await product.save();
-
+    // view_count removed as it doesn't exist in DB
     return product;
 }
 

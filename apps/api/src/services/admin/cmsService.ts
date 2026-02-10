@@ -19,7 +19,13 @@ export async function listBanners(query: any) {
         order: [['display_order', 'ASC'], ['created_at', 'DESC']]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
+}
+
+export async function getBanner(id: number) {
+    const banner = await CmsBanner.findByPk(id);
+    if (!banner) throw new NotFoundError('Banner');
+    return banner;
 }
 
 export async function createBanner(data: any) {
@@ -75,7 +81,7 @@ export async function listPages(query: any) {
         order: [['created_at', 'DESC']]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, meta: { total: count, page, limit } };
 }
 
 export async function createPage(data: any) {

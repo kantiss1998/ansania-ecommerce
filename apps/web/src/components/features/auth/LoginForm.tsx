@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { useToast } from '@/components/ui/Toast';
 import { authSchemas, LoginDTO } from '@repo/shared';
+import { Eye, EyeOff, LogIn } from 'lucide-react';
 
 type LoginFormData = LoginDTO;
 
@@ -35,99 +36,108 @@ export function LoginForm() {
         try {
             await login(data.email, data.password);
             success('Login berhasil!');
-            router.push('/');
+
+            // Get user from store to check role
+            const user = useAuthStore.getState().user;
+            if (user?.role === 'admin') {
+                router.push('/admin');
+            } else {
+                router.push('/');
+            }
         } catch (err) {
             showError(authError || 'Login gagal. Silakan coba lagi.');
         }
     };
 
     return (
-        <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50">
-            {/* Header */}
-            <div className="mb-8 text-center">
-                <h1 className="text-2xl font-bold text-gray-900 font-heading">
+        <div className="w-full max-w-md mx-auto space-y-8">
+            <div className="text-center space-y-2">
+                <h1 className="text-3xl font-bold text-gray-900 font-heading">
                     Selamat Datang Kembali
                 </h1>
-                <p className="mt-2 text-sm text-gray-500">
-                    Masuk ke akun Ansania Anda
+                <p className="text-gray-500">
+                    Masuk untuk mengakses akun Anda
                 </p>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <Input
-                    label="Email"
-                    type="email"
-                    placeholder="nama@example.com"
-                    error={errors.email?.message}
-                    {...register('email')}
-                    required
-                />
-
-                <Input
-                    label="Password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Masukkan password"
-                    error={errors.password?.message}
-                    {...register('password')}
-                    required
-                    endAdornment={
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                        >
-                            {showPassword ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            )}
-                        </button>
-                    }
-                />
-
-                <div className="flex items-center justify-between">
-                    <Checkbox
-                        label="Ingat saya"
-                        {...register('remember_me')}
+            <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    <Input
+                        label="Email"
+                        type="email"
+                        placeholder="contoh@email.com"
+                        error={errors.email?.message}
+                        {...register('email')}
+                        required
+                        className="bg-gray-50/50"
                     />
 
-                    <Link
-                        href="/auth/forgot-password"
-                        className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
+                    <div className="space-y-1">
+                        <Input
+                            label="Password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Masukkan password Anda"
+                            error={errors.password?.message}
+                            {...register('password')}
+                            required
+                            className="bg-gray-50/50"
+                            rightIcon={
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+                                    title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="h-5 w-5" />
+                                    ) : (
+                                        <Eye className="h-5 w-5" />
+                                    )}
+                                </button>
+                            }
+                        />
+                        <div className="flex justify-end">
+                            <Link
+                                href="/auth/forgot-password"
+                                className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline transition-colors"
+                            >
+                                Lupa password?
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center">
+                        <Checkbox
+                            label="Ingat saya"
+                            id="remember-me"
+                            {...register('remember_me')}
+                        />
+                    </div>
+
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        size="lg"
+                        fullWidth
+                        isLoading={isLoading}
+                        className="shadow-lg shadow-primary-500/30 hover:shadow-primary-500/40"
                     >
-                        Lupa password?
-                    </Link>
+                        <LogIn className="mr-2 h-5 w-5" />
+                        Masuk Sekarang
+                    </Button>
+                </form>
+
+                <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                    <p className="text-sm text-gray-500">
+                        Belum punya akun?{' '}
+                        <Link
+                            href="/auth/register"
+                            className="font-semibold text-primary-600 hover:text-primary-700 hover:underline transition-colors"
+                        >
+                            Daftar sekarang
+                        </Link>
+                    </p>
                 </div>
-
-                <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    fullWidth
-                    isLoading={isLoading}
-                    className="shadow-primary-500/20 shadow-lg"
-                >
-                    Masuk
-                </Button>
-            </form>
-
-            {/* Footer */}
-            <div className="mt-8 text-center">
-                <p className="text-sm text-gray-500">
-                    Belum punya akun?{' '}
-                    <Link
-                        href="/auth/register"
-                        className="font-medium text-primary-600 hover:text-primary-700 hover:underline"
-                    >
-                        Daftar sekarang
-                    </Link>
-                </p>
             </div>
         </div>
     );

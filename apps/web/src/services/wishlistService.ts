@@ -11,8 +11,8 @@ export interface WishlistItem {
 export const wishlistService = {
     async getWishlist(): Promise<WishlistItem[]> {
         try {
-            const response = await apiClient.get<ApiResponse<WishlistItem[]>>('/wishlist');
-            return response.data.data || [];
+            const response = await apiClient.get<ApiResponse<{ items: WishlistItem[] }>>('/wishlist');
+            return response.data.data?.items || [];
         } catch (error) {
             // Return empty array if 404 or auth error to avoid breaking UI
             console.error('Failed to fetch wishlist', error);

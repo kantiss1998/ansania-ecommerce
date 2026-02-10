@@ -10,8 +10,8 @@ async function getAttributes() {
 
         if (!token) return [];
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${baseUrl}/api/admin/attributes`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/attributes`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 

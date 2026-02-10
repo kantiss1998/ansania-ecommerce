@@ -11,7 +11,8 @@ async function getBanners(): Promise<Banner[] | null> {
 
         if (!token) return null;
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/cms/banners`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/cms/banners`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

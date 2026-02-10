@@ -37,8 +37,8 @@ export async function listCustomers(query: any) {
     });
 
     return {
-        data: rows,
-        meta: {
+        items: rows,
+        pagination: {
             total: count,
             page: Number(page),
             limit: Number(limit),
@@ -90,8 +90,8 @@ export async function getCustomerOrders(id: number, query: any) {
     });
 
     return {
-        data: rows,
-        meta: { total: count, page, limit }
+        items: rows,
+        pagination: { total: count, page: Number(page), limit: Number(limit), totalPages: Math.ceil(count / Number(limit)) }
     };
 }
 
@@ -111,8 +111,8 @@ export async function getCustomerReviews(id: number, query: any) {
     });
 
     return {
-        data: rows,
-        meta: { total: count, page, limit }
+        items: rows,
+        pagination: { total: count, page: Number(page), limit: Number(limit), totalPages: Math.ceil(count / Number(limit)) }
     };
 }
 
@@ -140,10 +140,10 @@ export async function getCustomerActivity(id: number, query: any) {
         order: [['created_at', 'DESC']]
     });
 
-    return { data: rows, meta: { total: count, page, limit } };
+    return { items: rows, pagination: { total: count, page: Number(page), limit: Number(limit), totalPages: Math.ceil(count / Number(limit)) } };
 }
 
 export async function exportCustomers(query: any) {
     const customers = await listCustomers({ ...query, limit: 1000, page: 1 });
-    return customers.data;
+    return customers.items;
 }

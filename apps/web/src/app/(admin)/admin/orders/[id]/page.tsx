@@ -10,12 +10,15 @@ async function getOrderDetails(id: string) {
 
         if (!token) return null;
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${baseUrl}/api/admin/orders/${id}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/orders/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!response.ok) return null;
+        if (!response.ok) {
+            console.error('Failed to fetch order details:', response.statusText);
+            return null;
+        }
 
         const result = await response.json();
         return result.data;

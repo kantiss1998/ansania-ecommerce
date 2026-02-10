@@ -11,7 +11,8 @@ async function getPages(): Promise<CMSPage[] | null> {
 
         if (!token) return null;
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/admin/cms/pages`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/cms/pages`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

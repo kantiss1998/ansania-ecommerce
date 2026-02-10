@@ -78,7 +78,7 @@ export async function login(data: LoginDTO, userAgent?: string, ip?: string) {
 
     // 3. Generate JWT
     const token = jwt.sign(
-        { userId: user.id, email: user.email, role: 'user' },
+        { userId: user.id, email: user.email, role: user.role },
         JWT_SECRET,
         { expiresIn: ACCESS_TOKEN_EXPIRY }
     );
@@ -179,7 +179,7 @@ export async function refreshToken(token: string) {
     // We can also rotate refresh token here if we want strict security
     const user = (session as any).user as User;
     const newAccessToken = jwt.sign(
-        { userId: session.user_id, email: user?.email, role: 'user' },
+        { userId: session.user_id, email: user?.email, role: user?.role },
         JWT_SECRET,
         { expiresIn: ACCESS_TOKEN_EXPIRY }
     );

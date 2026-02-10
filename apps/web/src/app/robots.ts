@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: ['/admin/', '/profile/', '/checkout/'],
+            disallow: ['/admin/', '/user/', '/checkout/'],
         },
         sitemap: 'https://ansania.com/sitemap.xml',
     };

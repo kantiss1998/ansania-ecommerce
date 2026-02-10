@@ -10,13 +10,13 @@ async function getMarketingStats() {
 
         if (!token) return null;
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
         const [abandonedRes, analyticsRes] = await Promise.all([
-            fetch(`${baseUrl}/api/admin/analytics/abandoned-carts`, {
+            fetch(`${baseUrl}/admin/analytics/abandoned-carts`, {
                 headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${baseUrl}/api/admin/analytics/conversion`, {
+            fetch(`${baseUrl}/admin/analytics/conversion`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
         ]);

@@ -45,6 +45,8 @@ export async function removeFromWishlist(userId: number, id: number) {
     return { success: true };
 }
 
+import { mapProduct } from './productService';
+
 export async function getWishlist(userId: number, query: ListWishlistQuery) {
     const { page = 1, limit = 10 } = query;
     const offset = (page - 1) * limit;
@@ -55,7 +57,10 @@ export async function getWishlist(userId: number, query: ListWishlistQuery) {
             {
                 model: Product,
                 as: 'product',
-                include: [{ model: ProductImage, as: 'images' }]
+                include: [
+                    { model: ProductImage, as: 'images' },
+                    { model: require('@repo/database').ProductRatingsSummary, as: 'ratingsSummary' }
+                ]
             },
             {
                 model: ProductVariant,
@@ -68,7 +73,13 @@ export async function getWishlist(userId: number, query: ListWishlistQuery) {
     });
 
     return {
-        items: rows,
+        items: rows.map(row => {
+            const data = row.toJSON() as any;
+            return {
+                ...data,
+                product: mapProduct(data.product)
+            };
+        }),
         total: count,
         page,
         limit,

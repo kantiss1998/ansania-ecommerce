@@ -10,8 +10,8 @@ async function getBanner(id: string) {
 
         if (!token) return null;
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-        const response = await fetch(`${baseUrl}/api/admin/banners/${id}`, {
+        const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+        const response = await fetch(`${baseUrl}/admin/cms/banners/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 

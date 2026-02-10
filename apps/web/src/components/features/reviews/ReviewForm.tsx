@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { RatingStars } from './RatingStars';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { cn } from '@/lib/utils';
 
 interface ReviewFormProps {
     onSubmit: (data: ReviewData) => void;
@@ -74,21 +75,26 @@ export function ReviewForm({
             />
 
             <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
+                <label className="mb-1 block text-sm font-bold text-gray-700">
                     Ulasan
                 </label>
                 <textarea
                     rows={4}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    className={`w-full rounded-lg border p-3 focus:outline-none focus:ring-2 ${errors.comment
-                        ? 'border-error-300 focus:border-error-500 focus:ring-error-200'
-                        : 'border-gray-300 focus:border-primary-500 focus:ring-primary-200'
-                        }`}
+                    className={cn(
+                        "w-full rounded-xl border p-3 transition-all placeholder:text-gray-400 focus:outline-none focus:ring-4",
+                        errors.comment
+                            ? "border-error-300 focus:border-error-500 focus:ring-error-100 bg-error-50/10"
+                            : "border-gray-200 bg-gray-50/50 focus:bg-white focus:border-primary-500 focus:ring-primary-500/10"
+                    )}
                     placeholder="Ceritakan pengalaman Anda menggunakan produk ini..."
                 />
                 {errors.comment && (
-                    <p className="mt-1 text-sm text-error-600">{errors.comment}</p>
+                    <p className="mt-1 text-sm text-error-600 font-medium flex items-center gap-1">
+                        <span className="inline-block w-1 h-1 rounded-full bg-error-500"></span>
+                        {errors.comment}
+                    </p>
                 )}
             </div>
 

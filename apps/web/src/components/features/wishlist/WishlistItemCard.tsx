@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { formatCurrency } from '@/lib/utils';
+import { Trash2, ShoppingCart, Percent } from 'lucide-react';
 
 /**
  * Wishlist item type
@@ -46,90 +47,94 @@ export function WishlistItemCard({
     const isOutOfStock = item.stock_status === 'out_of_stock';
 
     return (
-        <div className="group relative rounded-lg border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md">
+        <div className="group relative rounded-xl border border-gray-200 bg-white p-4 transition-all duration-300 hover:shadow-lg hover:border-primary-100 flex flex-col h-full">
             {/* Remove Button */}
             <button
                 onClick={() => onRemove(item.id)}
                 disabled={isLoading}
-                className="absolute right-2 top-2 rounded-full bg-white p-2 text-gray-400 shadow-sm transition-colors hover:bg-error-light hover:text-error-DEFAULT disabled:opacity-50"
+                className="absolute right-3 top-3 z-10 rounded-full bg-white/90 backdrop-blur-sm p-2 text-gray-400 shadow-sm transition-all hover:bg-error-50 hover:text-error-600 disabled:opacity-50 border border-gray-100"
+                aria-label="Hapus dari wishlist"
             >
-                <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                    />
-                </svg>
+                <Trash2 className="h-4 w-4" />
             </button>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 h-full">
                 {/* Product Image */}
                 <Link
                     href={`/products/${item.product_slug}`}
-                    className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100"
+                    className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-95 transition-opacity"
                 >
                     <Image
                         src={item.product_image}
                         alt={item.product_name}
                         fill
                         className="object-cover"
-                        sizes="96px"
+                        sizes="(max-width: 768px) 100px, 112px"
                     />
                     {discountPercentage > 0 && (
-                        <div className="absolute left-1 top-1">
-                            <Badge variant="error" className="text-xs">
-                                -{discountPercentage}%
+                        <div className="absolute left-2 top-2">
+                            <Badge variant="error" className="text-[10px] px-1.5 py-0.5 h-auto font-bold shadow-sm">
+                                <Percent className="h-3 w-3 mr-0.5 inline" />
+                                {discountPercentage}%
                             </Badge>
                         </div>
                     )}
                 </Link>
 
                 {/* Product Info */}
-                <div className="flex flex-1 flex-col">
-                    <Link
-                        href={`/products/${item.product_slug}`}
-                        className="mb-2 line-clamp-2 text-sm font-medium text-gray-900 hover:text-primary-700"
-                    >
-                        {item.product_name}
-                    </Link>
+                <div className="flex flex-1 flex-col justify-between py-1">
+                    <div>
+                        <Link
+                            href={`/products/${item.product_slug}`}
+                            className="mb-2 line-clamp-2 text-sm font-bold text-gray-900 hover:text-primary-700 transition-colors"
+                        >
+                            {item.product_name}
+                        </Link>
 
-                    {/* Price */}
-                    <div className="mb-3 flex items-baseline gap-2">
-                        <span className="text-lg font-bold text-primary-700">
-                            {formatCurrency(price)}
-                        </span>
-                        {item.discount_price && (
-                            <span className="text-sm text-gray-500 line-through">
-                                {formatCurrency(item.base_price)}
+                        {/* Price */}
+                        <div className="mb-2 flex flex-col gap-0.5">
+                            <span className="text-lg font-bold text-primary-700 font-heading">
+                                {formatCurrency(price)}
                             </span>
+                            {item.discount_price && (
+                                <span className="text-xs text-gray-400 line-through">
+                                    {formatCurrency(item.base_price)}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Stock Status */}
+                        {isOutOfStock ? (
+                            <p className="mb-3 text-xs font-semibold text-error-600 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-error-500"></span>
+                                Stok Habis
+                            </p>
+                        ) : item.stock_status === 'limited_stock' ? (
+                            <p className="mb-3 text-xs font-semibold text-warning-600 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-warning-500"></span>
+                                Stok Terbatas
+                            </p>
+                        ) : (
+                            <p className="mb-3 text-xs font-semibold text-success-600 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-success-500"></span>
+                                Tersedia
+                            </p>
                         )}
                     </div>
 
-                    {/* Stock Status */}
-                    {isOutOfStock ? (
-                        <p className="mb-3 text-xs text-error-DEFAULT">Stok Habis</p>
-                    ) : item.stock_status === 'limited_stock' ? (
-                        <p className="mb-3 text-xs text-warning-DEFAULT">
-                            Stok Terbatas
-                        </p>
-                    ) : null}
-
                     {/* Add to Cart Button */}
-                    <Button
-                        variant={isOutOfStock ? 'outline' : 'primary'}
-                        size="sm"
-                        onClick={() => onAddToCart(item.product_id)}
-                        disabled={isLoading || isOutOfStock}
-                        className="mt-auto"
-                    >
-                        {isOutOfStock ? 'Stok Habis' : 'Tambah ke Keranjang'}
-                    </Button>
+                    <div className="pt-2">
+                        <Button
+                            variant={isOutOfStock ? 'outline' : 'primary'}
+                            size="sm"
+                            onClick={() => onAddToCart(item.product_id)}
+                            disabled={isLoading || isOutOfStock}
+                            className="w-full shadow-sm"
+                        >
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            {isOutOfStock ? 'Stok Habis' : 'Keranjang'}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>

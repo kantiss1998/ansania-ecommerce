@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Filter, RotateCcw, Sparkles } from 'lucide-react';
 
 /**
  * Filter options type
@@ -74,21 +75,38 @@ export function ProductFilters({
         }
     };
 
+    const hasActiveFilters = minPrice || maxPrice || selectedColors.length > 0 || selectedSizes.length > 0 || selectedFinishings.length > 0 || stockStatus;
+
     return (
-        <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6">
-            <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Filter</h3>
-                <button
-                    onClick={handleReset}
-                    className="text-sm font-medium text-primary-700 hover:text-primary-800"
-                >
-                    Reset
-                </button>
+        <div className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-50 to-purple-50">
+                        <Filter className="h-5 w-5 text-primary-600" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-bold font-heading text-gray-900">Filter Produk</h3>
+                        {hasActiveFilters && (
+                            <p className="text-xs text-primary-600 font-medium">Filter aktif</p>
+                        )}
+                    </div>
+                </div>
+                {hasActiveFilters && (
+                    <button
+                        onClick={handleReset}
+                        className="flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-primary-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary-50"
+                    >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        Reset
+                    </button>
+                )}
             </div>
 
             {/* Price Range */}
             <div>
-                <h4 className="mb-3 text-sm font-medium text-gray-900">
+                <h4 className="mb-3 text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary-600" />
                     Rentang Harga
                 </h4>
                 <div className="flex gap-2">
@@ -99,7 +117,7 @@ export function ProductFilters({
                         onChange={(e) => setMinPrice(e.target.value)}
                         className="text-sm"
                     />
-                    <span className="flex items-center text-gray-500">-</span>
+                    <span className="flex items-center text-gray-400 font-bold">-</span>
                     <Input
                         type="number"
                         placeholder="Max"
@@ -113,7 +131,7 @@ export function ProductFilters({
             {/* Colors */}
             {availableColors.length > 0 && (
                 <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-900">
+                    <h4 className="mb-3 text-sm font-bold text-gray-900">
                         Warna
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -127,9 +145,9 @@ export function ProductFilters({
                                         setSelectedColors
                                     )
                                 }
-                                className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${selectedColors.includes(color)
-                                        ? 'border-primary-700 bg-primary-700 text-white'
-                                        : 'border-gray-300 bg-white text-gray-700 hover:border-primary-700'
+                                className={`rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all ${selectedColors.includes(color)
+                                        ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
+                                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
                                     }`}
                             >
                                 {color}
@@ -142,7 +160,7 @@ export function ProductFilters({
             {/* Sizes */}
             {availableSizes.length > 0 && (
                 <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-900">
+                    <h4 className="mb-3 text-sm font-bold text-gray-900">
                         Ukuran
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -156,9 +174,9 @@ export function ProductFilters({
                                         setSelectedSizes
                                     )
                                 }
-                                className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${selectedSizes.includes(size)
-                                        ? 'border-primary-700 bg-primary-700 text-white'
-                                        : 'border-gray-300 bg-white text-gray-700 hover:border-primary-700'
+                                className={`rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all ${selectedSizes.includes(size)
+                                        ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
+                                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
                                     }`}
                             >
                                 {size}
@@ -171,7 +189,7 @@ export function ProductFilters({
             {/* Finishings */}
             {availableFinishings.length > 0 && (
                 <div>
-                    <h4 className="mb-3 text-sm font-medium text-gray-900">
+                    <h4 className="mb-3 text-sm font-bold text-gray-900">
                         Finishing
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -185,9 +203,9 @@ export function ProductFilters({
                                         setSelectedFinishings
                                     )
                                 }
-                                className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${selectedFinishings.includes(finishing)
-                                        ? 'border-primary-700 bg-primary-700 text-white'
-                                        : 'border-gray-300 bg-white text-gray-700 hover:border-primary-700'
+                                className={`rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all ${selectedFinishings.includes(finishing)
+                                        ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
+                                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
                                     }`}
                             >
                                 {finishing}
@@ -199,13 +217,13 @@ export function ProductFilters({
 
             {/* Stock Status */}
             <div>
-                <h4 className="mb-3 text-sm font-medium text-gray-900">
+                <h4 className="mb-3 text-sm font-bold text-gray-900">
                     Ketersediaan
                 </h4>
                 <select
                     value={stockStatus}
                     onChange={(e) => setStockStatus(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-700"
+                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-medium focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
                 >
                     <option value="">Semua</option>
                     <option value="in_stock">Tersedia</option>
@@ -216,10 +234,11 @@ export function ProductFilters({
 
             {/* Apply Button */}
             <Button
-                variant="primary"
+                variant="gradient"
                 size="md"
                 fullWidth
                 onClick={handleApplyFilters}
+                className="shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40"
             >
                 Terapkan Filter
             </Button>

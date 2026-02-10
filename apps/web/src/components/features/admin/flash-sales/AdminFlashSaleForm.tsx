@@ -28,8 +28,8 @@ export function AdminFlashSaleForm({ initialData }: AdminFlashSaleFormProps) {
     const [formData, setFormData] = useState({
         name: initialData?.name || '',
         description: initialData?.description || '',
-        start_time: formatDateForInput(initialData?.start_time),
-        end_time: formatDateForInput(initialData?.end_time),
+        start_date: formatDateForInput(initialData?.start_date),
+        end_date: formatDateForInput(initialData?.end_date),
         is_active: initialData?.is_active ?? true,
     });
 
@@ -41,8 +41,8 @@ export function AdminFlashSaleForm({ initialData }: AdminFlashSaleFormProps) {
             // Ensure dates are valid ISO strings
             const dataToSubmit = {
                 ...formData,
-                start_time: new Date(formData.start_time).toISOString(),
-                end_time: new Date(formData.end_time).toISOString(),
+                start_date: new Date(formData.start_date).toISOString(),
+                end_date: new Date(formData.end_date).toISOString(),
             };
 
             if (initialData) {
@@ -90,15 +90,15 @@ export function AdminFlashSaleForm({ initialData }: AdminFlashSaleFormProps) {
                     <Input
                         label="Waktu Mulai"
                         type="datetime-local"
-                        value={formData.start_time}
-                        onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                        value={formData.start_date}
+                        onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                         required
                     />
                     <Input
                         label="Waktu Berakhir"
                         type="datetime-local"
-                        value={formData.end_time}
-                        onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                        value={formData.end_date}
+                        onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                         required
                     />
                 </div>

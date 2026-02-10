@@ -1,6 +1,8 @@
 import { SelectHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
+import { ChevronDown } from 'lucide-react';
+
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
     label?: string;
     error?: string;
@@ -43,7 +45,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
                         ref={ref}
                         id={selectId}
                         className={cn(
-                            'appearance-none flex h-11 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm transition-all duration-200',
+                            'appearance-none flex h-11 w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm transition-all duration-200 pr-10',
                             'hover:bg-white hover:border-gray-300',
                             'focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500',
                             'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100',
@@ -55,10 +57,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
                         {children}
                     </select>
                     {/* Chevron Icon */}
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                        <ChevronDown className="h-4 w-4" />
                     </div>
                 </div>
 

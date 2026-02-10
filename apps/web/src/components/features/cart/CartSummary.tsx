@@ -1,6 +1,7 @@
 import { formatCurrency } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { ShoppingBag, ArrowRight, Tag, Truck } from 'lucide-react';
 
 /**
  * Cart summary data type
@@ -28,8 +29,9 @@ export function CartSummary({
     isCheckoutDisabled = false,
 }: CartSummaryProps) {
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sticky top-24">
-            <h2 className="mb-6 text-lg font-bold text-gray-900 font-heading">
+        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg shadow-gray-200/50 sticky top-24">
+            <h2 className="mb-6 text-xl font-bold text-gray-900 font-heading flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-primary-600" />
                 Ringkasan Belanja
             </h2>
 
@@ -43,15 +45,16 @@ export function CartSummary({
 
                 {summary.discount > 0 && (
                     <div className="flex justify-between text-base">
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 flex items-center gap-2">
                             Diskon
                             {summary.voucher_code && (
-                                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-50 text-primary-700 border border-primary-100">
+                                    <Tag className="w-3 h-3 mr-1" />
                                     {summary.voucher_code}
                                 </span>
                             )}
                         </span>
-                        <span className="font-semibold text-success-600">
+                        <span className="font-semibold text-green-600">
                             -{formatCurrency(summary.discount)}
                         </span>
                     </div>
@@ -59,7 +62,10 @@ export function CartSummary({
 
                 {summary.shipping > 0 && (
                     <div className="flex justify-between text-base">
-                        <span className="text-gray-600">Ongkir</span>
+                        <span className="text-gray-600 flex items-center gap-2">
+                            <Truck className="w-4 h-4 text-gray-400" />
+                            Ongkir
+                        </span>
                         <span className="font-semibold text-gray-900">
                             {formatCurrency(summary.shipping)}
                         </span>
@@ -70,9 +76,12 @@ export function CartSummary({
             {/* Total */}
             <div className="flex justify-between items-end mb-8">
                 <span className="text-lg font-bold text-gray-900">Total</span>
-                <span className="text-2xl font-bold text-primary-700 font-heading">
-                    {formatCurrency(summary.total)}
-                </span>
+                <div className="text-right">
+                    <span className="text-3xl font-bold text-primary-700 font-heading block">
+                        {formatCurrency(summary.total)}
+                    </span>
+                    <span className="text-xs text-gray-500">Termasuk PPN</span>
+                </div>
             </div>
 
             {/* Checkout Button */}
@@ -84,9 +93,10 @@ export function CartSummary({
                         fullWidth
                         onClick={onCheckout}
                         disabled={isCheckoutDisabled}
-                        className="shadow-lg shadow-primary-500/20"
+                        className="shadow-xl shadow-primary-600/20 hover:shadow-primary-600/30 transition-shadow h-14 text-lg"
                     >
                         Lanjut ke Pembayaran
+                        <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                 </div>
             )}
