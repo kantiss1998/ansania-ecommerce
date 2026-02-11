@@ -5,6 +5,7 @@
  */
 
 import crypto from 'crypto';
+
 import { AppError } from '@repo/shared/errors';
 
 // Doku API Configuration

@@ -8,7 +8,9 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { Cart } from './Cart';
 import { ProductVariant } from './ProductVariant';
 

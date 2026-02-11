@@ -1,13 +1,14 @@
 'use client';
 
 import { Mail, Lock, User, Search, Heart, ShoppingCart, Star, Check } from 'lucide-react';
+
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/Accordion';
+import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, CardImage } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/Accordion';
-import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
 import { Switch } from '@/components/ui/Switch';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
 import { Tooltip } from '@/components/ui/Tooltip';
 
 /**
@@ -369,7 +370,7 @@ export function ShowcaseContent() {
                                             Sign In
                                         </Button>
                                         <p className="text-center text-sm text-gray-600">
-                                            Don't have an account?{' '}
+                                            Don&apos;t have an account?{' '}
                                             <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">
                                                 Sign up
                                             </a>

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+
 import * as searchService from '../services/searchService';
 import { AuthenticatedRequest } from '../types/express';
 

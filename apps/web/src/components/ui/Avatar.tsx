@@ -1,7 +1,10 @@
 'use client';
 
-import { HTMLAttributes } from 'react';
+import Image from 'next/image';
+import * as React from 'react';
 import { User } from 'lucide-react';
+import { HTMLAttributes } from 'react';
+
 import { cn } from '@/lib/utils';
 
 /**
@@ -66,10 +69,11 @@ export function Avatar({
                 )}
             >
                 {src ? (
-                    <img
+                    <Image
                         src={src}
                         alt={alt}
-                        className="h-full w-full object-cover"
+                        fill
+                        className="object-cover"
                     />
                 ) : fallback ? (
                     <span className="font-medium text-white">
@@ -147,6 +151,3 @@ export function AvatarGroup({
         </div>
     );
 }
-
-// Re-export React for Children API
-import * as React from 'react';

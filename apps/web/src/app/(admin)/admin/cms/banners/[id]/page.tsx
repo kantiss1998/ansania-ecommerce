@@ -1,6 +1,7 @@
-import { BannerForm } from '@/components/features/admin/BannerForm';
-import adminCmsService from '@/services/adminCmsService';
 import { notFound } from 'next/navigation';
+
+import { BannerForm } from '@/components/features/admin/BannerForm';
+import { adminCmsService } from '@/services/adminCmsService';
 
 export default async function BannerDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;

@@ -1,7 +1,9 @@
 import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey } from 'sequelize';
+
 import { sequelize } from '../config/database';
-import { Product } from './Product';
+
 import { Category } from './Category';
+import { Product } from './Product';
 
 // ProductCategories junction model
 export class ProductCategories extends Model<

@@ -1,7 +1,7 @@
 
 import { Order, OrderItem, User, Shipping, Payment } from '@repo/database';
-import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
+import { Op } from 'sequelize';
 
 export async function listAllOrders(query: any) {
     const {

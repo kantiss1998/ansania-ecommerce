@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+
 import { ForgotPasswordForm } from '@/components/features/auth/ForgotPasswordForm';
 
 export const dynamic = 'force-dynamic';

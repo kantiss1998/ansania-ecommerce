@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+
 import { ProductForm } from '@/components/features/admin/ProductForm';
 
 export const dynamic = 'force-dynamic';

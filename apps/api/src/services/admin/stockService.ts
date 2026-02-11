@@ -1,7 +1,7 @@
 
 import { ProductVariant, Product, ProductStock } from '@repo/database';
-import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
+import { Op } from 'sequelize';
 
 /**
  * List stock levels with filtering for low/out of stock

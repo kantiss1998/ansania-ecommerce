@@ -1,7 +1,9 @@
-import { ButtonHTMLAttributes, forwardRef, ReactNode } from 'react';
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import { Loader2, LucideIcon } from 'lucide-react';
+import Link from 'next/link';
+import { ButtonHTMLAttributes, forwardRef, ReactNode } from 'react';
+
+import { cn } from '@/lib/utils';
+
 
 /**
  * Button variants
@@ -110,7 +112,9 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
                 xl: 'h-6 w-6',
             }[size];
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && 'render' in (icon as any))) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const IconComponent = icon as any;
                 return <IconComponent className={iconSize} />;
             }
@@ -147,7 +151,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
                 <Link
                     href={href}
                     className={cn(classes, 'group')}
-                    // @ts-ignore
+
                     ref={ref as any}
                 >
                     {content}

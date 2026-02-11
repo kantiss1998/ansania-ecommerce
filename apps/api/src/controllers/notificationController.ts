@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as notificationService from '../services/notificationService';
 import { AuthenticatedRequest } from '../types/express';
 

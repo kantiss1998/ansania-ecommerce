@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as attributeService from '../services/attributeService';
 
 export async function getAllAttributes(_req: Request, res: Response, next: NextFunction) {

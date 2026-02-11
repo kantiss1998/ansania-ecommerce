@@ -38,13 +38,13 @@ export const cmsService = {
 
     async getPage(slug: string): Promise<CMSPage> {
         try {
-            const response = await apiClient.get<ApiResponse<any>>(`/cms/pages/${slug}`);
+            const response = await apiClient.get<ApiResponse<Record<string, unknown>>>(`/cms/pages/${slug}`);
             // Map backend response if necessary, assuming backend returns snake_case
             const data = response.data.data!;
             return {
                 ...data,
-                publishedAt: data.published_at || data.updated_at // Fallback to updated_at if published_at missing
-            };
+                publishedAt: (data.published_at as string) || (data.updated_at as string) // Fallback to updated_at if published_at missing
+            } as unknown as CMSPage;
         } catch (error) {
             throw new Error(getErrorMessage(error)); // Allow 404 to bubble up for Next.js notFound()
         }

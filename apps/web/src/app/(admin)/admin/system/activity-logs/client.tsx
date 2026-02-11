@@ -1,9 +1,10 @@
 'use client';
 
+import { PaginatedResponse } from '@repo/shared';
 import { Suspense } from 'react';
+
 import { Badge } from '@/components/ui/Badge';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { PaginatedResponse } from '@repo/shared';
 
 interface AdminActivityLogsClientProps {
     initialData: PaginatedResponse<any> | null;

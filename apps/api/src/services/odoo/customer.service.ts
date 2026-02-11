@@ -1,7 +1,8 @@
 
-import { odooClient } from './odoo.client';
 import { User } from '@repo/database';
 import { RegisterDTO, LoginDTO } from '@repo/shared/schemas';
+
+import { odooClient } from './odoo.client';
 
 export class OdooCustomerService {
     /**

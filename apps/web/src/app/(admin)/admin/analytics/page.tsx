@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+
 import AdminAnalyticsClient from './client';
 
 export const dynamic = 'force-dynamic';

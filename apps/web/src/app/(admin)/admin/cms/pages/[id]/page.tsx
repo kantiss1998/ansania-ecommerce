@@ -1,6 +1,7 @@
-import { CMSPageForm } from '@/components/features/admin/CMSPageForm';
-import adminCmsService from '@/services/adminCmsService';
 import { notFound } from 'next/navigation';
+
+import { CMSPageForm } from '@/components/features/admin/CMSPageForm';
+import { adminCmsService } from '@/services/adminCmsService';
 
 export default async function PageDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;

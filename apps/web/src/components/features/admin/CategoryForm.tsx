@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
 import { Category } from '@repo/shared';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
 import { getAccessToken } from '@/lib/auth';
 
 interface CategoryFormProps {
@@ -28,7 +30,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
             setIsLoading(true);
             const token = getAccessToken();
             const method = isEdit ? 'PUT' : 'POST';
-            const endpoint = isEdit ? `/api/admin/categories/${initialData.id}` : '/api/admin/categories';
+            const endpoint = isEdit ? `/api/admin/categories/${initialData?.id}` : '/api/admin/categories';
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
                 method,
@@ -58,7 +60,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
             <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900">
-                        {isEdit ? `Edit Kategori: ${initialData.name}` : 'Tambah Kategori Baru'}
+                        {isEdit ? `Edit Kategori: ${initialData?.name}` : 'Tambah Kategori Baru'}
                     </h2>
                     <p className="mt-1 text-sm text-gray-500">
                         Kelola struktur pengelompokan produk untuk mempermudah pencarian pelanggan
@@ -127,10 +129,15 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                             <div className="aspect-square w-full rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-4 text-center group hover:border-primary-500 transition-all cursor-pointer">
                                 {formData.image ? (
                                     <div className="relative w-full h-full">
-                                        <img src={formData.image} alt="Preview" className="w-full h-full object-cover rounded-md" />
+                                        <Image
+                                            src={formData.image}
+                                            alt="Preview"
+                                            fill
+                                            className="object-cover rounded-md"
+                                        />
                                         <button
                                             type="button"
-                                            className="absolute top-1 right-1 bg-white/80 rounded-full p-1 shadow hover:bg-error-50"
+                                            className="absolute top-1 right-1 bg-white/80 rounded-full p-1 shadow hover:bg-error-50 z-10"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setFormData({ ...formData, image: '' });
@@ -158,8 +165,8 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                                 type="checkbox"
                                 id="is_active"
                                 className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                                checked={(formData as any).is_active !== false}
-                                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked } as any)}
+                                checked={!!(formData as unknown as Record<string, unknown>).is_active !== false}
+                                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked } as unknown as Partial<Category>)}
                             />
                             <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Kategori Aktif</label>
                         </div>

@@ -1,6 +1,7 @@
-import { cookies } from 'next/headers';
-import AdminPagesClient from './client';
 import { CMSPage } from '@repo/shared';
+import { cookies } from 'next/headers';
+
+import AdminPagesClient from './client';
 
 export const dynamic = 'force-dynamic';
 

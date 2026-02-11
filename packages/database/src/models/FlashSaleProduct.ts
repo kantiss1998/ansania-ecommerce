@@ -1,8 +1,10 @@
 import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
+import { FlashSale } from './FlashSale';
 import { Product } from './Product';
 import { ProductVariant } from './ProductVariant';
-import { FlashSale } from './FlashSale';
 
 export interface FlashSaleProductAttributes {
     id: number;

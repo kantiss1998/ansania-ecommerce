@@ -1,6 +1,7 @@
-import { cookies } from 'next/headers';
-import AdminOrdersClient from './client';
 import { Order, PaginatedResponse } from '@repo/shared';
+import { cookies } from 'next/headers';
+
+import AdminOrdersClient from './client';
 
 export const dynamic = 'force-dynamic';
 

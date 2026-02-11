@@ -8,8 +8,13 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
+import type { CartItem } from './CartItem';
 import { User } from './User';
+// Use type-only imports to avoid circular dependencies
+import type { Voucher } from './Voucher';
 
 export interface CartAttributes {
     id: number;
@@ -43,13 +48,13 @@ export class Cart extends Model<
 
     // Associations
     declare user?: NonAttribute<User>;
-    declare items?: NonAttribute<any[]>;
-    declare voucher?: NonAttribute<any>;
+    declare items?: NonAttribute<CartItem[]>;
+    declare voucher?: NonAttribute<Voucher>;
 
     declare static associations: {
         user: Association<Cart, User>;
-        items: Association<Cart, any>;
-        voucher: Association<Cart, any>;
+        items: Association<Cart, CartItem>;
+        voucher: Association<Cart, Voucher>;
     };
 }
 

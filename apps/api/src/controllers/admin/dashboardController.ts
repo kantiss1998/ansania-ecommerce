@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as dashboardService from '../../services/admin/dashboardService';
 
 export async function getDashboardStats(_req: Request, res: Response, next: NextFunction) {

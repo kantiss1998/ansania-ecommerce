@@ -1,6 +1,7 @@
-import { cookies } from 'next/headers';
-import AdminBannersClient from './client';
 import { Banner } from '@repo/shared';
+import { cookies } from 'next/headers';
+
+import AdminBannersClient from './client';
 
 export const dynamic = 'force-dynamic';
 

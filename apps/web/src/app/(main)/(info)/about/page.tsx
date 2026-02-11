@@ -1,5 +1,6 @@
-import { cmsClient } from '@/lib/cms';
 import { notFound } from 'next/navigation';
+
+import { cmsClient } from '@/lib/cms';
 
 const PAGE_SLUG = 'about';
 export const dynamic = 'force-dynamic';

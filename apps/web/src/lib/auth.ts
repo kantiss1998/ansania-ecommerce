@@ -61,6 +61,8 @@ export function isAuthenticated(): boolean {
     // Check if token is expired
     try {
         const payload = parseJwt(token);
+        if (!payload || typeof payload.exp !== 'number') return false;
+
         const currentTime = Date.now() / 1000;
         return payload.exp > currentTime;
     } catch {
@@ -71,7 +73,7 @@ export function isAuthenticated(): boolean {
 /**
  * Parse JWT token to get payload
  */
-export function parseJwt(token: string): any {
+export function parseJwt(token: string): Record<string, unknown> | null {
     try {
         const base64Url = token.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -95,5 +97,11 @@ export function getUserIdFromToken(): number | null {
     if (!token) return null;
 
     const payload = parseJwt(token);
-    return payload?.userId || payload?.sub || null;
+    if (!payload) return null;
+
+    // Safelycast or check property
+    const userId = payload.userId as number | undefined;
+    const sub = payload.sub as number | undefined;
+
+    return userId || sub || null;
 }

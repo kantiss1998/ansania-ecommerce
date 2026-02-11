@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { Attribute } from '@repo/shared';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { getAccessToken } from '@/lib/auth';
 
 interface AdminAttributesProps {

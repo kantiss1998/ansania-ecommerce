@@ -1,7 +1,8 @@
+import { ChevronDown } from 'lucide-react';
 import { SelectHTMLAttributes, forwardRef } from 'react';
+
 import { cn } from '@/lib/utils';
 
-import { ChevronDown } from 'lucide-react';
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
     label?: string;

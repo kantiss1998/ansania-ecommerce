@@ -1,4 +1,5 @@
-import adminCmsService from '@/services/adminCmsService';
+import { adminCmsService } from '@/services/adminCmsService';
+
 import PagesClient from './client';
 
 export const dynamic = 'force-dynamic';

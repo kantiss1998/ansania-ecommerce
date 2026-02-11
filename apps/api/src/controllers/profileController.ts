@@ -1,8 +1,9 @@
 
+import { UpdateProfileDTO, ChangePasswordDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+
 import * as profileService from '../services/profileService';
 import { AuthenticatedRequest } from '../types/express';
-import { UpdateProfileDTO, ChangePasswordDTO } from '@repo/shared/schemas';
 
 export async function getProfile(req: Request, res: Response, next: NextFunction) {
     try {

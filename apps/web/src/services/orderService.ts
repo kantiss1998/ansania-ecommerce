@@ -59,7 +59,7 @@ export const orderService = {
             // Checking backend controller... it typically uses `paginatedResult`.
             if (Array.isArray(response.data.data)) {
                 return {
-                    items: response.data.data as any,
+                    items: response.data.data as unknown as Order[],
                     meta: { total: 0, page: 1, limit: 10, totalPages: 1 }
                 };
             }

@@ -1,5 +1,6 @@
 
 import { Router } from 'express';
+
 import * as attributeController from '../controllers/attributeController';
 
 const router = Router();

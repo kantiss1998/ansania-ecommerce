@@ -8,7 +8,11 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
+// Use type-only imports to avoid circular dependencies
+import type { Product } from './Product';
 
 export interface CategoryAttributes {
     id: number;
@@ -47,12 +51,12 @@ export class Category extends Model<
     // Associations
     declare parent?: NonAttribute<Category>;
     declare children?: NonAttribute<Category[]>;
-    declare products?: NonAttribute<any[]>;
+    declare products?: NonAttribute<Product[]>;
 
     declare static associations: {
         parent: Association<Category, Category>;
         children: Association<Category, Category>;
-        products: Association<Category, any>;
+        products: Association<Category, Product>;
     };
 }
 

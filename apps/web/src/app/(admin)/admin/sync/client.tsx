@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { SyncStatus, SyncLog } from '@repo/shared';
+import Link from 'next/link';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { getAccessToken } from '@/lib/auth';
 
-import Link from 'next/link';
 
 interface AdminSyncProps {
     status: SyncStatus;

@@ -1,11 +1,13 @@
 
+import { Order, User } from '@repo/database';
 import { Request, Response, NextFunction } from 'express';
-import { OdooProductService } from '../services/odoo/product.service';
-import { OdooOrderService } from '../services/odoo/order.service';
+import { Op } from 'sequelize';
+
 import { OdooCustomerService } from '../services/odoo/customer.service';
 import { odooClient } from '../services/odoo/odoo.client';
-import { Order, User } from '@repo/database';
-import { Op } from 'sequelize';
+import { OdooOrderService } from '../services/odoo/order.service';
+import { OdooProductService } from '../services/odoo/product.service';
+
 
 const productService = new OdooProductService();
 const orderService = new OdooOrderService();

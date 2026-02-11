@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { CMSPage } from '@/services/cmsService';
 
 interface CmsContentProps {

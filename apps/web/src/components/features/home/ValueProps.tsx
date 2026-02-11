@@ -2,46 +2,49 @@
 
 import { motion } from 'framer-motion';
 import { Truck, ShieldCheck, HeadphonesIcon, Award } from 'lucide-react';
+import { Grid } from '@/components/layout/Grid';
+import { Card } from '@/components/atoms/Card';
+import { Stack } from '@/components/layout/Stack';
 
 const valueProps = [
     {
         icon: ShieldCheck,
         title: 'Kualitas Terjamin',
         description: 'Material pilihan dan pengerjaan rapi untuk kepuasan Anda.',
-        gradient: 'from-emerald-500 to-teal-600',
-        iconBg: 'from-emerald-50 to-teal-50',
-        iconColor: 'text-emerald-600'
+        color: 'primary',
+        iconBg: 'bg-primary-50',
+        iconColor: 'text-primary'
     },
     {
         icon: Truck,
         title: 'Pengiriman Cepat',
         description: 'Layanan pengiriman tepat waktu ke seluruh Indonesia.',
-        gradient: 'from-blue-500 to-cyan-600',
-        iconBg: 'from-blue-50 to-cyan-50',
-        iconColor: 'text-blue-600'
+        color: 'info',
+        iconBg: 'bg-info-light',
+        iconColor: 'text-info'
     },
     {
         icon: HeadphonesIcon,
         title: '24/7 Support',
         description: 'Layanan pelanggan siap membantu Anda kapan saja.',
-        gradient: 'from-purple-500 to-pink-600',
-        iconBg: 'from-purple-50 to-pink-50',
-        iconColor: 'text-purple-600'
+        color: 'secondary',
+        iconBg: 'bg-secondary-light',
+        iconColor: 'text-primary'
     },
     {
         icon: Award,
         title: 'Garansi Resmi',
         description: 'Produk bergaransi resmi untuk ketenangan pikiran Anda.',
-        gradient: 'from-amber-500 to-orange-600',
-        iconBg: 'from-amber-50 to-orange-50',
-        iconColor: 'text-amber-600'
+        color: 'warning',
+        iconBg: 'bg-warning-light',
+        iconColor: 'text-warning'
     }
 ];
 
 export function ValueProps() {
     return (
-        <section className="my-16">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Section background="muted" className="rounded-3xl border border-gray-100 shadow-sm" spacing="md">
+            <Grid cols={1} md={2} lg={4} gap={6}>
                 {valueProps.map((prop, index) => {
                     const Icon = prop.icon;
                     return (
@@ -51,31 +54,29 @@ export function ValueProps() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1, duration: 0.5 }}
-                            whileHover={{ y: -8, scale: 1.02 }}
-                            className="group relative flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-primary-500/10 hover:border-transparent transition-all duration-300 overflow-hidden"
                         >
-                            {/* Background Gradient (appears on hover) */}
-                            <div className={`absolute inset-0 bg-gradient-to-br ${prop.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+                            <Card hover className="h-full flex flex-col items-center text-center p-8 group">
+                                <Stack align="center" spacing={6}>
+                                    <div className={`relative flex h-20 w-20 items-center justify-center rounded-2xl ${prop.iconBg} ${prop.iconColor} transition-all duration-base group-hover:rotate-6 group-hover:scale-110 shadow-sm group-hover:shadow-lg`}>
+                                        <Icon className="h-10 w-10" />
+                                    </div>
 
-                            {/* Icon Container */}
-                            <div className="relative mb-6">
-                                <div className={`absolute inset-0 bg-gradient-to-br ${prop.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-300`} />
-                                <div className={`relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br ${prop.iconBg} ${prop.iconColor} transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 shadow-sm group-hover:shadow-lg`}>
-                                    <Icon className="h-10 w-10" strokeWidth={1.5} />
-                                </div>
-                            </div>
-
-                            <h3 className={`mb-3 text-xl font-bold text-gray-900 font-heading group-hover:bg-gradient-to-r group-hover:${prop.gradient} group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300`}>
-                                {prop.title}
-                            </h3>
-
-                            <p className="text-gray-600 leading-relaxed text-sm">
-                                {prop.description}
-                            </p>
+                                    <Stack spacing={2}>
+                                        <h3 className="text-xl font-bold text-gray-900 font-heading">
+                                            {prop.title}
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed text-sm">
+                                            {prop.description}
+                                        </p>
+                                    </Stack>
+                                </Stack>
+                            </Card>
                         </motion.div>
                     );
                 })}
-            </div>
-        </section>
+            </Grid>
+        </Section>
     );
 }
+
+import { Section } from '@/components/layout/Section';

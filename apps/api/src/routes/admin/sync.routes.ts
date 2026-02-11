@@ -1,7 +1,8 @@
 
 import { Router } from 'express';
-import * as odooController from '../../controllers/odooController';
+
 import * as adminSystemController from '../../controllers/admin/systemController';
+import * as odooController from '../../controllers/odooController';
 import { authenticate, authorizeAdmin } from '../../middleware/auth';
 
 const router = Router();

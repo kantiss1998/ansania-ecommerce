@@ -1,7 +1,8 @@
 
-import { Request, Response, NextFunction } from 'express';
-import * as adminCustomerService from '../../services/admin/customerService';
 import { toCSV } from '@repo/shared/utils';
+import { Request, Response, NextFunction } from 'express';
+
+import * as adminCustomerService from '../../services/admin/customerService';
 
 export async function getAllCustomers(req: Request, res: Response, next: NextFunction) {
     try {

@@ -8,7 +8,9 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { Product } from './Product';
 
 export interface ProductVariantAttributes {

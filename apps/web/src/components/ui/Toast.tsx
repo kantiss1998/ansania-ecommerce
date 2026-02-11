@@ -1,9 +1,10 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { useUiStore } from '@/store/uiStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
+import { useUiStore } from '@/store/uiStore';
 
 /**
  * Toast component - Self-contained notification

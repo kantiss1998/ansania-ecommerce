@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import * as searchController from '../controllers/searchController';
 import { authenticate } from '../middleware/auth';
 

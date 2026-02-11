@@ -52,7 +52,7 @@ export default {
             `SELECT count(*) as count FROM cms_banners`
         );
 
-        // @ts-ignore
+        // @ts-expect-error - results[0] might not be typed strictly
         const count = results[0]?.count || 0;
 
         if (count > 0) {

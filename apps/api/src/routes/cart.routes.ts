@@ -1,10 +1,12 @@
 
+import { cartSchemas } from '@repo/shared/schemas';
 import { Router, Request, Response, NextFunction } from 'express';
-import { AuthenticatedRequest } from '../types/express';
+import jwt from 'jsonwebtoken';
+
 import * as cartController from '../controllers/cartController';
 import { validateRequest } from '../middleware/validation';
-import { cartSchemas } from '@repo/shared/schemas';
-import jwt from 'jsonwebtoken';
+import { AuthenticatedRequest } from '../types/express';
+
 
 const router = Router();
 

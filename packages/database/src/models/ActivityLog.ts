@@ -1,5 +1,7 @@
 import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { User } from './User';
 
 export interface ActivityLogAttributes {
@@ -10,7 +12,7 @@ export interface ActivityLogAttributes {
     entity_id: number | null;
     ip_address: string | null;
     user_agent: string | null;
-    metadata: Record<string, any> | null;
+    metadata: Record<string, unknown> | null;
     created_at: Date;
 }
 
@@ -25,7 +27,7 @@ export class ActivityLog extends Model<
     declare entity_id: number | null;
     declare ip_address: string | null;
     declare user_agent: string | null;
-    declare metadata: Record<string, any> | null;
+    declare metadata: Record<string, unknown> | null;
     declare created_at: CreationOptional<Date>;
 }
 

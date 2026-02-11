@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, Suspense } from 'react';
+
 import { Button } from '@/components/ui/Button';
 interface AdminSettingsClientProps {
     initialSettings: any;

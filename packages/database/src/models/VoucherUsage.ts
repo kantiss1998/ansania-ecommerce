@@ -8,10 +8,12 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
-import { Voucher } from './Voucher';
-import { User } from './User';
+
 import { Order } from './Order';
+import { User } from './User';
+import { Voucher } from './Voucher';
 
 export interface VoucherUsageAttributes {
     id: number;

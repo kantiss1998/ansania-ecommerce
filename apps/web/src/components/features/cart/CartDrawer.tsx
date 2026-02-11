@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useUiStore } from '@/store/uiStore';
-import { useCartStore } from '@/store/cartStore';
-import { formatCurrency, cn } from '@/lib/utils';
-import { Button } from '@/components/ui/Button';
 import { X, ShoppingBag, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
+import { formatCurrency, cn } from '@/lib/utils';
+import { useCartStore } from '@/store/cartStore';
+import { useUiStore } from '@/store/uiStore';
+
 
 /**
  * Cart drawer component that slides from right

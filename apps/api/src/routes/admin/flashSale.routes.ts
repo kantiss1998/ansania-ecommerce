@@ -1,5 +1,6 @@
 
 import { Router } from 'express';
+
 import * as adminFlashSaleController from '../../controllers/admin/flashSaleController';
 import { authenticate, authorizeAdmin } from '../../middleware/auth';
 

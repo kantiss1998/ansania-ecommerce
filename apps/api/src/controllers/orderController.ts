@@ -1,7 +1,8 @@
 
-import { Request, Response } from 'express';
-import * as orderService from '../services/orderService';
 import { AppError } from '@repo/shared/errors';
+import { Request, Response } from 'express';
+
+import * as orderService from '../services/orderService';
 import { AuthenticatedRequest } from '../types/express';
 
 export const getOrders = async (req: Request, res: Response) => {

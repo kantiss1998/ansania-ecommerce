@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import {
     Model,
     DataTypes,
@@ -7,8 +8,21 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
-import bcrypt from 'bcryptjs';
+
 import { sequelize } from '../config/database';
+
+// Use type-only imports to avoid circular dependencies
+import type { ActivityLog } from './ActivityLog';
+import type { Address } from './Address';
+import type { Cart } from './Cart';
+import type { Notification } from './Notification';
+import type { Order } from './Order';
+import type { PasswordResetToken } from './PasswordResetToken';
+import type { ProductView } from './ProductView';
+import type { Review } from './Review';
+import type { SearchHistory } from './SearchHistory';
+import type { UserSession } from './UserSession';
+import type { Wishlist } from './Wishlist';
 
 // Define User attributes interface
 export interface UserAttributes {
@@ -54,32 +68,32 @@ export class User extends Model<
     declare updated_at: CreationOptional<Date>;
 
     // Associations
-    declare addresses?: NonAttribute<any[]>;
-    declare orders?: NonAttribute<any[]>;
-    declare cart?: NonAttribute<any>;
-    declare reviews?: NonAttribute<any[]>;
-    declare wishlist?: NonAttribute<any[]>;
+    declare addresses?: NonAttribute<Address[]>;
+    declare orders?: NonAttribute<Order[]>;
+    declare cart?: NonAttribute<Cart>;
+    declare reviews?: NonAttribute<Review[]>;
+    declare wishlist?: NonAttribute<Wishlist[]>;
     // New associations
-    declare sessions?: NonAttribute<any[]>;
-    declare passwordResetTokens?: NonAttribute<any[]>;
-    declare notifications?: NonAttribute<any[]>;
-    declare activityLogs?: NonAttribute<any[]>;
-    declare searchHistory?: NonAttribute<any[]>;
-    declare views?: NonAttribute<any[]>;
+    declare sessions?: NonAttribute<UserSession[]>;
+    declare passwordResetTokens?: NonAttribute<PasswordResetToken[]>;
+    declare notifications?: NonAttribute<Notification[]>;
+    declare activityLogs?: NonAttribute<ActivityLog[]>;
+    declare searchHistory?: NonAttribute<SearchHistory[]>;
+    declare views?: NonAttribute<ProductView[]>;
 
     // Association declarations
     declare static associations: {
-        addresses: Association<User, any>;
-        orders: Association<User, any>;
-        cart: Association<User, any>;
-        reviews: Association<User, any>;
-        wishlist: Association<User, any>;
-        sessions: Association<User, any>;
-        passwordResetTokens: Association<User, any>;
-        notifications: Association<User, any>;
-        activityLogs: Association<User, any>;
-        searchHistory: Association<User, any>;
-        views: Association<User, any>;
+        addresses: Association<User, Address>;
+        orders: Association<User, Order>;
+        cart: Association<User, Cart>;
+        reviews: Association<User, Review>;
+        wishlist: Association<User, Wishlist>;
+        sessions: Association<User, UserSession>;
+        passwordResetTokens: Association<User, PasswordResetToken>;
+        notifications: Association<User, Notification>;
+        activityLogs: Association<User, ActivityLog>;
+        searchHistory: Association<User, SearchHistory>;
+        views: Association<User, ProductView>;
     };
 
     // Instance methods
@@ -88,9 +102,9 @@ export class User extends Model<
     }
 
     toJSON(): Omit<UserAttributes, 'password'> {
-        const values = { ...this.get() } as any;
+        const values = { ...this.get() } as Record<string, unknown>;
         delete values.password;
-        return values as Omit<UserAttributes, 'password'>;
+        return values as unknown as Omit<UserAttributes, 'password'>;
     }
 }
 

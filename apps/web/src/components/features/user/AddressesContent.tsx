@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { AddressForm } from '@/components/features/checkout/AddressForm';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/components/ui/Toast';
-import { addressService, Address } from '@/services/addressService';
 import { getErrorMessage } from '@/lib/api';
+import { addressService, Address } from '@/services/addressService';
 
 /**
  * Addresses management content

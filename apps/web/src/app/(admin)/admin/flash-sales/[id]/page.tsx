@@ -1,7 +1,8 @@
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
+
 import { AdminFlashSaleForm } from '@/components/features/admin/flash-sales/AdminFlashSaleForm';
 import { flashSaleService } from '@/services/flashSaleService';
-import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
 
 export default async function FlashSaleDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const cookieStore = await cookies();

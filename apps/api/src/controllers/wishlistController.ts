@@ -1,8 +1,9 @@
 
+import { ListWishlistQuery, AddToWishlistDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+
 import * as wishlistService from '../services/wishlistService';
 import { AuthenticatedRequest } from '../types/express';
-import { ListWishlistQuery, AddToWishlistDTO } from '@repo/shared/schemas';
 
 export async function getWishlist(req: Request, res: Response, next: NextFunction) {
     try {

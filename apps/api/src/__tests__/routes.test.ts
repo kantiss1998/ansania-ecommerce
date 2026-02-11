@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
 import request from 'supertest';
+import { describe, it, expect, vi } from 'vitest';
+
 import app from '../app';
 
 // Mock services to avoid DB calls

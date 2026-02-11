@@ -1,14 +1,16 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShoppingBag, Heart, Search, Menu, X, LogIn, ChevronDown, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, Suspense } from 'react';
+
+import { SearchBar } from '@/components/features/search/SearchBar';
+import { Avatar } from '@/components/ui/Avatar';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { useUiStore } from '@/store/uiStore';
-import { SearchBar } from '@/components/features/search/SearchBar';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Heart, Search, Menu, X, LogIn, ChevronDown, Sparkles } from 'lucide-react';
-import { Avatar } from '@/components/ui/Avatar';
+
 
 /**
  * Header component with navigation, cart, and user menu

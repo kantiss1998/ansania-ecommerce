@@ -1,5 +1,7 @@
 import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { User } from './User';
 
 export interface SearchHistoryAttributes {
@@ -8,7 +10,7 @@ export interface SearchHistoryAttributes {
     session_id: string | null;
     search_query: string;
     results_count: number;
-    filters_applied: Record<string, any> | null;
+    filters_applied: Record<string, unknown> | null;
     created_at: Date;
 }
 
@@ -21,7 +23,7 @@ export class SearchHistory extends Model<
     declare session_id: string | null;
     declare search_query: string;
     declare results_count: CreationOptional<number>;
-    declare filters_applied: Record<string, any> | null;
+    declare filters_applied: Record<string, unknown> | null;
     declare created_at: CreationOptional<Date>;
 }
 

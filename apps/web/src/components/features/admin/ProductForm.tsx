@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { Product, Category } from '@repo/shared';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { getAccessToken } from '@/lib/auth';
 
 interface ProductFormProps {
@@ -67,7 +69,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
             <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900">
-                        {isEdit ? `Edit Produk: ${initialData.name}` : 'Tambah Produk Baru'}
+                        {isEdit ? `Edit Produk: ${initialData?.name}` : 'Tambah Produk Baru'}
                     </h2>
                     <p className="mt-1 text-sm text-gray-500">
                         Lengkapi informasi detail produk dan manajemen stok
@@ -162,15 +164,19 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
-                                        {formData.variants?.map((v, i) => (
+                                        {(formData.variants as unknown as any[])?.map((v, i) => (
                                             <tr key={v.id || i}>
-                                                <td className="px-4 py-3">{v.sku}</td>
+                                                <td className="px-4 py-3 text-gray-900">{v.sku}</td>
                                                 <td className="px-4 py-3">
                                                     <span className="text-xs text-gray-500">{v.color} / {v.size}</span>
                                                 </td>
-                                                <td className="px-4 py-3 font-medium">{v.price}</td>
+                                                <td className="px-4 py-3 font-medium text-gray-900">
+                                                    Rp {v.price?.toLocaleString('id-ID')}
+                                                </td>
                                                 <td className="px-4 py-3">
-                                                    <Badge variant={v.stock > 0 ? 'success' : 'error'}>{v.stock}</Badge>
+                                                    <Badge variant={(v.stock || 0) > 0 ? 'success' : 'error'}>
+                                                        {v.stock || 0}
+                                                    </Badge>
                                                 </td>
                                             </tr>
                                         ))}
@@ -187,16 +193,25 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {formData.images?.map((img, idx) => (
                                     <div key={idx} className="relative aspect-square rounded-lg border border-gray-200 overflow-hidden bg-gray-50 group">
-                                        <img src={img} alt="" className="w-full h-full object-cover" />
-                                        <button
-                                            type="button"
-                                            className="absolute top-1 right-1 bg-white/80 rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => {
-                                                const newImgs = [...formData.images!];
-                                                newImgs.splice(idx, 1);
-                                                setFormData({ ...formData, images: newImgs });
-                                            }}
-                                        >✕</button>
+                                        <div className="relative w-full h-full">
+                                            <Image
+                                                src={img}
+                                                alt={`Product image ${idx + 1}`}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="absolute top-1 right-1 bg-white/80 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-50 hover:text-red-500"
+                                                onClick={() => {
+                                                    const newImgs = [...(formData.images || [])];
+                                                    newImgs.splice(idx, 1);
+                                                    setFormData({ ...formData, images: newImgs });
+                                                }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                                 <button

@@ -1,15 +1,16 @@
 'use client';
 
-import Link from 'next/link';
-import { useEffect } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import { useUiStore } from '@/store/uiStore';
-import { cn } from '@/lib/utils';
 import {
     X, Home, ShoppingBag, Grid, Heart,
     ClipboardList, User, Info, Phone, LogOut, LogIn
 } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect } from 'react';
+
 import { Button } from '@/components/ui/Button';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/authStore';
+import { useUiStore } from '@/store/uiStore';
 
 /**
  * Mobile navigation drawer
@@ -148,7 +149,7 @@ function NavItem({
     onClick
 }: {
     href: string;
-    icon: any;
+    icon: React.ElementType;
     label: string;
     onClick: () => void;
 }) {

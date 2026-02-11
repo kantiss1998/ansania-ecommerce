@@ -19,14 +19,14 @@ export const adminVoucherService = {
     async getAllVouchers(
         params?: { page?: number; limit?: number; status?: 'active' | 'upcoming' | 'expired' | 'all' },
         token?: string
-    ): Promise<{ items: Voucher[]; meta: any }> {
+    ): Promise<{ items: Voucher[]; meta: unknown }> {
         const query = new URLSearchParams();
         if (params?.page) query.append('page', params.page.toString());
         if (params?.limit) query.append('limit', params.limit.toString());
         if (params?.status) query.append('status', params.status);
 
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await apiClient.get<ApiResponse<{ items: Voucher[]; meta: any }>>(`/admin/vouchers?${query.toString()}`, config);
+        const response = await apiClient.get<ApiResponse<{ items: Voucher[]; meta: unknown }>>(`/admin/vouchers?${query.toString()}`, config);
         return response.data.data!;
     },
 

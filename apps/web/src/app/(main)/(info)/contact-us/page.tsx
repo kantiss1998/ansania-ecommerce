@@ -1,6 +1,7 @@
-import { cmsClient } from '@/lib/cms';
 import { notFound } from 'next/navigation';
+
 import { ContactForm } from '@/components/features/contact/ContactForm';
+import { cmsClient } from '@/lib/cms';
 
 const PAGE_SLUG = 'contact-us';
 export const dynamic = 'force-dynamic';

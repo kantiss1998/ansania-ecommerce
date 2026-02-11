@@ -1,9 +1,10 @@
 
-import { Router } from 'express';
-import * as wishlistController from '../controllers/wishlistController';
-import { validateRequest } from '../middleware/validation';
 import { wishlistSchemas } from '@repo/shared/schemas';
+import { Router } from 'express';
+
+import * as wishlistController from '../controllers/wishlistController';
 import { authenticate } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
 
 const router = Router();
 

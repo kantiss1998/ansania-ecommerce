@@ -1,8 +1,9 @@
 'use client';
 
-import { useAuthStore } from '@/store/authStore';
-import { DashboardSidebar } from '@/components/features/dashboard/DashboardSidebar';
 import { Sparkles } from 'lucide-react';
+
+import { DashboardSidebar } from '@/components/features/dashboard/DashboardSidebar';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * User dashboard layout with sidebar

@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { CheckCircle, Clock, Copy, Home, ShoppingBag, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/utils';
 import { orderService, Order } from '@/services/orderService';
-import { motion } from 'framer-motion';
-import { CheckCircle, Clock, Copy, Home, ShoppingBag, Sparkles } from 'lucide-react';
+
 
 export default function OrderConfirmationPage() {
     const params = useParams();

@@ -1,5 +1,6 @@
 
 import { Router } from 'express';
+
 import * as adminStockController from '../../controllers/admin/stockController';
 import { authenticate, authorizeAdmin } from '../../middleware/auth';
 

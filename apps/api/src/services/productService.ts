@@ -1,7 +1,7 @@
-import { Product, ProductVariant, Category, ProductImage, ProductRatingsSummary } from '@repo/database';
+import { Product, ProductVariant, Category, ProductImage, ProductRatingsSummary , sequelize } from '@repo/database';
 import { ListProductsQuery } from '@repo/shared/schemas';
 import { Op, Includeable, Order } from 'sequelize';
-import { sequelize } from '@repo/database';
+
 
 export function mapProduct(product: any) {
     if (!product) return null;

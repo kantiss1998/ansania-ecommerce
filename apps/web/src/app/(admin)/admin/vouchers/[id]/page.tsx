@@ -1,7 +1,8 @@
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
+
 import { VoucherForm } from '@/components/features/admin/vouchers/VoucherForm';
 import { adminVoucherService } from '@/services/adminVoucherService';
-import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
 
 export default async function VoucherDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const cookieStore = await cookies();

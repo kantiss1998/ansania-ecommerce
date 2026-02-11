@@ -110,10 +110,10 @@ export function VariantSelector({
                                     onClick={() => handleColorChange(color)}
                                     disabled={!isAvailable}
                                     className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all ${isSelected
-                                            ? 'border-primary-700 bg-primary-700 text-white'
-                                            : isAvailable
-                                                ? 'border-gray-300 bg-white text-gray-900 hover:border-primary-700'
-                                                : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        ? 'border-primary-700 bg-primary-700 text-white'
+                                        : isAvailable
+                                            ? 'border-gray-300 bg-white text-gray-900 hover:border-primary-700'
+                                            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                                         }`}
                                 >
                                     {color}
@@ -150,10 +150,10 @@ export function VariantSelector({
                                     onClick={() => handleSizeChange(size)}
                                     disabled={!isAvailable}
                                     className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all ${isSelected
-                                            ? 'border-primary-700 bg-primary-700 text-white'
-                                            : isAvailable
-                                                ? 'border-gray-300 bg-white text-gray-900 hover:border-primary-700'
-                                                : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        ? 'border-primary-700 bg-primary-700 text-white'
+                                        : isAvailable
+                                            ? 'border-gray-300 bg-white text-gray-900 hover:border-primary-700'
+                                            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                                         }`}
                                 >
                                     {size}
@@ -190,10 +190,10 @@ export function VariantSelector({
                                     onClick={() => handleFinishingChange(finishing)}
                                     disabled={!isAvailable}
                                     className={`rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all ${isSelected
-                                            ? 'border-primary-700 bg-primary-700 text-white'
-                                            : isAvailable
-                                                ? 'border-gray-300 bg-white text-gray-900 hover:border-primary-700'
-                                                : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        ? 'border-primary-700 bg-primary-700 text-white'
+                                        : isAvailable
+                                            ? 'border-gray-300 bg-white text-gray-900 hover:border-primary-700'
+                                            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                                         }`}
                                 >
                                     {finishing}

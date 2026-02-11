@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as categoryService from '../services/categoryService';
 
 export async function getCategories(_req: Request, res: Response, next: NextFunction) {

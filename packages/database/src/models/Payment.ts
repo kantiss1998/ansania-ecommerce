@@ -8,7 +8,9 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { Order } from './Order';
 
 export type PaymentMethod =

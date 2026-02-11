@@ -1,5 +1,5 @@
-import { QueryInterface } from 'sequelize';
 import bcrypt from 'bcryptjs';
+import { QueryInterface } from 'sequelize';
 
 export default {
     async up(queryInterface: QueryInterface): Promise<void> {

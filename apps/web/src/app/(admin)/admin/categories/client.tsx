@@ -1,11 +1,12 @@
 'use client';
 
-import { Suspense } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { Category, PaginatedResponse } from '@repo/shared';
 import Link from 'next/link';
+import { Suspense } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 
 interface AdminCategoriesClientProps {
     initialData: PaginatedResponse<Category> | null;

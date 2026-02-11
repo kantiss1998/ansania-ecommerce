@@ -1,4 +1,6 @@
+import Image from 'next/image';
 import { HTMLAttributes, ReactNode } from 'react';
+
 import { cn } from '@/lib/utils';
 
 /**
@@ -202,10 +204,11 @@ export function CardImage({
             )}
             {...props}
         >
-            <img
+            <Image
                 src={src}
                 alt={alt}
-                className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                fill
+                className="object-cover transition-transform duration-500 hover:scale-110"
             />
         </div>
     );

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/Button';
+
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import apiClient from '@/lib/api';
 
@@ -167,7 +168,7 @@ export default function AdminStockSyncClient() {
                     <p>• Sinkronisasi akan mengambil data stok terbaru dari Odoo</p>
                     <p>• Proses sinkronisasi berjalan di background dan mungkin memakan waktu beberapa menit</p>
                     <p>• Sinkronisasi otomatis berjalan setiap 1 jam sekali</p>
-                    <p>• Anda dapat memicu sinkronisasi manual kapan saja dengan tombol "Sync Now"</p>
+                    <p>• Anda dapat memicu sinkronisasi manual kapan saja dengan tombol &quot;Sync Now&quot;</p>
                 </div>
             </div>
         </div>

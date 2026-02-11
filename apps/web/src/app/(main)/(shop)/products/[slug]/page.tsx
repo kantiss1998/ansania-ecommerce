@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+
 import { ProductDetailView, ProductDetailData } from '@/components/features/product/ProductDetailView';
 import { productService } from '@/services/productService';
 

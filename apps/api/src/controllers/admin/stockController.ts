@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as adminStockService from '../../services/admin/stockService';
 import { OdooProductService } from '../../services/odoo/product.service';
 

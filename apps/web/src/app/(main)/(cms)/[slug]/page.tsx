@@ -1,5 +1,6 @@
-import { cmsClient } from '@/lib/cms';
 import { notFound } from 'next/navigation';
+
+import { cmsClient } from '@/lib/cms';
 
 export const dynamic = 'force-dynamic';
 

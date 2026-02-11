@@ -1,10 +1,11 @@
 
-import { Router, Request, Response, NextFunction } from 'express';
-import * as voucherController from '../controllers/voucherController';
-import { AuthenticatedRequest } from '../types/express';
-import { validateRequest } from '../middleware/validation';
 import { cartSchemas } from '@repo/shared/schemas';
+import { Router, Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+
+import * as voucherController from '../controllers/voucherController';
+import { validateRequest } from '../middleware/validation';
+import { AuthenticatedRequest } from '../types/express';
 
 const router = Router();
 
@@ -16,7 +17,7 @@ const extractUser = (req: Request, _res: Response, next: NextFunction) => {
             const token = authHeader.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
             (req as AuthenticatedRequest).user = decoded as { userId: number; email: string; role: string };
-        } catch (e) { }
+        } catch (e) { /* empty */ }
     }
     next();
 };

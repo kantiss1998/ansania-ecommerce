@@ -1,8 +1,9 @@
 
+import { AddToCartDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+
 import * as cartService from '../services/cartService';
 import { AuthenticatedRequest } from '../types/express';
-import { AddToCartDTO } from '@repo/shared/schemas';
 
 function getSession(req: Request) {
     // If authenticated (via auth middleware), use user.

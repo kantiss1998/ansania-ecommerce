@@ -1,5 +1,7 @@
 import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { Product } from './Product';
 
 export interface ProductRatingsSummaryAttributes {

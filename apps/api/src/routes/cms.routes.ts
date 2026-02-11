@@ -1,5 +1,6 @@
 
 import { Router } from 'express';
+
 import * as cmsController from '../controllers/cmsController';
 
 const router = Router();

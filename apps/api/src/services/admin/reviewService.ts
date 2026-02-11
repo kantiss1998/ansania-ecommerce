@@ -1,7 +1,7 @@
 
 import { Review, User, Product } from '@repo/database';
-import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
+import { Op } from 'sequelize';
 
 export async function listAllReviews(query: any) {
     const {

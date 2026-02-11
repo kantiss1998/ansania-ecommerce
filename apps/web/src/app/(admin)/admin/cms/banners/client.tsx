@@ -1,12 +1,13 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Banner } from '@repo/shared';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { Banner } from '@repo/shared';
-import adminCmsService from '@/services/adminCmsService';
+import { adminCmsService } from '@/services/adminCmsService';
 
 interface BannersClientProps {
     initialData: Banner[];

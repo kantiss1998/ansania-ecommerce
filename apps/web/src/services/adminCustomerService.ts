@@ -16,7 +16,7 @@ export interface CustomerActivity {
     type: 'order' | 'review' | 'login' | 'registration';
     description: string;
     created_at: string;
-    metadata?: any;
+    metadata?: Record<string, unknown> | null;
 }
 
 export const adminCustomerService = {
@@ -30,10 +30,8 @@ export const adminCustomerService = {
         return response.data.data || [];
     },
 
-    async getCustomerReviews(userId: number): Promise<any[]> {
-        const response = await apiClient.get<ApiResponse<any[]>>(`/admin/customers/${userId}/reviews`);
+    async getCustomerReviews(userId: number): Promise<unknown[]> {
+        const response = await apiClient.get<ApiResponse<unknown[]>>(`/admin/customers/${userId}/reviews`);
         return response.data.data || [];
     }
 };
-
-export default adminCustomerService;

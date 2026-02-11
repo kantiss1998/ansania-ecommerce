@@ -1,7 +1,7 @@
 
-import { User, Order, Address, Review } from '@repo/database';
-import { Op } from 'sequelize';
+import { User, Order, Address, Review, ActivityLog } from '@repo/database';
 import { NotFoundError } from '@repo/shared/errors';
+import { Op } from 'sequelize';
 
 export async function listCustomers(query: any) {
     const {
@@ -129,7 +129,7 @@ export async function getCustomerStats(id: number) {
 }
 
 export async function getCustomerActivity(id: number, query: any) {
-    const { ActivityLog } = require('@repo/database');
+
     const { page = 1, limit = 20 } = query;
     const offset = (Number(page) - 1) * Number(limit);
 

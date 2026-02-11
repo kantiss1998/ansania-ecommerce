@@ -4,9 +4,10 @@
  */
 
 import { Address, Cart, CartItem, ProductVariant, Product, ShippingCostsCache } from '@repo/database';
-import { jntClient, JNTRateResponse } from '../integrations/jnt/client';
 import { NotFoundError, AppError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
+
+import { jntClient, JNTRateResponse } from '../integrations/jnt/client';
 
 // Default warehouse location (can be configured via CMS)
 const WAREHOUSE_CITY = process.env.JNT_WAREHOUSE_CITY || 'Jakarta Utara';

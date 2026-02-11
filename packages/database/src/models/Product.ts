@@ -8,8 +8,14 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { Category } from './Category';
+// Use type-only imports to avoid circular dependencies
+import type { ProductImage } from './ProductImage';
+import type { ProductVariant } from './ProductVariant';
+import type { Review } from './Review';
 
 export interface ProductAttributes {
     id: number;
@@ -65,15 +71,15 @@ export class Product extends Model<
 
     // Associations
     declare category?: NonAttribute<Category>;
-    declare variants?: NonAttribute<any[]>;
-    declare images?: NonAttribute<any[]>;
-    declare reviews?: NonAttribute<any[]>;
+    declare variants?: NonAttribute<ProductVariant[]>;
+    declare images?: NonAttribute<ProductImage[]>;
+    declare reviews?: NonAttribute<Review[]>;
 
     declare static associations: {
         category: Association<Product, Category>;
-        variants: Association<Product, any>;
-        images: Association<Product, any>;
-        reviews: Association<Product, any>;
+        variants: Association<Product, ProductVariant>;
+        images: Association<Product, ProductImage>;
+        reviews: Association<Product, Review>;
     };
 }
 

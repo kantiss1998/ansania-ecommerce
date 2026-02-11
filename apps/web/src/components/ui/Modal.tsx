@@ -1,10 +1,11 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
-import { cn } from '@/lib/utils';
-import { useUiStore } from '@/store/uiStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { ReactNode, useEffect } from 'react';
+
+import { cn } from '@/lib/utils';
+import { useUiStore } from '@/store/uiStore';
 
 /**
  * Modal props interface

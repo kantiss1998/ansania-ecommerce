@@ -1,6 +1,7 @@
-import { cookies } from 'next/headers';
-import AdminReviewsClient from './client';
 import { Review, PaginatedResponse } from '@repo/shared';
+import { cookies } from 'next/headers';
+
+import AdminReviewsClient from './client';
 
 export const dynamic = 'force-dynamic';
 

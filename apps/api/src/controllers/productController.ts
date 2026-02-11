@@ -1,8 +1,10 @@
 
-import { Request, Response, NextFunction } from 'express';
-import * as productService from '../services/productService';
-import { OdooProductService } from '../services/odoo/product.service';
 import { SearchHistory } from '@repo/database';
+import { Request, Response, NextFunction } from 'express';
+
+import { OdooProductService } from '../services/odoo/product.service';
+import * as productService from '../services/productService';
+
 const odooProductService = new OdooProductService();
 import { ListProductsQuery } from '@repo/shared/schemas';
 import { NotFoundError } from '@repo/shared/errors';

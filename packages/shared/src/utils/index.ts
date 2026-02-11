@@ -2,6 +2,11 @@
  * Utility Functions for Shared Use
  */
 
+// Export utility modules
+export * from './string';
+export * from './number';
+export * from './date';
+
 /**
  * Format price to Indonesian Rupiah
  */
@@ -35,8 +40,8 @@ export function slugify(text: string): string {
         .toLowerCase()
         .trim()
         .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '')
-        .replace(/\-\-+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-')
         .replace(/^-+/, '')
         .replace(/-+$/, '');
 }
@@ -141,18 +146,20 @@ export function deepClone<T>(obj: T): T {
 /**
  * Remove undefined/null values from object
  */
-export function removeEmptyValues<T extends Record<string, any>>(obj: T): Partial<T> {
-    return Object.entries(obj).reduce((acc, [key, value]) => {
+export function removeEmptyValues<T extends Record<string, unknown>>(obj: T): Partial<T> {
+    const result: Partial<T> = {};
+    (Object.keys(obj) as Array<keyof T>).forEach((key) => {
+        const value = obj[key];
         if (value !== undefined && value !== null) {
-            acc[key as keyof T] = value;
+            result[key] = value;
         }
-        return acc;
-    }, {} as Partial<T>);
+    });
+    return result;
 }
 /**
  * Convert array of objects to CSV string
  */
-export function toCSV(data: any[]): string {
+export function toCSV(data: Record<string, unknown>[]): string {
     if (data.length === 0) return '';
 
     const headers = Object.keys(data[0]);

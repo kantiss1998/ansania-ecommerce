@@ -15,8 +15,10 @@ if (result.error) {
 
 // Now import app and other modules AFTER env is loaded
 // IMPORTANT: Use require() instead of import to prevent hoisting
-const app = require('./app').default;
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { sequelize } = require('@repo/database');
+const app = require('./app').default;
+/* eslint-enable @typescript-eslint/no-var-requires */
 
 const PORT = process.env.API_PORT || 5000;
 

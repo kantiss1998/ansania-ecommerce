@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+
 import AdminSyncClient from './client';
 
 export const dynamic = 'force-dynamic';

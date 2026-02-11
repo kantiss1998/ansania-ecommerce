@@ -1,6 +1,7 @@
-import { cmsClient } from '@/lib/cms';
 import { notFound } from 'next/navigation';
+
 import { CmsContent } from '@/components/features/cms/CmsContent';
+import { cmsClient } from '@/lib/cms';
 
 const PAGE_SLUG = 'shipping-info';
 export const dynamic = 'force-dynamic';

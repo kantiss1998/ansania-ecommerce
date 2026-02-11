@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as adminVoucherService from '../../services/admin/voucherService';
 
 export async function getAllVouchers(req: Request, res: Response, next: NextFunction) {

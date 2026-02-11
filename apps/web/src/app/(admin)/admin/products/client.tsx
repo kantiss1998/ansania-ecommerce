@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { Product, PaginatedResponse } from '@repo/shared';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
+import { useState, Suspense } from 'react';
+
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { formatCurrency } from '@/lib/utils';
-import { Product, PaginatedResponse } from '@repo/shared';
-import Link from 'next/link';
+
 
 interface AdminProductsClientProps {
     initialData: PaginatedResponse<Product> | null;

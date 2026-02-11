@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as shippingService from '../services/shippingService';
 
 export const getProvinces = async (_req: Request, res: Response, next: NextFunction) => {

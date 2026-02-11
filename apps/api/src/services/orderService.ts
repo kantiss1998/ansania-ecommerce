@@ -1,9 +1,10 @@
 
 import { Order, OrderItem, Cart, CartItem, ProductVariant, Product, sequelize, Shipping, Address, Voucher, VoucherUsage, Payment } from '@repo/database';
-import { WhereOptions } from 'sequelize';
-import { CreateOrderDTO } from '@repo/shared/schemas';
 import { AppError, NotFoundError, InsufficientStockError } from '@repo/shared/errors';
+import { CreateOrderDTO } from '@repo/shared/schemas';
 import { generateOrderNumber } from '@repo/shared/utils';
+import { WhereOptions } from 'sequelize';
+
 import { calculateShipping } from './shippingService';
 
 export async function createOrder(userId: number, data: CreateOrderDTO) {

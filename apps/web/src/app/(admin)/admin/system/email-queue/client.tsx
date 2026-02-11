@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { PaginatedResponse } from '@repo/shared';
+import { Suspense } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 
 interface AdminEmailQueueClientProps {
     initialData: PaginatedResponse<any> | null;

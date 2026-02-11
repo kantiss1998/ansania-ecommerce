@@ -1,12 +1,13 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { CMSPage } from '@repo/shared';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
-import { CMSPage } from '@repo/shared';
-import adminCmsService from '@/services/adminCmsService';
+import { adminCmsService } from '@/services/adminCmsService';
 
 interface PagesClientProps {
     initialData: CMSPage[];
@@ -64,7 +65,7 @@ function PagesContent({ initialData }: PagesClientProps) {
                                 <TableRow key={page.id}>
                                     <TableCell>
                                         <div className="font-medium text-gray-900">{page.title}</div>
-                                        <div className="text-xs text-gray-400 truncate max-w-[200px]">{page.metadata?.meta_title || ''}</div>
+                                        <div className="text-xs text-gray-400 truncate max-w-[200px]">{(page as any).meta_title || (page as any).metadata?.meta_title || ''}</div>
                                     </TableCell>
                                     <TableCell>
                                         <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-600">

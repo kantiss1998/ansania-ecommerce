@@ -1,9 +1,10 @@
 'use client';
 
-import { useAuthStore } from '@/store/authStore';
-import { AdminSidebar } from '@/components/features/admin/AdminSidebar';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+
+import { AdminSidebar } from '@/components/features/admin/AdminSidebar';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * Admin layout with sidebar

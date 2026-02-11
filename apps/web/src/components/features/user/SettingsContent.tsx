@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Input } from '@/components/ui/Input';
+import { motion } from 'framer-motion';
+import { Lock, Bell, LogOut, Sparkles, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
 import { useAuthStore } from '@/store/authStore';
 
@@ -22,6 +24,11 @@ export function SettingsContent() {
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const [notifications, setNotifications] = useState({
+        email: true,
+        promo: true,
+    });
 
     const handlePasswordChange = (field: string, value: string) => {
         setPasswordForm((prev) => ({ ...prev, [field]: value }));
@@ -79,155 +86,251 @@ export function SettingsContent() {
         window.location.href = '/';
     };
 
+    const toggleNotification = (key: 'email' | 'promo') => {
+        setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
+        success(`Notifikasi ${key === 'email' ? 'Email' : 'Promo'} ${!notifications[key] ? 'diaktifkan' : 'dinonaktifkan'}`);
+    };
+
     return (
         <div className="space-y-6">
+            {/* Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-4 py-2 mb-4">
+                    <Sparkles className="h-4 w-4 text-primary-600" />
+                    <span className="text-sm font-semibold text-primary-700">Pengaturan Akun</span>
+                </div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+                    Pengaturan
+                </h1>
+                <p className="mt-2 text-gray-600">Kelola keamanan dan preferensi akun Anda</p>
+            </motion.div>
+
             {/* Password Section */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6">
-                <div className="mb-4 flex items-center justify-between">
-                    <div>
-                        <h2 className="text-xl font-semibold text-gray-900">
-                            Keamanan Akun
-                        </h2>
-                        <p className="mt-1 text-sm text-gray-600">
-                            Ubah password untuk keamanan akun Anda
-                        </p>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg"
+            >
+                {/* Decorative blur */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full blur-3xl opacity-30"></div>
+
+                <div className="relative">
+                    <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="inline-flex rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 p-3 shadow-md">
+                                <Lock className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                    Keamanan Akun
+                                </h2>
+                                <p className="text-sm text-gray-600">
+                                    Ubah password untuk keamanan akun Anda
+                                </p>
+                            </div>
+                        </div>
+                        {!isChangingPassword && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsChangingPassword(true)}
+                                className="border-2"
+                            >
+                                Ubah Password
+                            </Button>
+                        )}
                     </div>
-                    {!isChangingPassword && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setIsChangingPassword(true)}
+
+                    {isChangingPassword && (
+                        <motion.form
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            onSubmit={handlePasswordSubmit}
+                            className="mt-6 space-y-4"
                         >
-                            Ubah Password
-                        </Button>
+                            <Input
+                                label="Password Saat Ini"
+                                type="password"
+                                value={passwordForm.current_password}
+                                onChange={(e) =>
+                                    handlePasswordChange('current_password', e.target.value)
+                                }
+                                error={errors.current_password}
+                                required
+                            />
+
+                            <Input
+                                label="Password Baru"
+                                type="password"
+                                value={passwordForm.new_password}
+                                onChange={(e) =>
+                                    handlePasswordChange('new_password', e.target.value)
+                                }
+                                error={errors.new_password}
+                                helperText="Minimal 8 karakter"
+                                required
+                            />
+
+                            <Input
+                                label="Konfirmasi Password Baru"
+                                type="password"
+                                value={passwordForm.confirm_password}
+                                onChange={(e) =>
+                                    handlePasswordChange('confirm_password', e.target.value)
+                                }
+                                error={errors.confirm_password}
+                                required
+                            />
+
+                            <div className="flex gap-3 pt-4">
+                                <Button
+                                    type="submit"
+                                    variant="gradient"
+                                    size="md"
+                                    isLoading={isLoading}
+                                    className="flex-1 shadow-lg"
+                                >
+                                    Simpan Password
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="md"
+                                    onClick={() => {
+                                        setIsChangingPassword(false);
+                                        setPasswordForm({
+                                            current_password: '',
+                                            new_password: '',
+                                            confirm_password: '',
+                                        });
+                                        setErrors({});
+                                    }}
+                                    disabled={isLoading}
+                                    className="border-2"
+                                >
+                                    Batal
+                                </Button>
+                            </div>
+                        </motion.form>
                     )}
                 </div>
-
-                {isChangingPassword && (
-                    <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4">
-                        <Input
-                            label="Password Saat Ini"
-                            type="password"
-                            value={passwordForm.current_password}
-                            onChange={(e) =>
-                                handlePasswordChange('current_password', e.target.value)
-                            }
-                            error={errors.current_password}
-                            required
-                        />
-
-                        <Input
-                            label="Password Baru"
-                            type="password"
-                            value={passwordForm.new_password}
-                            onChange={(e) =>
-                                handlePasswordChange('new_password', e.target.value)
-                            }
-                            error={errors.new_password}
-                            helperText="Minimal 8 karakter"
-                            required
-                        />
-
-                        <Input
-                            label="Konfirmasi Password Baru"
-                            type="password"
-                            value={passwordForm.confirm_password}
-                            onChange={(e) =>
-                                handlePasswordChange('confirm_password', e.target.value)
-                            }
-                            error={errors.confirm_password}
-                            required
-                        />
-
-                        <div className="flex gap-3 pt-4">
-                            <Button
-                                type="submit"
-                                variant="primary"
-                                size="md"
-                                isLoading={isLoading}
-                                className="flex-1"
-                            >
-                                Simpan Password
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="md"
-                                onClick={() => {
-                                    setIsChangingPassword(false);
-                                    setPasswordForm({
-                                        current_password: '',
-                                        new_password: '',
-                                        confirm_password: '',
-                                    });
-                                    setErrors({});
-                                }}
-                                disabled={isLoading}
-                            >
-                                Batal
-                            </Button>
-                        </div>
-                    </form>
-                )}
-            </div>
+            </motion.div>
 
             {/* Privacy Section */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6">
-                <h2 className="text-xl font-semibold text-gray-900">
-                    Privasi & Preferensi
-                </h2>
-                <div className="mt-6 space-y-4">
-                    <div className="flex items-center justify-between">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg"
+            >
+                {/* Decorative blur */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-50 to-pink-50 rounded-full blur-3xl opacity-30"></div>
+
+                <div className="relative">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="inline-flex rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 p-3 shadow-md">
+                            <Bell className="h-5 w-5 text-purple-600" />
+                        </div>
                         <div>
-                            <p className="font-medium text-gray-900">
-                                Notifikasi Email
-                            </p>
+                            <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                                Privasi & Preferensi
+                            </h2>
                             <p className="text-sm text-gray-600">
-                                Terima update pesanan via email
+                                Atur notifikasi dan preferensi Anda
                             </p>
                         </div>
-                        <label className="relative inline-flex cursor-pointer items-center">
-                            <input type="checkbox" className="peer sr-only" defaultChecked />
-                            <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-700 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300"></div>
-                        </label>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="font-medium text-gray-900">
-                                Notifikasi Promo
-                            </p>
-                            <p className="text-sm text-gray-600">
-                                Terima informasi promo dan penawaran spesial
-                            </p>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-100">
+                            <div>
+                                <p className="font-semibold text-gray-900">
+                                    Notifikasi Email
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                    Terima update pesanan via email
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => toggleNotification('email')}
+                                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${notifications.email ? 'bg-gradient-to-r from-primary-600 to-purple-600' : 'bg-gray-300'
+                                    }`}
+                            >
+                                <span
+                                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform ${notifications.email ? 'translate-x-6' : 'translate-x-1'
+                                        }`}
+                                />
+                            </button>
                         </div>
-                        <label className="relative inline-flex cursor-pointer items-center">
-                            <input type="checkbox" className="peer sr-only" defaultChecked />
-                            <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary-700 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300"></div>
-                        </label>
+
+                        <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-100">
+                            <div>
+                                <p className="font-semibold text-gray-900">
+                                    Notifikasi Promo
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                    Terima informasi promo dan penawaran spesial
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => toggleNotification('promo')}
+                                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${notifications.promo ? 'bg-gradient-to-r from-primary-600 to-purple-600' : 'bg-gray-300'
+                                    }`}
+                            >
+                                <span
+                                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform ${notifications.promo ? 'translate-x-6' : 'translate-x-1'
+                                        }`}
+                                />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Danger Zone */}
-            <div className="rounded-lg border-2 border-error-DEFAULT bg-error-light p-6">
-                <h2 className="text-xl font-semibold text-error-DEFAULT">
-                    Zona Bahaya
-                </h2>
-                <p className="mt-2 text-sm text-gray-700">
-                    Tindakan di bawah ini bersifat permanen dan tidak dapat dibatalkan.
-                </p>
-                <div className="mt-6 space-y-3">
-                    <Button
-                        variant="outline"
-                        size="md"
-                        onClick={handleLogout}
-                        className="w-full border-error-DEFAULT text-error-DEFAULT hover:bg-error-DEFAULT hover:text-white"
-                    >
-                        Keluar dari Akun
-                    </Button>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="relative overflow-hidden rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-6 shadow-lg"
+            >
+                {/* Decorative blur */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-100 to-orange-100 rounded-full blur-3xl opacity-40"></div>
+
+                <div className="relative">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="inline-flex rounded-xl bg-gradient-to-br from-red-100 to-orange-100 p-3 shadow-md">
+                            <AlertTriangle className="h-5 w-5 text-red-600" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold bg-gradient-to-r from-red-700 to-orange-700 bg-clip-text text-transparent">
+                                Zona Bahaya
+                            </h2>
+                            <p className="text-sm text-gray-700">
+                                Tindakan di bawah ini bersifat permanen
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mt-6">
+                        <Button
+                            variant="outline"
+                            size="md"
+                            onClick={handleLogout}
+                            className="w-full border-2 border-red-500 text-red-600 hover:bg-red-600 hover:text-white transition-all shadow-md hover:shadow-lg"
+                        >
+                            <LogOut className="h-4 w-4 mr-2" />
+                            Keluar dari Akun
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }

@@ -1,7 +1,8 @@
 
 import { Request, Response, NextFunction } from 'express';
-import * as voucherService from '../services/voucherService';
+
 import * as cartService from '../services/cartService';
+import * as voucherService from '../services/voucherService';
 import { AuthenticatedRequest } from '../types/express';
 
 export async function applyVoucher(req: Request, res: Response, next: NextFunction) {

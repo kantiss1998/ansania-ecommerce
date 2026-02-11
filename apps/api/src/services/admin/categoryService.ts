@@ -1,7 +1,7 @@
 
 import { Category, Product } from '@repo/database';
-import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
+import { Op } from 'sequelize';
 
 export async function listAdminCategories(query: any) {
     const { search, is_active } = query;

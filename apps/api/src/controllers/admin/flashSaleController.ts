@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as adminFlashSaleService from '../../services/admin/flashSaleService';
 
 export async function getAllFlashSales(req: Request, res: Response, next: NextFunction) {

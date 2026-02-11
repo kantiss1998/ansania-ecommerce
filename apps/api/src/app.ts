@@ -1,28 +1,8 @@
-import express, { Application } from 'express';
 import cors from 'cors';
+import express, { Application } from 'express';
 import helmet from 'helmet';
-import authRoutes from './routes/auth.routes';
 import { errorHandler } from './middleware/errorHandler';
-import productRoutes from './routes/product.routes';
-import cartRoutes from './routes/cart.routes';
-import wishlistRoutes from './routes/wishlist.routes';
-import checkoutRoutes from './routes/checkout.routes';
-import paymentRoutes from './routes/payment.routes';
 import addressRoutes from './routes/address.routes';
-import profileRoutes from './routes/profile.routes';
-import voucherRoutes from './routes/voucher.routes';
-import reviewRoutes from './routes/review.routes';
-import cmsRoutes from './routes/cms.routes';
-import attributeRoutes from './routes/attribute.routes';
-import flashSaleRoutes from './routes/flashSale.routes';
-import notificationRoutes from './routes/notification.routes';
-import statsRoutes from './routes/stats.routes';
-import odooRoutes from './routes/odoo.routes';
-import orderRoutes from './routes/order.routes';
-import shippingRoutes from './routes/shipping.routes';
-import categoryRoutes from './routes/category.routes';
-import searchRoutes from './routes/search.routes';
-import userDashboardRoutes from './routes/userDashboard.routes';
 import recommendationRoutes from './routes/recommendation.routes';
 
 // Admin Routes
@@ -42,6 +22,26 @@ import adminAnalyticsRoutes from './routes/admin/analytics.routes';
 import adminSystemRoutes from './routes/admin/system.routes';
 import adminSyncRoutes from './routes/admin/sync.routes';
 import adminAttributeRoutes from './routes/admin/attribute.routes';
+import attributeRoutes from './routes/attribute.routes';
+import authRoutes from './routes/auth.routes';
+import cartRoutes from './routes/cart.routes';
+import categoryRoutes from './routes/category.routes';
+import checkoutRoutes from './routes/checkout.routes';
+import cmsRoutes from './routes/cms.routes';
+import flashSaleRoutes from './routes/flashSale.routes';
+import notificationRoutes from './routes/notification.routes';
+import odooRoutes from './routes/odoo.routes';
+import orderRoutes from './routes/order.routes';
+import paymentRoutes from './routes/payment.routes';
+import productRoutes from './routes/product.routes';
+import profileRoutes from './routes/profile.routes';
+import reviewRoutes from './routes/review.routes';
+import searchRoutes from './routes/search.routes';
+import shippingRoutes from './routes/shipping.routes';
+import statsRoutes from './routes/stats.routes';
+import userDashboardRoutes from './routes/userDashboard.routes';
+import voucherRoutes from './routes/voucher.routes';
+import wishlistRoutes from './routes/wishlist.routes';
 
 // Note: Environment variables are loaded in server.ts before this module is imported
 

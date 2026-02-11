@@ -1,9 +1,10 @@
 'use client';
 
-import { Suspense } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
+import { Suspense } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 interface AdminAnalyticsClientProps {
     initialData: {

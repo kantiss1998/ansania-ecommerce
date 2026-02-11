@@ -1,9 +1,10 @@
 
-import { Router } from 'express';
-import * as reviewController from '../controllers/reviewController';
-import { validateRequest } from '../middleware/validation';
 import { reviewSchemas } from '@repo/shared/schemas';
+import { Router } from 'express';
+
+import * as reviewController from '../controllers/reviewController';
 import { authenticate } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
 
 const router = Router();
 

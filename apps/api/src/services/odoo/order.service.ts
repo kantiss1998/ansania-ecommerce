@@ -1,6 +1,7 @@
 
-import { odooClient } from './odoo.client';
 import { Order, OrderItem, User, Address } from '@repo/database';
+
+import { odooClient } from './odoo.client';
 
 export class OdooOrderService {
     /**

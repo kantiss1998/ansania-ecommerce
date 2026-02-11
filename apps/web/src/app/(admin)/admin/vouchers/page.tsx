@@ -1,6 +1,8 @@
-import { adminVoucherService } from '@/services/adminVoucherService';
-import AdminVouchersClient from './client';
 import { cookies } from 'next/headers';
+
+import { adminVoucherService } from '@/services/adminVoucherService';
+
+import AdminVouchersClient from './client';
 
 export const dynamic = 'force-dynamic';
 

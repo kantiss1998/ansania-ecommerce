@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+
 import { ProductForm } from '@/components/features/admin/ProductForm';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,6 @@ async function getProductAndCategories(id: string) {
 
         if (!token) return { product: null, categories: [] };
 
-        console.log(`[DEBUG] Fetching product detail for ID: ${id}`);
         const [productRes, categoriesRes] = await Promise.all([
             fetch(`${baseUrl}/admin/products/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -21,17 +21,13 @@ async function getProductAndCategories(id: string) {
             })
         ]);
 
-        console.log(`[DEBUG] Product Res Status: ${productRes.status}`);
-        console.log(`[DEBUG] Categories Res Status: ${categoriesRes.status}`);
-
         let product = null;
         if (productRes.ok) {
             const data = await productRes.json();
             product = data.data;
-            console.log(`[DEBUG] Product data found: ${!!product}`);
         } else {
             const errorText = await productRes.text();
-            console.error(`[DEBUG] Product fetch error: ${errorText}`);
+            console.error(`[Admin] Product fetch error: ${errorText}`);
         }
 
         let categories = [];

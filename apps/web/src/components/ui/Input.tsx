@@ -1,8 +1,9 @@
 'use client';
 
-import { InputHTMLAttributes, forwardRef, ReactNode, useState } from 'react';
-import { cn } from '@/lib/utils';
 import { LucideIcon } from 'lucide-react';
+import { InputHTMLAttributes, forwardRef, ReactNode, useState } from 'react';
+
+import { cn } from '@/lib/utils';
 
 /**
  * Input props interface
@@ -12,6 +13,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     error?: string;
     helperText?: string;
     fullWidth?: boolean;
+    id?: string;
     leftIcon?: LucideIcon | ReactNode;
     rightIcon?: LucideIcon | ReactNode;
     floatingLabel?: boolean;
@@ -41,7 +43,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         const renderIcon = (icon: LucideIcon | ReactNode, size: string = 'h-5 w-5') => {
             if (!icon) return null;
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && 'render' in (icon as any))) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const IconComponent = icon as any;
                 return <IconComponent className={cn(size, 'text-gray-400')} />;
             }

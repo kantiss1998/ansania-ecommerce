@@ -1,12 +1,15 @@
 
 // import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { User, UserSession, PasswordResetToken } from '@repo/database';
-import { RegisterDTO, LoginDTO } from '@repo/shared/schemas';
 import { AppError, UnauthorizedError, ConflictError, NotFoundError } from '@repo/shared/errors';
+import { RegisterDTO, LoginDTO } from '@repo/shared/schemas';
+import jwt from 'jsonwebtoken';
+
 import { OdooCustomerService } from './odoo/customer.service';
+
 const odooCustomerService = new OdooCustomerService();
 import { Op } from 'sequelize';
+
 import crypto from 'crypto';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';

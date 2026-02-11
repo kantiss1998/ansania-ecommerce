@@ -56,12 +56,14 @@ export interface ProductVariant {
     id: number;
     product_id: number;
     sku: string;
-    name: string;
+    name?: string;
     color?: string;
     size?: string;
+    finishing?: string;
     price: number;
     stock: number;
     image_url?: string;
+    is_visible?: boolean;
     odoo_variant_id?: number;
 }
 
@@ -147,17 +149,7 @@ export interface StockItem {
     last_sync_at: string;
 }
 
-export interface ProductVariant {
-    id: number;
-    product_id: number;
-    sku: string;
-    color?: string;
-    finishing?: string;
-    size?: string;
-    price: number;
-    stock: number;
-    is_visible: boolean;
-}
+// ProductVariant moved to line 55
 
 // Cart types
 export interface CartItem {
@@ -309,7 +301,7 @@ export interface CMSPage {
     title: string;
     content?: string;
     is_published: boolean;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     published_at?: string;
     created_at: string;
     updated_at: string;

@@ -1,9 +1,10 @@
-import { flashSaleService } from '@/services/flashSaleService';
-import Link from 'next/link';
-import { Badge } from '@/components/ui/Badge';
-import { formatCurrency } from '@/lib/utils';
 import Image from 'next/image';
+import Link from 'next/link';
+
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { formatCurrency } from '@/lib/utils';
+import { flashSaleService } from '@/services/flashSaleService';
 
 export const dynamic = 'force-dynamic';
 

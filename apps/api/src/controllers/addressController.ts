@@ -1,8 +1,9 @@
 
+import { CreateAddressDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+
 import * as addressService from '../services/addressService';
 import { AuthenticatedRequest } from '../types/express';
-import { CreateAddressDTO } from '@repo/shared/schemas';
 
 export async function createAddress(req: Request, res: Response, next: NextFunction) {
     try {

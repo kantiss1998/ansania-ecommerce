@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as cmsService from '../services/cmsService';
 
 export async function getBanners(_req: Request, res: Response, next: NextFunction) {

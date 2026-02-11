@@ -1,4 +1,4 @@
-import { Review, Order, OrderItem, ReviewImage, ProductRatingsSummary, Product } from '@repo/database';
+import { Review, Order, OrderItem, ReviewImage, ProductRatingsSummary, Product, User } from '@repo/database';
 import { AppError, UnauthorizedError } from '@repo/shared/errors';
 import { CreateReviewDTO } from '@repo/shared/schemas';
 import { Includeable } from 'sequelize';
@@ -144,9 +144,6 @@ export async function getReviewsByProduct(productId: number) {
     });
 }
 
-// Need to import User to use in include
-import { User } from '@repo/database';
-
 // Update a review (user can only update their own)
 export async function updateReview(userId: number, reviewId: number, data: Partial<CreateReviewDTO>) {
     const review = await Review.findByPk(reviewId);
@@ -284,7 +281,7 @@ export async function getPendingReviews(userId: number) {
                     variant_name: item.variant_name,
                     price: item.price,
                     purchased_at: order.created_at,
-                    product: item.product
+                    product: (item as any).product
                 });
             }
         }

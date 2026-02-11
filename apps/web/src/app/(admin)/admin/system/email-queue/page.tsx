@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+
 import AdminEmailQueueClient from './client';
 
 export const dynamic = 'force-dynamic';

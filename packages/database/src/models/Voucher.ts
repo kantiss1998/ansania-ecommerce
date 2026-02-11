@@ -7,7 +7,11 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
+// Use type-only imports to avoid circular dependencies
+import type { VoucherUsage } from './VoucherUsage';
 
 export type VoucherType = 'percentage' | 'fixed_amount' | 'free_shipping';
 
@@ -53,9 +57,9 @@ export class Voucher extends Model<
     declare updated_at: CreationOptional<Date>;
 
     // Associations
-    declare usages?: NonAttribute<any[]>;
+    declare usages?: NonAttribute<VoucherUsage[]>;
     declare static associations: {
-        usages: Association<Voucher, any>;
+        usages: Association<Voucher, VoucherUsage>;
     };
 
     // Instance methods

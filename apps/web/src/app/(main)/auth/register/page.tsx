@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+
 import { RegisterForm } from '@/components/features/auth/RegisterForm';
 
 export const dynamic = 'force-dynamic';

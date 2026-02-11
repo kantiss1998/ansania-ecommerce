@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
-import { CategoryForm } from '@/components/features/admin/CategoryForm';
 import { notFound } from 'next/navigation';
+
+import { CategoryForm } from '@/components/features/admin/CategoryForm';
 
 export const dynamic = 'force-dynamic';
 

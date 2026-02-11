@@ -1,14 +1,15 @@
 'use client';
 
-import { useAuthStore } from '@/store/authStore';
+import { Package, Heart, MapPin, Edit2, User, Sparkles, Camera } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/Toast';
+import { addressService } from '@/services/addressService';
 import { orderService } from '@/services/orderService';
 import { wishlistService } from '@/services/wishlistService';
-import { addressService } from '@/services/addressService';
-import { Package, Heart, MapPin, Edit2 } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * User profile content
@@ -80,99 +81,175 @@ export function ProfileContent() {
         setIsEditing(false);
     };
 
+    const statsCards = [
+        {
+            title: 'Total Pesanan',
+            value: stats.orders,
+            icon: Package,
+            gradient: 'from-blue-500 to-cyan-500',
+            bgGradient: 'from-blue-50 to-cyan-50',
+        },
+        {
+            title: 'Wishlist',
+            value: stats.wishlist,
+            icon: Heart,
+            gradient: 'from-pink-500 to-rose-500',
+            bgGradient: 'from-pink-50 to-rose-50',
+        },
+        {
+            title: 'Alamat Tersimpan',
+            value: stats.addresses,
+            icon: MapPin,
+            gradient: 'from-purple-500 to-indigo-500',
+            bgGradient: 'from-purple-50 to-indigo-50',
+        },
+    ];
+
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">
-                    Informasi Profil
-                </h2>
-                {!isEditing && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2"
-                        onClick={() => setIsEditing(true)}
-                    >
-                        <Edit2 className="h-4 w-4" />
-                        Edit Profil
-                    </Button>
-                )}
-            </div>
+        <div className="space-y-6">
+            {/* Profile Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-8 shadow-lg"
+            >
+                {/* Decorative blur */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-primary-50 to-purple-50 rounded-full blur-3xl opacity-30"></div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <Input
-                    label="Nama Lengkap"
-                    type="text"
-                    value={formData.full_name}
-                    onChange={(e) => handleChange('full_name', e.target.value)}
-                    disabled={!isEditing}
-                    required
-                />
-
-                <Input
-                    label="Email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    disabled={!isEditing}
-                    required
-                />
-
-                <Input
-                    label="Nomor Telepon"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleChange('phone', e.target.value)}
-                    disabled={!isEditing}
-                />
-
-                {isEditing && (
-                    <div className="flex gap-3 pt-4">
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="md"
-                            isLoading={isLoading}
-                            className="flex-1"
-                        >
-                            Simpan Perubahan
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="md"
-                            onClick={handleCancel}
-                            disabled={isLoading}
-                        >
-                            Batal
-                        </Button>
+                <div className="relative">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-4 py-2 mb-4">
+                        <Sparkles className="h-4 w-4 text-primary-600" />
+                        <span className="text-sm font-semibold text-primary-700">Profil Saya</span>
                     </div>
-                )}
-            </form>
+
+                    <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-6">
+                            {/* Avatar */}
+                            <div className="relative group">
+                                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-primary-100 to-purple-100 flex items-center justify-center shadow-lg">
+                                    <User className="h-12 w-12 text-primary-600" />
+                                </div>
+                                <button className="absolute bottom-0 right-0 rounded-xl bg-gradient-to-r from-primary-600 to-purple-600 p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Camera className="h-4 w-4 text-white" />
+                                </button>
+                            </div>
+
+                            {/* User Info */}
+                            <div>
+                                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+                                    {user?.full_name || 'User'}
+                                </h2>
+                                <p className="mt-1 text-sm text-gray-600">{user?.email}</p>
+                            </div>
+                        </div>
+
+                        {!isEditing && (
+                            <Button
+                                variant="gradient"
+                                size="sm"
+                                className="flex items-center gap-2 shadow-lg"
+                                onClick={() => setIsEditing(true)}
+                            >
+                                <Edit2 className="h-4 w-4" />
+                                Edit Profil
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Profile Form */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg"
+            >
+                <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
+                    Informasi Profil
+                </h3>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input
+                        label="Nama Lengkap"
+                        type="text"
+                        value={formData.full_name}
+                        onChange={(e) => handleChange('full_name', e.target.value)}
+                        disabled={!isEditing}
+                        required
+                    />
+
+                    <Input
+                        label="Email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleChange('email', e.target.value)}
+                        disabled={!isEditing}
+                        required
+                    />
+
+                    <Input
+                        label="Nomor Telepon"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => handleChange('phone', e.target.value)}
+                        disabled={!isEditing}
+                    />
+
+                    {isEditing && (
+                        <div className="flex gap-3 pt-4">
+                            <Button
+                                type="submit"
+                                variant="gradient"
+                                size="md"
+                                isLoading={isLoading}
+                                className="flex-1 shadow-lg"
+                            >
+                                Simpan Perubahan
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="md"
+                                onClick={handleCancel}
+                                disabled={isLoading}
+                                className="border-2"
+                            >
+                                Batal
+                            </Button>
+                        </div>
+                    )}
+                </form>
+            </motion.div>
 
             {/* Account Stats */}
-            <div className="mt-8 grid grid-cols-1 gap-4 border-t border-gray-200 pt-8 md:grid-cols-3">
-                <div className="rounded-lg bg-gray-50 p-4 text-center group hover:bg-primary-50 transition-colors">
-                    <div className="mb-2 flex justify-center text-primary-200 group-hover:text-primary-300">
-                        <Package className="h-8 w-8" />
-                    </div>
-                    <p className="text-2xl font-bold text-primary-700">{stats.orders}</p>
-                    <p className="mt-1 text-sm font-medium text-gray-600">Total Pesanan</p>
-                </div>
-                <div className="rounded-lg bg-gray-50 p-4 text-center group hover:bg-pink-50 transition-colors">
-                    <div className="mb-2 flex justify-center text-pink-200 group-hover:text-pink-300">
-                        <Heart className="h-8 w-8" />
-                    </div>
-                    <p className="text-2xl font-bold text-pink-600">{stats.wishlist}</p>
-                    <p className="mt-1 text-sm font-medium text-gray-600">Wishlist</p>
-                </div>
-                <div className="rounded-lg bg-gray-50 p-4 text-center group hover:bg-blue-50 transition-colors">
-                    <div className="mb-2 flex justify-center text-blue-200 group-hover:text-blue-300">
-                        <MapPin className="h-8 w-8" />
-                    </div>
-                    <p className="text-2xl font-bold text-blue-600">{stats.addresses}</p>
-                    <p className="mt-1 text-sm font-medium text-gray-600">Alamat Tersimpan</p>
-                </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                {statsCards.map((stat, index) => (
+                    <motion.div
+                        key={stat.title}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + index * 0.1 }}
+                        whileHover={{ scale: 1.02 }}
+                        className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg transition-all hover:shadow-xl cursor-pointer"
+                    >
+                        {/* Decorative blur */}
+                        <div
+                            className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.bgGradient} rounded-full blur-2xl opacity-30`}
+                        ></div>
+
+                        <div className="relative">
+                            <div className={`inline-flex rounded-xl bg-gradient-to-br ${stat.bgGradient} p-3 shadow-md mb-4`}>
+                                <stat.icon className={`h-6 w-6 bg-gradient-to-r ${stat.gradient} bg-clip-text`} style={{ WebkitTextFillColor: 'transparent' }} />
+                            </div>
+                            <p className={`text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                                {stat.value}
+                            </p>
+                            <p className="mt-2 text-sm font-medium text-gray-600">{stat.title}</p>
+                        </div>
+                    </motion.div>
+                ))}
             </div>
         </div>
     );

@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
 import { Banner } from '@repo/shared';
-import adminCmsService, { BannerData } from '@/services/adminCmsService';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
+import { adminCmsService, BannerData } from '@/services/adminCmsService';
 
 interface BannerFormProps {
     initialData?: Banner;
@@ -48,7 +50,7 @@ export function BannerForm({ initialData }: BannerFormProps) {
             <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900">
-                        {isEdit ? `Edit Banner: ${initialData.title}` : 'Tambah Banner Baru'}
+                        {isEdit ? `Edit Banner: ${initialData?.title}` : 'Tambah Banner Baru'}
                     </h2>
                     <p className="mt-1 text-sm text-gray-500">
                         Kelola aset visual promosi di berbagai posisi halaman
@@ -112,7 +114,7 @@ export function BannerForm({ initialData }: BannerFormProps) {
                             <select
                                 className="w-full rounded-lg border-gray-200 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
                                 value={formData.position}
-                                onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
+                                onChange={(e) => setFormData({ ...formData, position: e.target.value as 'home_hero' | 'home_sidebar' | 'promo_page' })}
                             >
                                 <option value="home_hero">Home Hero Slider</option>
                                 <option value="home_sidebar">Home Sidebar</option>
@@ -143,9 +145,14 @@ export function BannerForm({ initialData }: BannerFormProps) {
                     </div>
 
                     {formData.image_url && (
-                        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm relative h-40">
                             <p className="text-xs font-bold text-gray-400 uppercase mb-2 tracking-widest">Preview</p>
-                            <img src={formData.image_url} alt="Preview" className="w-full rounded object-contain max-h-40 bg-gray-50" />
+                            <Image
+                                src={formData.image_url}
+                                alt="Preview"
+                                fill
+                                className="rounded object-contain bg-gray-50"
+                            />
                         </div>
                     )}
                 </div>

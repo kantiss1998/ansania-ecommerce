@@ -8,10 +8,12 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
-import { User } from './User';
+
 import { Product } from './Product';
 import { ProductVariant } from './ProductVariant';
+import { User } from './User';
 
 export interface WishlistAttributes {
     id: number;

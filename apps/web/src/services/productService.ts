@@ -19,7 +19,7 @@ export interface Product {
         slug: string;
     };
     images?: { image_url: string; is_primary?: boolean }[];
-    variants?: any[]; // Refine type as needed
+    variants?: unknown[]; // Refine type as needed
     related_products?: Product[];
 }
 
@@ -51,7 +51,7 @@ export const productService = {
     async getProducts(params?: ProductListParams): Promise<ProductListResponse> {
         try {
             // Map camelCase params to snake_case for API
-            const apiParams: any = { ...params };
+            const apiParams: Record<string, unknown> = { ...params };
             if (params?.minPrice !== undefined) {
                 apiParams.price_min = params.minPrice;
                 delete apiParams.minPrice;
@@ -93,9 +93,9 @@ export const productService = {
 
     async getColors(): Promise<string[]> {
         try {
-            const response = await apiClient.get<ApiResponse<any[]>>('/attributes/colors');
-            return (response.data.data || []).map((item: any) =>
-                typeof item === 'object' ? item.name : item
+            const response = await apiClient.get<ApiResponse<({ name: string } | string)[]>>('/attributes/colors');
+            return (response.data.data || []).map((item) =>
+                typeof item === 'object' && item !== null && 'name' in item ? item.name : String(item)
             );
         } catch (error) {
             console.error('Failed to fetch colors:', error);
@@ -105,9 +105,9 @@ export const productService = {
 
     async getSizes(): Promise<string[]> {
         try {
-            const response = await apiClient.get<ApiResponse<any[]>>('/attributes/sizes');
-            return (response.data.data || []).map((item: any) =>
-                typeof item === 'object' ? item.name : item
+            const response = await apiClient.get<ApiResponse<({ name: string } | string)[]>>('/attributes/sizes');
+            return (response.data.data || []).map((item) =>
+                typeof item === 'object' && item !== null && 'name' in item ? item.name : String(item)
             );
         } catch (error) {
             console.error('Failed to fetch sizes:', error);
@@ -117,9 +117,9 @@ export const productService = {
 
     async getFinishings(): Promise<string[]> {
         try {
-            const response = await apiClient.get<ApiResponse<any[]>>('/attributes/finishings');
-            return (response.data.data || []).map((item: any) =>
-                typeof item === 'object' ? item.name : item
+            const response = await apiClient.get<ApiResponse<({ name: string } | string)[]>>('/attributes/finishings');
+            return (response.data.data || []).map((item) =>
+                typeof item === 'object' && item !== null && 'name' in item ? item.name : String(item)
             );
         } catch (error) {
             console.error('Failed to fetch finishings:', error);
@@ -127,7 +127,7 @@ export const productService = {
         }
     },
 
-    async recordSearch(query: string, filters?: any, results_count?: number): Promise<void> {
+    async recordSearch(query: string, filters?: Record<string, unknown>, results_count?: number): Promise<void> {
         try {
             await apiClient.post('/products/stats/search', {
                 query,
@@ -141,11 +141,13 @@ export const productService = {
 
     async getRelatedProducts(productId: number, category: string): Promise<Product[]> {
         try {
-            const response = await this.getProducts({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const searchParams: any = {
                 category,
                 limit: 4,
                 excludeId: productId,
-            } as any);
+            };
+            const response = await this.getProducts(searchParams);
             return response.items;
         } catch (error) {
             console.error('Failed to fetch related products:', error);
@@ -161,9 +163,9 @@ export const productService = {
         }
     },
 
-    async getReviews(productId: number): Promise<any[]> {
+    async getReviews(productId: number): Promise<unknown[]> {
         try {
-            const response = await apiClient.get<ApiResponse<any[]>>(`/reviews/${productId}`);
+            const response = await apiClient.get<ApiResponse<unknown[]>>(`/reviews/${productId}`);
             return response.data.data!;
         } catch (error) {
             console.error('Failed to fetch reviews:', error);

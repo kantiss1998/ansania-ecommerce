@@ -1,4 +1,5 @@
 import apiClient, { ApiResponse } from '@/lib/api';
+
 import { Product } from './productService';
 
 export interface FlashSaleProduct {
@@ -26,14 +27,14 @@ export const flashSaleService = {
     async getAllFlashSales(
         params?: { page?: number; limit?: number; status?: 'active' | 'upcoming' | 'expired' | 'all' },
         token?: string
-    ): Promise<{ items: FlashSale[]; meta: any }> {
+    ): Promise<{ items: FlashSale[]; meta: unknown }> {
         const query = new URLSearchParams();
         if (params?.page) query.append('page', params.page.toString());
         if (params?.limit) query.append('limit', params.limit.toString());
         if (params?.status) query.append('status', params.status);
 
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await apiClient.get<ApiResponse<{ items: FlashSale[]; meta: any }>>(`/admin/flash-sales?${query.toString()}`, config);
+        const response = await apiClient.get<ApiResponse<{ items: FlashSale[]; meta: unknown }>>(`/admin/flash-sales?${query.toString()}`, config);
         return response.data.data!;
     },
 

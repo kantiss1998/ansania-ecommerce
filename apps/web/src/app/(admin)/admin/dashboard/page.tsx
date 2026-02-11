@@ -1,6 +1,7 @@
-import { cookies } from 'next/headers';
-import AdminDashboardClient from './client';
 import { DashboardStats } from '@repo/shared';
+import { cookies } from 'next/headers';
+
+import AdminDashboardClient from './client';
 
 export const dynamic = 'force-dynamic';
 

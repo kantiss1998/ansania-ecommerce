@@ -1,9 +1,10 @@
 
-import { Router } from 'express';
-import * as profileController from '../controllers/profileController';
-import { validateRequest } from '../middleware/validation';
 import { userSchemas } from '@repo/shared/schemas';
+import { Router } from 'express';
+
+import * as profileController from '../controllers/profileController';
 import { authenticate } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
 
 const router = Router();
 

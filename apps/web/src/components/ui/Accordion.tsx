@@ -1,7 +1,9 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { ReactNode, useState } from 'react';
+import * as React from 'react';
+
 import { cn } from '@/lib/utils';
 
 /**
@@ -217,4 +219,3 @@ export function AccordionContent({
 }
 
 // Re-export React for context
-import * as React from 'react';

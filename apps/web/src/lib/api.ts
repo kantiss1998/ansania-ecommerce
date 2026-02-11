@@ -1,4 +1,5 @@
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig, isAxiosError } from 'axios';
+
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from './auth';
 
 /**
@@ -96,12 +97,12 @@ apiClient.interceptors.response.use(
 /**
  * API response wrapper type
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     success: boolean;
     data?: T;
     error?: string;
     code?: string;
-    details?: any;
+    details?: unknown;
     meta?: {
         timestamp: string;
     };
@@ -120,7 +121,7 @@ export interface ApiError {
  * Extract error message from API error
  */
 export function getErrorMessage(error: unknown): string {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
         const apiError = error.response?.data as ApiResponse;
         return apiError?.error || error.message || 'An error occurred';
     }

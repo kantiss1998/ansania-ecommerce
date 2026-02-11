@@ -1,5 +1,5 @@
 
-import { Order, User, Product } from '@repo/database';
+import { Order, User, Product, ProductStock, OrderItem, ProductVariant } from '@repo/database';
 import { Op, fn, col, literal } from 'sequelize';
 
 export async function getStatsOverview() {
@@ -66,7 +66,6 @@ export async function getRecentActivity() {
 }
 
 export async function getInventoryStatus() {
-    const { ProductStock } = require('@repo/database');
     const lowStockCount = await ProductStock.count({
         where: { available_quantity: { [Op.gt]: 0, [Op.lte]: 10 } }
     });
@@ -81,7 +80,6 @@ export async function getInventoryStatus() {
 }
 
 export async function getTopProducts(limit: number = 5) {
-    const { OrderItem, ProductVariant, Product } = require('@repo/database');
     const items = await OrderItem.findAll({
         attributes: [
             'product_variant_id',

@@ -1,11 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { formatCurrency } from '@/lib/utils';
 import { Trash2, ShoppingCart, Percent } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { formatCurrency } from '@/lib/utils';
+
 
 /**
  * Wishlist item type

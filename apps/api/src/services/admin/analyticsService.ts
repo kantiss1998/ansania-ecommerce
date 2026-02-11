@@ -1,5 +1,5 @@
 
-import { ProductView, SearchHistory, Product, Cart, Order } from '@repo/database';
+import { ProductView, SearchHistory, Product, Cart, Order, OrderItem, ProductVariant, Category } from '@repo/database';
 import { Op, fn, col, literal } from 'sequelize';
 
 export async function getProductViewStats(startDate: Date, endDate: Date) {
@@ -78,7 +78,7 @@ export async function getAbandonedCartStats(startDate: Date, endDate: Date) {
 }
 
 export async function getRevenueByCategory(startDate: Date, endDate: Date) {
-    const { OrderItem, ProductVariant, Product, Category } = require('@repo/database');
+
 
     return OrderItem.findAll({
         attributes: [
@@ -108,7 +108,7 @@ export async function getRevenueByCategory(startDate: Date, endDate: Date) {
 }
 
 export async function getRevenueByProduct(startDate: Date, endDate: Date, limit: number = 10) {
-    const { OrderItem, ProductVariant, Product } = require('@repo/database');
+
 
     return OrderItem.findAll({
         attributes: [
@@ -138,7 +138,7 @@ export async function getAnalyticsOverview(startDate: Date, endDate: Date) {
     const abandoned = await getAbandonedCartStats(startDate, endDate);
 
     // Get sales trend (daily for overview)
-    const { Order } = require('@repo/database');
+
     const salesTrend = await Order.findAll({
         attributes: [
             [fn('DATE_FORMAT', col('created_at'), '%Y-%m-%d'), 'date'],

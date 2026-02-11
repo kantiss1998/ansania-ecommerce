@@ -1,7 +1,7 @@
 
 import { CmsBanner, CmsPage, CmsSetting } from '@repo/database';
-import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
+import { Op } from 'sequelize';
 
 // Banners
 export async function listBanners(query: any) {

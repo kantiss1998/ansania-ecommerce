@@ -1,10 +1,10 @@
-import Link from 'next/link';
+import { ShoppingCart, Star, Heart } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/utils';
-import { ShoppingCart, Star, Heart } from 'lucide-react';
-
 import { Product } from '@/services/productService';
 
 /**

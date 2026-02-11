@@ -1,5 +1,4 @@
 
-import { odooClient } from './odoo.client';
 import {
     Product,
     ProductVariant,
@@ -10,6 +9,8 @@ import {
     FilterFinishing
 } from '@repo/database';
 import { slugify } from '@repo/shared/utils';
+
+import { odooClient } from './odoo.client';
 
 export class OdooProductService {
     async safeSearchRead(model: string, domain: any[] = [], fields: string[] = [], options: any = {}) {
@@ -299,7 +300,7 @@ export class OdooProductService {
 
             let processedProducts = 0;
             let processedVariants = 0;
-            let errors: string[] = [];
+            const errors: string[] = [];
 
             // Sets to collect unique attributes for Filter tables
             const collectedColors = new Map<string, string | null>(); // Name -> Hex
@@ -458,7 +459,7 @@ export class OdooProductService {
     processVariantAttributes(variant: any, attributeData: any) {
         const { templateAttrValues, attributeValues, attributes } = attributeData;
 
-        let variantInfo: any = {
+        const variantInfo: any = {
             variantName: variant.display_name,
             variantValue: "",
             hexCode: null,

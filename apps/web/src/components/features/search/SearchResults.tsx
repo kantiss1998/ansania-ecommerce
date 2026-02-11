@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ProductGrid } from '@/components/features/product/ProductGrid';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
 import { ProductFilters, FilterOptions } from '@/components/features/product/ProductFilters';
-import { productService, Product } from '@/services/productService';
-import { Pagination } from '@/components/ui/Pagination';
+import { ProductGrid } from '@/components/features/product/ProductGrid';
 import { Button } from '@/components/ui/Button';
+import { Pagination } from '@/components/ui/Pagination';
+import { productService, Product } from '@/services/productService';
 
 export function SearchResults() {
     const router = useRouter();
@@ -86,7 +87,7 @@ export function SearchResults() {
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                     <div>
                         <h1 className="text-4xl font-bold text-gray-900">
-                            Pencarian: <span className="text-primary-700 italic">"{query}"</span>
+                            Pencarian: <span className="text-primary-700 italic">&quot;{query}&quot;</span>
                         </h1>
                         <p className="mt-2 text-gray-600">
                             Menemukan {pagination.total} produk yang sesuai

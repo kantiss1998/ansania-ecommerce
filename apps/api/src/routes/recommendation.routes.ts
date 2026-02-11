@@ -1,5 +1,6 @@
 
 import { Router } from 'express';
+
 import * as recommendationController from '../controllers/recommendationController';
 import { authenticate } from '../middleware/auth';
 

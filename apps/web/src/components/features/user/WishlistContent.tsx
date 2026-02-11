@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { wishlistService, WishlistItem } from '@/services/wishlistService';
-import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
+import { wishlistService, WishlistItem } from '@/services/wishlistService';
 
 export function WishlistContent() {
     const [wishlist, setWishlist] = useState<WishlistItem[]>([]);

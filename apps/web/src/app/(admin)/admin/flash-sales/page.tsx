@@ -1,6 +1,8 @@
-import { flashSaleService } from '@/services/flashSaleService';
-import AdminFlashSalesClient from './client';
 import { cookies } from 'next/headers';
+
+import { flashSaleService } from '@/services/flashSaleService';
+
+import AdminFlashSalesClient from './client';
 
 export const dynamic = 'force-dynamic';
 

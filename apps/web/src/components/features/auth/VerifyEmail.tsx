@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
 import { Button } from '@/components/ui/Button';
 import apiClient, { getErrorMessage } from '@/lib/api';
 

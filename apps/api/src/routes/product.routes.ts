@@ -1,9 +1,10 @@
 
+import { productSchemas } from '@repo/shared/schemas';
 import { Router } from 'express';
+
 import * as productController from '../controllers/productController';
 import * as reviewController from '../controllers/reviewController';
 import { validateRequest } from '../middleware/validation';
-import { productSchemas } from '@repo/shared/schemas';
 
 const router = Router();
 

@@ -1,6 +1,7 @@
 
 import { Cart, CartItem, User, Product } from '@repo/database';
 import { Op } from 'sequelize';
+
 import { queueEmail } from './emailService';
 
 /**

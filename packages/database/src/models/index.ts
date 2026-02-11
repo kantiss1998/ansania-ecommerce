@@ -6,59 +6,45 @@
 import { sequelize } from '../config/database';
 
 // Import all models
-import { User } from './User';
+import { ActivityLog } from './ActivityLog';
 import { Address } from './Address';
-import { Category } from './Category';
-import { Product } from './Product';
-import { ProductVariant } from './ProductVariant';
-import { ProductImage } from './ProductImage';
 import { Cart } from './Cart';
 import { CartItem } from './CartItem';
-import { Order } from './Order';
-import { OrderItem } from './OrderItem';
-import { Payment } from './Payment';
-import { Shipping } from './Shipping';
-import { Voucher } from './Voucher';
-import { VoucherUsage } from './VoucherUsage';
-import { Review } from './Review';
-import { ReviewImage } from './ReviewImage';
-import { Wishlist } from './Wishlist';
-
-// New models - Authentication
-import { UserSession } from './UserSession';
-import { PasswordResetToken } from './PasswordResetToken';
-
-// New models - Stock & Inventory
-import { ProductStock } from './ProductStock';
-
-// New models - Junction tables
-import { ProductCategories } from './ProductCategories';
-import { VoucherProducts } from './VoucherProducts';
-import { VoucherCategories } from './VoucherCategories';
-
-// New models - Filters
+import { Category } from './Category';
+import { CmsBanner } from './CmsBanner';
+import { CmsPage } from './CmsPage';
+import { CmsSetting } from './CmsSetting';
+import { EmailQueue } from './EmailQueue';
 import { FilterColor } from './FilterColor';
 import { FilterFinishing } from './FilterFinishing';
 import { FilterSize } from './FilterSize';
-
-// New models - CMS
-import { CmsPage } from './CmsPage';
-import { CmsBanner } from './CmsBanner';
-import { CmsSetting } from './CmsSetting';
-
-// New models - Utility & Logging (split into individual files for better maintainability)
-import { ShippingCostsCache } from './ShippingCostsCache';
-import { ProductRatingsSummary } from './ProductRatingsSummary';
-import { SyncLog } from './SyncLog';
-import { Notification } from './Notification';
-import { ActivityLog } from './ActivityLog';
-import { EmailQueue } from './EmailQueue';
-
-// New models - Flash Sales & Analytics (all individual files)
 import { FlashSale } from './FlashSale';
 import { FlashSaleProduct } from './FlashSaleProduct';
-import { SearchHistory } from './SearchHistory';
+import { Notification } from './Notification';
+import { Order } from './Order';
+import { OrderItem } from './OrderItem';
+import { PasswordResetToken } from './PasswordResetToken';
+import { Payment } from './Payment';
+import { Product } from './Product';
+import { ProductCategories } from './ProductCategories';
+import { ProductImage } from './ProductImage';
+import { ProductRatingsSummary } from './ProductRatingsSummary';
+import { ProductStock } from './ProductStock';
+import { ProductVariant } from './ProductVariant';
 import { ProductView } from './ProductView';
+import { Review } from './Review';
+import { ReviewImage } from './ReviewImage';
+import { SearchHistory } from './SearchHistory';
+import { Shipping } from './Shipping';
+import { ShippingCostsCache } from './ShippingCostsCache';
+import { SyncLog } from './SyncLog';
+import { User } from './User';
+import { UserSession } from './UserSession';
+import { Voucher } from './Voucher';
+import { VoucherCategories } from './VoucherCategories';
+import { VoucherProducts } from './VoucherProducts';
+import { VoucherUsage } from './VoucherUsage';
+import { Wishlist } from './Wishlist';
 
 // ==========================================
 // DEFINE ALL MODEL ASSOCIATIONS

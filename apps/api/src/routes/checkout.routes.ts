@@ -1,9 +1,10 @@
 
-import { Router } from 'express';
-import * as checkoutController from '../controllers/checkoutController';
-import { validateRequest } from '../middleware/validation';
 import { checkoutSchemas } from '@repo/shared/schemas';
+import { Router } from 'express';
+
+import * as checkoutController from '../controllers/checkoutController';
 import { authenticate } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
 
 const router = Router();
 

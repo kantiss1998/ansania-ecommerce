@@ -21,7 +21,7 @@ export async function getActiveFlashSales() {
                         include: [{ model: ProductImage, as: 'images' }]
                     }
                 ],
-                // @ts-ignore
+
                 order: [['display_order', 'ASC']]
             }
         ],
@@ -48,7 +48,7 @@ export async function getFlashSale(id: number) {
                         include: [{ model: ProductImage, as: 'images' }]
                     }
                 ],
-                // @ts-ignore
+
                 order: [['display_order', 'ASC']]
             }
         ]

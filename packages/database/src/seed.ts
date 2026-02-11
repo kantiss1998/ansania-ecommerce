@@ -1,7 +1,7 @@
 import { sequelize } from './config/database';
-import userSeeder from './seeders/users.seeder';
-import cmsPagesSeeder from './seeders/cms-pages.seeder';
 import bannersSeeder from './seeders/banners.seeder';
+import cmsPagesSeeder from './seeders/cms-pages.seeder';
+import userSeeder from './seeders/users.seeder';
 
 async function runSeeders() {
     try {

@@ -1,8 +1,9 @@
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { ProductGrid } from '@/components/features/product/ProductGrid';
 import { categoryService } from '@/services/categoryService';
 import { productService } from '@/services/productService';
-import { ProductGrid } from '@/components/features/product/ProductGrid';
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 

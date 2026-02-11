@@ -146,8 +146,8 @@ export function ProductFilters({
                                     )
                                 }
                                 className={`rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all ${selectedColors.includes(color)
-                                        ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
-                                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
+                                    ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
+                                    : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
                                     }`}
                             >
                                 {color}
@@ -175,8 +175,8 @@ export function ProductFilters({
                                     )
                                 }
                                 className={`rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all ${selectedSizes.includes(size)
-                                        ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
-                                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
+                                    ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
+                                    : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
                                     }`}
                             >
                                 {size}
@@ -204,8 +204,8 @@ export function ProductFilters({
                                     )
                                 }
                                 className={`rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-all ${selectedFinishings.includes(finishing)
-                                        ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
-                                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
+                                    ? 'border-primary-600 bg-gradient-primary text-white shadow-md shadow-primary-500/30 scale-105'
+                                    : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50'
                                     }`}
                             >
                                 {finishing}

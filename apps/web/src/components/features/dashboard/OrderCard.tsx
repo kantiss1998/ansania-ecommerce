@@ -1,90 +1,125 @@
-import { formatCurrency } from '@/lib/utils';
-import { Badge } from '@/components/ui/Badge';
+import { Package, ChevronRight, Calendar, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/Badge';
+import { formatCurrency } from '@/lib/utils';
 import { Order } from '@/services/orderService';
-import { Package, ChevronRight, Calendar } from 'lucide-react';
 
 export interface OrderCardProps {
     order: Order;
 }
 
 export function OrderCard({ order }: OrderCardProps) {
-    const statusConfig: Record<string, { label: string; variant: 'warning' | 'info' | 'success' | 'error' }> = {
+    const statusConfig: Record<
+        string,
+        { label: string; variant: 'warning' | 'info' | 'success' | 'error'; gradient: string; bgGradient: string }
+    > = {
         pending_payment: {
-            label: 'Menunggu Pembayaran',
+            label: 'Belum Bayar',
             variant: 'warning',
+            gradient: 'from-orange-500 to-amber-500',
+            bgGradient: 'from-orange-50 to-amber-50',
         },
         processing: {
             label: 'Diproses',
             variant: 'info',
+            gradient: 'from-blue-500 to-cyan-500',
+            bgGradient: 'from-blue-50 to-cyan-50',
         },
         shipped: {
             label: 'Dikirim',
             variant: 'info',
+            gradient: 'from-purple-500 to-pink-500',
+            bgGradient: 'from-purple-50 to-pink-50',
         },
         delivered: {
             label: 'Selesai',
             variant: 'success',
+            gradient: 'from-green-500 to-emerald-500',
+            bgGradient: 'from-green-50 to-emerald-50',
         },
         cancelled: {
             label: 'Dibatalkan',
             variant: 'error',
+            gradient: 'from-red-500 to-rose-500',
+            bgGradient: 'from-red-50 to-rose-50',
         },
     };
 
-    // safely handle status mapping
     const status = order.status || 'pending_payment';
     const config = statusConfig[status] || statusConfig.pending_payment;
 
     return (
-        <Link
-            href={`/orders/${order.order_number}`}
-            className="group block rounded-xl border border-gray-200 bg-white p-5 transition-all duration-200 hover:shadow-md hover:border-primary-200"
-        >
-            <div className="flex items-start justify-between">
-                <div className="flex-1">
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-primary-50 p-1.5 rounded-lg text-primary-600">
-                                <Package className="h-4 w-4" />
-                            </div>
-                            <h3 className="font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
-                                {order.order_number}
-                            </h3>
-                        </div>
-                        {/* Ensure variant matches allowed Badge variants */}
-                        <Badge variant={config.variant as any} className="shadow-none">
-                            {config.label}
-                        </Badge>
-                    </div>
-                    <div className="mt-3 flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar className="h-4 w-4 text-gray-400" />
-                        <p>
-                            {new Date(order.created_at).toLocaleDateString('id-ID', {
-                                day: 'numeric',
-                                month: 'long',
-                                year: 'numeric',
-                            })}
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <Link href={`/user/orders/${order.order_number}`}>
+            <motion.div
+                whileHover={{ scale: 1.01 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+                className="group relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-primary-200"
+            >
+                {/* Decorative blur */}
+                <div
+                    className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${config.bgGradient} rounded-full blur-3xl opacity-20 group-hover:opacity-30 transition-opacity`}
+                ></div>
 
-            <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-                <div className="space-y-1">
-                    <p className="text-sm text-gray-500 flex items-center gap-1.5">
-                        <Package className="h-3.5 w-3.5" />
-                        {order.items ? order.items.length : 0} item
-                    </p>
-                    <p className="text-lg font-bold text-gray-900 group-hover:text-primary-700 transition-colors font-heading flex items-center gap-1.5">
-                        {formatCurrency(order.total_amount)}
-                    </p>
+                <div className="relative">
+                    <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-3 flex-wrap">
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className={`inline-flex rounded-xl bg-gradient-to-br ${config.bgGradient} p-2 shadow-md`}
+                                    >
+                                        <Package className={`h-5 w-5 bg-gradient-to-r ${config.gradient} bg-clip-text`} style={{ WebkitTextFillColor: 'transparent' }} />
+                                    </div>
+                                    <h3 className="font-bold text-gray-900 group-hover:bg-gradient-to-r group-hover:from-primary-600 group-hover:to-purple-600 group-hover:bg-clip-text group-hover:text-transparent transition-all">
+                                        {order.order_number}
+                                    </h3>
+                                </div>
+                                <Badge variant={config.variant as any} className="shadow-sm">
+                                    {config.label}
+                                </Badge>
+                            </div>
+                            <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
+                                <div className="flex items-center gap-1.5">
+                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                    <p>
+                                        {new Date(order.created_at).toLocaleDateString('id-ID', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            year: 'numeric',
+                                        })}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <Clock className="h-4 w-4 text-gray-400" />
+                                    <p>
+                                        {new Date(order.created_at).toLocaleTimeString('id-ID', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between border-t-2 border-gray-100 pt-4">
+                        <div className="space-y-1">
+                            <p className="text-sm text-gray-500 flex items-center gap-1.5">
+                                <Package className="h-3.5 w-3.5" />
+                                {order.items ? order.items.length : 0} item
+                            </p>
+                            <p className="text-xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent font-heading">
+                                {formatCurrency(order.total_amount)}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-50 to-purple-50 px-4 py-2 text-sm font-semibold text-primary-600 group-hover:from-primary-100 group-hover:to-purple-100 group-hover:translate-x-1 transition-all shadow-sm">
+                            Lihat Detail
+                            <ChevronRight className="h-4 w-4" />
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-1 text-sm font-semibold text-primary-600 group-hover:translate-x-1 transition-transform">
-                    Lihat Detail
-                    <ChevronRight className="h-4 w-4" />
-                </div>
-            </div>
+            </motion.div>
         </Link>
     );
 }

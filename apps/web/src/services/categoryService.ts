@@ -1,5 +1,6 @@
-import apiClient, { ApiResponse, getErrorMessage } from '@/lib/api';
 import { Category } from '@repo/shared';
+
+import apiClient, { ApiResponse, getErrorMessage } from '@/lib/api';
 
 export const categoryService = {
     async getCategories(): Promise<Category[]> {

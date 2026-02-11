@@ -1,7 +1,7 @@
 
 import { User } from '@repo/database';
-import { UpdateProfileDTO, ChangePasswordDTO } from '@repo/shared/schemas';
 import { NotFoundError, UnauthorizedError } from '@repo/shared/errors';
+import { UpdateProfileDTO, ChangePasswordDTO } from '@repo/shared/schemas';
 import bcrypt from 'bcryptjs';
 
 export async function getProfile(userId: number) {

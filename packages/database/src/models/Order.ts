@@ -8,19 +8,15 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
+// Use type-only imports to avoid circular dependencies
+import type { OrderItem } from './OrderItem';
+import type { Payment } from './Payment';
+import type { Review } from './Review';
+import type { Shipping } from './Shipping';
 import { User } from './User';
-
-export type OrderStatus =
-    | 'pending_payment'
-    | 'paid'
-    | 'processing'
-    | 'shipped'
-    | 'delivered'
-    | 'cancelled'
-    | 'refunded';
-
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface OrderAttributes {
     id: number;
@@ -42,6 +38,17 @@ export interface OrderAttributes {
     created_at: Date;
     updated_at: Date;
 }
+
+export type OrderStatus =
+    | 'pending_payment'
+    | 'paid'
+    | 'processing'
+    | 'shipped'
+    | 'delivered'
+    | 'cancelled'
+    | 'refunded';
+
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export class Order extends Model<
     InferAttributes<Order>,
@@ -71,17 +78,17 @@ export class Order extends Model<
 
     // Associations
     declare user?: NonAttribute<User>;
-    declare items?: NonAttribute<any[]>;
-    declare payment?: NonAttribute<any>;
-    declare shipping?: NonAttribute<any>;
-    declare reviews?: NonAttribute<any[]>;
+    declare items?: NonAttribute<OrderItem[]>;
+    declare payment?: NonAttribute<Payment>;
+    declare shipping?: NonAttribute<Shipping>;
+    declare reviews?: NonAttribute<Review[]>;
 
     declare static associations: {
         user: Association<Order, User>;
-        items: Association<Order, any>;
-        payment: Association<Order, any>;
-        shipping: Association<Order, any>;
-        reviews: Association<Order, any>;
+        items: Association<Order, OrderItem>;
+        payment: Association<Order, Payment>;
+        shipping: Association<Order, Shipping>;
+        reviews: Association<Order, Review>;
     };
 }
 

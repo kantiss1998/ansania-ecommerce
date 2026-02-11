@@ -1,4 +1,5 @@
 import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+
 import { sequelize } from '../config/database';
 
 export interface ShippingCostsCacheAttributes {

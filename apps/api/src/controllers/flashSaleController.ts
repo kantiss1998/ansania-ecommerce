@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as flashSaleService from '../services/flashSaleService';
 
 export async function getActiveFlashSales(_req: Request, res: Response, next: NextFunction) {

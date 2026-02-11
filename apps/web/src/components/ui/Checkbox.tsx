@@ -1,4 +1,5 @@
 import { InputHTMLAttributes, forwardRef } from 'react';
+
 import { cn } from '@/lib/utils';
 
 export interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {

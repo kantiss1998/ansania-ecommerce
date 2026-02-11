@@ -1,5 +1,6 @@
-import apiClient, { ApiResponse } from '@/lib/api';
 import { Banner, CMSPage } from '@repo/shared';
+
+import apiClient, { ApiResponse } from '@/lib/api';
 
 // Remove local interfaces that are duplicates of @repo/shared
 export interface BannerData {
@@ -83,4 +84,4 @@ export const adminCmsService = {
     }
 };
 
-export default adminCmsService;
+

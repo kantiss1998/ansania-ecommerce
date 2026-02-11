@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+
 import { VerifyEmailContent } from '@/components/features/auth/VerifyEmail';
 
 export const dynamic = 'force-dynamic';

@@ -1,7 +1,8 @@
 
-import { Request, Response, NextFunction } from 'express';
-import * as authService from '../services/authService';
 import { RegisterDTO, LoginDTO } from '@repo/shared/schemas';
+import { Request, Response, NextFunction } from 'express';
+
+import * as authService from '../services/authService';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
     try {

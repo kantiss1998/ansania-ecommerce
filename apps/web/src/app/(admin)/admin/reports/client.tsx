@@ -1,11 +1,12 @@
 'use client';
 
-import { Suspense } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { formatCurrency } from '@/lib/utils';
 import { SalesReportData, CustomerReportData, InventoryReportData } from '@repo/shared';
 import Link from 'next/link';
+import { Suspense } from 'react';
+
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { formatCurrency } from '@/lib/utils';
 
 interface AdminReportsClientProps {
     initialData: {

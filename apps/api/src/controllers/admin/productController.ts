@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+
 import * as adminProductService from '../../services/admin/productService';
 
 export async function getAllProducts(req: Request, res: Response, next: NextFunction) {

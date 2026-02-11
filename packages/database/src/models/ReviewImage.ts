@@ -8,7 +8,9 @@ import {
     NonAttribute,
     Association,
 } from 'sequelize';
+
 import { sequelize } from '../config/database';
+
 import { Review } from './Review';
 
 export interface ReviewImageAttributes {

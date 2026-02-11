@@ -1,8 +1,7 @@
 
 import { Cart, CartItem, ProductVariant, Product, ProductImage } from '@repo/database';
-import { AddToCartDTO } from '@repo/shared/schemas';
 import { AppError, NotFoundError, InsufficientStockError } from '@repo/shared/errors';
-
+import { AddToCartDTO } from '@repo/shared/schemas';
 import { WhereOptions } from 'sequelize';
 
 // Helper to get cart with items
@@ -94,7 +93,7 @@ export async function addToCart(
     }
 
     // Check if item exists in cart
-    let item = await CartItem.findOne({
+    const item = await CartItem.findOne({
         where: {
             cart_id: cart.id,
             product_variant_id: data.product_variant_id

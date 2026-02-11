@@ -1,7 +1,9 @@
 import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey } from 'sequelize';
+
 import { sequelize } from '../config/database';
-import { Voucher } from './Voucher';
+
 import { Product } from './Product';
+import { Voucher } from './Voucher';
 
 export interface VoucherProductsAttributes {
     voucher_id: number;

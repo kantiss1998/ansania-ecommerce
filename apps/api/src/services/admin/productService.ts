@@ -1,7 +1,8 @@
 
 import { Product, ProductVariant, ProductImage, Category } from '@repo/database';
-import { Op } from 'sequelize';
 import { NotFoundError } from '@repo/shared/errors';
+import { Op } from 'sequelize';
+
 import { mapProduct } from '../productService';
 
 /**

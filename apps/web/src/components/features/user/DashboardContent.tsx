@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
     ShoppingBag,
@@ -15,9 +13,12 @@ import {
     TrendingUp,
     Sparkles,
 } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/Button';
-import { orderService, Order } from '@/services/orderService';
 import { formatCurrency } from '@/lib/utils';
+import { orderService, Order } from '@/services/orderService';
 
 interface DashboardStats {
     totalOrders: number;

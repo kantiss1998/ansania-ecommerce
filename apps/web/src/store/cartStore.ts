@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { cartService } from '@/services/cartService';
+
 import { getErrorMessage } from '@/lib/api';
+import { cartService } from '@/services/cartService';
 
 /**
  * Cart item interface
@@ -90,7 +91,7 @@ export const useCartStore = create<CartState>()(
                     // If cartService returns generic Cart structure, we might need mapping
                     // But typically backend response should match what we expect or we adapt types
 
-                    // @ts-ignore - Assuming compatibility for now, will fix types if strictly different
+
                     set({
                         cart: cart as unknown as Cart,
                         isLoading: false,

@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
 import { Search } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+
+import { Button } from '@/components/ui/Button';
+
 
 export function SearchBar() {
     const router = useRouter();

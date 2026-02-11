@@ -1,9 +1,10 @@
 'use client';
 
-import { Suspense } from 'react';
-import { formatCurrency } from '@/lib/utils';
-import Link from 'next/link';
 import { DashboardStats } from '@repo/shared';
+import Link from 'next/link';
+import { Suspense } from 'react';
+
+import { formatCurrency } from '@/lib/utils';
 
 interface AdminDashboardClientProps {
     initialStats: DashboardStats | null;

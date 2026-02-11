@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+
 import * as statsService from '../services/statsService';
 import { AuthenticatedRequest } from '../types/express';
 

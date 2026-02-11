@@ -1,10 +1,11 @@
 
-import { Request, Response, NextFunction } from 'express';
-import * as shippingService from '../services/shippingService';
-import * as orderService from '../services/orderService';
-import * as cartService from '../services/cartService'; // To get active cart
-import { AuthenticatedRequest } from '../types/express';
 import { CreateOrderDTO } from '@repo/shared/schemas';
+import { Request, Response, NextFunction } from 'express';
+
+import * as cartService from '../services/cartService'; // To get active cart
+import * as orderService from '../services/orderService';
+import * as shippingService from '../services/shippingService';
+import { AuthenticatedRequest } from '../types/express';
 
 export async function getShippingRates(req: Request, res: Response, next: NextFunction) {
     try {

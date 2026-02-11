@@ -1,5 +1,6 @@
-import { cmsClient } from '@/lib/cms';
 import { notFound } from 'next/navigation';
+
+import { cmsClient } from '@/lib/cms';
 
 const PAGE_SLUG = 'faq';
 export const dynamic = 'force-dynamic';
@@ -27,7 +28,7 @@ export default async function FAQPage() {
                 <div className="container mx-auto px-4">
                     <h1 className="mb-4 text-4xl font-bold">{page.title}</h1>
                     <p className="mx-auto max-w-2xl text-primary-100 text-lg">
-                        Have questions? We're here to help. Browse our frequently asked questions below.
+                        Have questions? We&apos;re here to help. Browse our frequently asked questions below.
                     </p>
                     {/* Placeholder for Search Input */}
                     <div className="mx-auto mt-8 max-w-md">

@@ -1,5 +1,6 @@
 
 import { Router } from 'express';
+
 import * as odooController from '../controllers/odooController';
 import { authenticate } from '../middleware/auth';
 

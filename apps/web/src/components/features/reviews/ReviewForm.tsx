@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { RatingStars } from './RatingStars';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
+
+import { RatingStars } from './RatingStars';
 
 interface ReviewFormProps {
     onSubmit: (data: ReviewData) => void;
