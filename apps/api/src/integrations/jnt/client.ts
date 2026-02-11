@@ -6,7 +6,7 @@
 
 import crypto from 'crypto';
 
-import { AppError } from '@repo/shared/errors';
+import { ServiceUnavailableError } from '@repo/shared/errors';
 
 // J&T API Configuration
 interface JNTConfig {
@@ -355,10 +355,7 @@ export class JNTClient {
 
         } catch (error) {
             console.error('[JNT] Failed to create order:', error);
-            throw new AppError(
-                `Failed to create J&T order: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                500
-            );
+            throw new ServiceUnavailableError('J&T Order Service');
         }
     }
 

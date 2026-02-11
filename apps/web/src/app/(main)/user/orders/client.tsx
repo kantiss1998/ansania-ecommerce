@@ -7,6 +7,7 @@ import { OrderCard } from '@/components/features/dashboard/OrderCard';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { orderService, Order } from '@/services/orderService';
+import { ORDER_STATUS } from '@repo/shared/constants';
 
 function OrdersContent() {
     const [activeTab, setActiveTab] = useState('all');
@@ -17,10 +18,10 @@ function OrdersContent() {
 
     const tabs = [
         { key: 'all' as const, label: 'Semua', gradient: 'from-gray-500 to-gray-600' },
-        { key: 'pending_payment' as const, label: 'Belum Bayar', gradient: 'from-orange-500 to-amber-500' },
-        { key: 'processing' as const, label: 'Diproses', gradient: 'from-blue-500 to-cyan-500' },
-        { key: 'shipped' as const, label: 'Dikirim', gradient: 'from-purple-500 to-pink-500' },
-        { key: 'delivered' as const, label: 'Selesai', gradient: 'from-green-500 to-emerald-500' },
+        { key: ORDER_STATUS.PENDING_PAYMENT, label: 'Belum Bayar', gradient: 'from-orange-500 to-amber-500' },
+        { key: ORDER_STATUS.PROCESSING, label: 'Diproses', gradient: 'from-blue-500 to-cyan-500' },
+        { key: ORDER_STATUS.SHIPPED, label: 'Dikirim', gradient: 'from-purple-500 to-pink-500' },
+        { key: ORDER_STATUS.DELIVERED, label: 'Selesai', gradient: 'from-green-500 to-emerald-500' },
     ];
 
     useEffect(() => {
@@ -94,8 +95,8 @@ function OrdersContent() {
                             transition={{ delay: 0.3 + index * 0.05 }}
                             onClick={() => setActiveTab(tab.key)}
                             className={`relative whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${activeTab === tab.key
-                                    ? 'bg-gradient-to-r ' + tab.gradient + ' text-white shadow-lg'
-                                    : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-gradient-to-r ' + tab.gradient + ' text-white shadow-lg'
+                                : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             {activeTab === tab.key && (

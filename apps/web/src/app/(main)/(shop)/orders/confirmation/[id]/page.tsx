@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/utils';
 import { orderService, Order } from '@/services/orderService';
-
+import { ORDER_STATUS } from '@repo/shared/constants';
 
 export default function OrderConfirmationPage() {
     const params = useParams();
@@ -156,7 +156,7 @@ export default function OrderConfirmationPage() {
                         className="lg:col-span-2 space-y-8"
                     >
                         {/* Enhanced Payment Instruction Card */}
-                        {order.status === 'pending_payment' && (
+                        {order.status === ORDER_STATUS.PENDING_PAYMENT && (
                             <>
                                 <div className="relative overflow-hidden rounded-2xl border-2 border-warning-200 bg-gradient-to-br from-warning-50 to-orange-50 p-6 shadow-lg">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-warning-200 to-orange-200 rounded-full blur-3xl opacity-20"></div>

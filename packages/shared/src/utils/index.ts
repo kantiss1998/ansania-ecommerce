@@ -8,17 +8,6 @@ export * from './number';
 export * from './date';
 
 /**
- * Format price to Indonesian Rupiah
- */
-export function formatPrice(amount: number): string {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-    }).format(amount);
-}
-
-/**
  * Generate unique order number
  * Format: ORD-YYYYMMDD-XXX
  */
@@ -29,44 +18,6 @@ export function generateOrderNumber(): string {
         .toString()
         .padStart(3, '0');
     return `ORD-${dateStr}-${random}`;
-}
-
-/**
- * Slugify string for URLs
- */
-export function slugify(text: string): string {
-    return text
-        .toString()
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '')
-        .replace(/--+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '');
-}
-
-/**
- * Calculate discount amount
- */
-export function calculateDiscount(
-    price: number,
-    discountType: 'percentage' | 'fixed_amount',
-    discountValue: number,
-    maxDiscount?: number
-): number {
-    let discount = 0;
-
-    if (discountType === 'percentage') {
-        discount = (price * discountValue) / 100;
-        if (maxDiscount && discount > maxDiscount) {
-            discount = maxDiscount;
-        }
-    } else {
-        discount = discountValue;
-    }
-
-    return Math.min(discount, price); // Never discount more than the price
 }
 
 /**
@@ -89,23 +40,8 @@ export function delay(ms: number): Promise<void> {
 }
 
 /**
- * Truncate text to specified length
- */
-export function truncate(text: string, length: number, suffix = '...'): string {
-    if (text.length <= length) return text;
-    return text.slice(0, length - suffix.length) + suffix;
-}
-
-/**
- * Check if email is valid format
- */
-export function isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-/**
  * Parse phone number to E.164 format
+ * Note: prefer formatPhone from ./string if possible, but this forces +62
  */
 export function parsePhoneNumber(phone: string): string {
     // Remove all non-digit characters
@@ -122,18 +58,6 @@ export function parsePhoneNumber(phone: string): string {
     }
 
     return '+' + cleaned;
-}
-
-/**
- * Generate random string
- */
-export function generateRandomString(length: number): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
 }
 
 /**
@@ -156,6 +80,7 @@ export function removeEmptyValues<T extends Record<string, unknown>>(obj: T): Pa
     });
     return result;
 }
+
 /**
  * Convert array of objects to CSV string
  */

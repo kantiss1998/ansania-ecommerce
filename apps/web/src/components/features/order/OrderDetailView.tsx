@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/Toast';
 import apiClient, { getErrorMessage } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import { Order } from '@/services/orderService';
+import { ORDER_STATUS } from '@repo/shared/constants';
 
 
 interface OrderDetailViewProps {
@@ -24,11 +25,13 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
     const [isLoading, setIsLoading] = useState(false);
 
     const statusConfig: Record<string, { label: string; variant: 'warning' | 'info' | 'success' | 'error' | 'default' }> = {
-        pending_payment: { label: 'Menunggu Pembayaran', variant: 'warning' },
-        processing: { label: 'Diproses', variant: 'info' },
-        shipped: { label: 'Dikirim', variant: 'info' },
-        delivered: { label: 'Selesai', variant: 'success' },
-        cancelled: { label: 'Dibatalkan', variant: 'error' },
+        [ORDER_STATUS.PENDING_PAYMENT]: { label: 'Menunggu Pembayaran', variant: 'warning' },
+        [ORDER_STATUS.PROCESSING]: { label: 'Diproses', variant: 'info' },
+        [ORDER_STATUS.SHIPPED]: { label: 'Dikirim', variant: 'info' },
+        [ORDER_STATUS.DELIVERED]: { label: 'Selesai', variant: 'success' },
+        [ORDER_STATUS.CANCELLED]: { label: 'Dibatalkan', variant: 'error' },
+        [ORDER_STATUS.REFUNDED]: { label: 'Dikembalikan', variant: 'default' },
+        [ORDER_STATUS.FAILED]: { label: 'Gagal', variant: 'error' },
     };
 
     const config = statusConfig[order.status] || { label: order.status, variant: 'default' };
@@ -104,7 +107,7 @@ export function OrderDetailView({ order }: OrderDetailViewProps) {
                                         <div className="font-bold text-gray-900 text-lg">
                                             {formatCurrency(item.subtotal)}
                                         </div>
-                                        {order.status === 'delivered' && (
+                                        {order.status === ORDER_STATUS.DELIVERED && (
                                             <Button
                                                 variant="outline"
                                                 size="sm"

@@ -1,5 +1,13 @@
+
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+// Use shared utilities
+import {
+    formatCurrency as sharedFormatCurrency,
+    formatDate as sharedFormatDate,
+    truncate as sharedTruncate,
+    isValidEmail as sharedIsValidEmail
+} from '@repo/shared/utils';
 
 /**
  * Utility function to merge class names
@@ -13,44 +21,28 @@ export function cn(...inputs: ClassValue[]) {
  * Format currency to Indonesian Rupiah
  */
 export function formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(amount);
+    return sharedFormatCurrency(amount);
 }
 
 /**
  * Format date to locale string
  */
 export function formatDate(date: string | Date): string {
-    return new Intl.DateTimeFormat('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    }).format(new Date(date));
+    return sharedFormatDate(date);
 }
 
 /**
  * Format date and time
  */
 export function formatDateTime(date: string | Date): string {
-    return new Intl.DateTimeFormat('id-ID', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    }).format(new Date(date));
+    return sharedFormatDate(date, true);
 }
 
 /**
  * Truncate text with ellipsis
  */
 export function truncate(text: string, maxLength: number): string {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength) + '...';
+    return sharedTruncate(text, maxLength);
 }
 
 /**
@@ -90,12 +82,12 @@ export function sleep(ms: number): Promise<void> {
  * Check if string is valid email
  */
 export function isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    return sharedIsValidEmail(email);
 }
 
 /**
  * Format phone number to Indonesian format
+ * Keeping specific web formatting for visual appeal
  */
 export function formatPhone(phone: string): string {
     // Remove all non-digit characters

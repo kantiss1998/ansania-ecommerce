@@ -2,6 +2,7 @@
 import { Order, User } from '@repo/database';
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { BadRequestError } from '@repo/shared/errors';
 
 import { OdooCustomerService } from '../services/odoo/customer.service';
 import { odooClient } from '../services/odoo/odoo.client';
@@ -68,8 +69,7 @@ export const syncCustomer = async (req: Request, res: Response, next: NextFuncti
     try {
         const userId = parseInt(req.params.userId);
         if (isNaN(userId)) {
-            res.status(400).json({ success: false, error: 'Invalid User ID' });
-            return;
+            throw new BadRequestError('Invalid User ID');
         }
 
         const odooPartnerId = await customerService.syncCustomer(userId);
@@ -94,8 +94,7 @@ export const syncOrder = async (req: Request, res: Response, next: NextFunction)
     try {
         const orderId = parseInt(req.params.orderId);
         if (isNaN(orderId)) {
-            res.status(400).json({ success: false, error: 'Invalid Order ID' });
-            return;
+            throw new BadRequestError('Invalid Order ID');
         }
 
         const odooOrderId = await orderService.syncOrder(orderId);

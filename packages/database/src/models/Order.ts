@@ -17,6 +17,8 @@ import type { Payment } from './Payment';
 import type { Review } from './Review';
 import type { Shipping } from './Shipping';
 import { User } from './User';
+import { ORDER_STATUS, PAYMENT_STATUS, type OrderStatus, type PaymentStatus } from '@repo/shared';
+export type { OrderStatus, PaymentStatus };
 
 export interface OrderAttributes {
     id: number;
@@ -38,17 +40,6 @@ export interface OrderAttributes {
     created_at: Date;
     updated_at: Date;
 }
-
-export type OrderStatus =
-    | 'pending_payment'
-    | 'paid'
-    | 'processing'
-    | 'shipped'
-    | 'delivered'
-    | 'cancelled'
-    | 'refunded';
-
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export class Order extends Model<
     InferAttributes<Order>,
@@ -121,21 +112,26 @@ Order.init(
         },
         status: {
             type: DataTypes.ENUM(
-                'pending_payment',
-                'paid',
-                'processing',
-                'shipped',
-                'delivered',
-                'cancelled',
-                'refunded'
+                ORDER_STATUS.PENDING_PAYMENT,
+                ORDER_STATUS.PAID,
+                ORDER_STATUS.PROCESSING,
+                ORDER_STATUS.SHIPPED,
+                ORDER_STATUS.DELIVERED,
+                ORDER_STATUS.CANCELLED,
+                ORDER_STATUS.REFUNDED
             ),
             allowNull: false,
-            defaultValue: 'pending_payment',
+            defaultValue: ORDER_STATUS.PENDING_PAYMENT,
         },
         payment_status: {
-            type: DataTypes.ENUM('pending', 'paid', 'failed', 'refunded'),
+            type: DataTypes.ENUM(
+                PAYMENT_STATUS.PENDING,
+                PAYMENT_STATUS.PAID,
+                PAYMENT_STATUS.FAILED,
+                PAYMENT_STATUS.REFUNDED
+            ),
             allowNull: false,
-            defaultValue: 'pending',
+            defaultValue: PAYMENT_STATUS.PENDING,
         },
         subtotal: {
             type: DataTypes.DECIMAL(15, 2),

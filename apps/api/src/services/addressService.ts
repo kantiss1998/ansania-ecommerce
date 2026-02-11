@@ -1,7 +1,7 @@
-
 import { Address } from '@repo/database';
 import { NotFoundError } from '@repo/shared/errors';
 import { CreateAddressDTO } from '@repo/shared/schemas';
+import { formatPhone } from '@repo/shared/utils';
 
 export async function createAddress(userId: number, data: CreateAddressDTO) {
     // If setting as default, unset other defaults
@@ -12,6 +12,7 @@ export async function createAddress(userId: number, data: CreateAddressDTO) {
     const address = await Address.create({
         user_id: userId,
         ...data,
+        phone: formatPhone(data.phone),
         is_default: data.is_default || false
     });
 
@@ -48,6 +49,10 @@ export async function updateAddress(userId: number, addressId: number, data: Par
 
     if (data.is_default) {
         await Address.update({ is_default: false }, { where: { user_id: userId } });
+    }
+
+    if (data.phone) {
+        data.phone = formatPhone(data.phone);
     }
 
     await address.update(data);

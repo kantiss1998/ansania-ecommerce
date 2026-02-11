@@ -1,9 +1,37 @@
-
 import { Review, User, Product } from '@repo/database';
 import { NotFoundError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
+import { REVIEW_STATUS } from '@repo/shared/constants';
 
-export async function listAllReviews(query: any) {
+export interface AdminReviewResult extends Omit<Partial<Review>, 'user' | 'product'> {
+    status: string;
+    user?: {
+        full_name: string;
+        email: string;
+    };
+    product?: {
+        name: string;
+        slug: string;
+    };
+}
+
+export interface ReviewListResult {
+    items: AdminReviewResult[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+export async function listAllReviews(query: {
+    page?: number | string;
+    limit?: number | string;
+    status?: string;
+    rating?: number | string;
+    search?: string;
+}): Promise<ReviewListResult> {
     const {
         page = 1,
         limit = 10,
@@ -15,8 +43,8 @@ export async function listAllReviews(query: any) {
     const offset = (Number(page) - 1) * Number(limit);
     const where: any = {};
 
-    if (status === 'approved') where.is_approved = true;
-    if (status === 'pending') where.is_approved = false;
+    if (status === REVIEW_STATUS.APPROVED) where.is_approved = true;
+    if (status === REVIEW_STATUS.PENDING) where.is_approved = false;
     if (rating) where.rating = rating;
 
     if (search) {
@@ -34,13 +62,22 @@ export async function listAllReviews(query: any) {
         order: [['created_at', 'DESC']],
         include: [
             { model: User, as: 'user', attributes: ['full_name', 'email'] },
-            { model: Product, as: 'product', attributes: ['name', 'slug'] }
+            { model: Product, as: 'product', attributes: ['name', 'slug', 'images', 'main_image'] }
         ],
         distinct: true
     });
 
+    // Map to JSON and add status field
+    const items: AdminReviewResult[] = rows.map(r => {
+        const review = r.get({ plain: true }) as any;
+        return {
+            ...review,
+            status: r.is_approved ? REVIEW_STATUS.APPROVED : REVIEW_STATUS.PENDING
+        };
+    });
+
     return {
-        items: rows,
+        items,
         meta: {
             total: count,
             page: Number(page),
@@ -50,15 +87,19 @@ export async function listAllReviews(query: any) {
     };
 }
 
-export async function moderateReview(id: number, approved: boolean) {
+export async function moderateReview(id: number, approved: boolean): Promise<AdminReviewResult> {
     const review = await Review.findByPk(id);
     if (!review) throw new NotFoundError('Review');
 
     await review.update({ is_approved: approved });
-    return review;
+    const reviewJson = review.get({ plain: true }) as any;
+    return {
+        ...reviewJson,
+        status: review.is_approved ? REVIEW_STATUS.APPROVED : REVIEW_STATUS.PENDING
+    };
 }
 
-export async function deleteReview(id: number) {
+export async function deleteReview(id: number): Promise<{ success: boolean }> {
     const review = await Review.findByPk(id);
     if (!review) throw new NotFoundError('Review');
 
@@ -66,20 +107,20 @@ export async function deleteReview(id: number) {
     return { success: true };
 }
 
-export async function bulkApprove(ids: number[]) {
+export async function bulkApprove(ids: number[]): Promise<{ success: boolean; count: number }> {
     await Review.update({ is_approved: true }, {
         where: { id: { [Op.in]: ids } }
     });
     return { success: true, count: ids.length };
 }
 
-export async function bulkReject(ids: number[]) {
+export async function bulkReject(ids: number[]): Promise<{ success: boolean; count: number }> {
     await Review.update({ is_approved: false }, {
         where: { id: { [Op.in]: ids } }
     });
     return { success: true, count: ids.length };
 }
 
-export async function getPendingReviews(query: any) {
-    return listAllReviews({ ...query, status: 'pending' });
+export async function getPendingReviews(query: any): Promise<ReviewListResult> {
+    return listAllReviews({ ...query, status: REVIEW_STATUS.PENDING });
 }

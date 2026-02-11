@@ -3,9 +3,10 @@ import { Cart, CartItem, ProductVariant, Product, ProductImage } from '@repo/dat
 import { AppError, NotFoundError, InsufficientStockError } from '@repo/shared/errors';
 import { AddToCartDTO } from '@repo/shared/schemas';
 import { WhereOptions } from 'sequelize';
+import { CART_CONFIG } from '@repo/shared/constants';
 
 // Helper to get cart with items
-async function getCartWithItems(whereClause: WhereOptions) {
+async function getCartWithItems(whereClause: WhereOptions): Promise<Cart | null> {
     return Cart.findOne({
         where: whereClause,
         include: [
@@ -27,14 +28,14 @@ async function getCartWithItems(whereClause: WhereOptions) {
     });
 }
 
-export async function getCart(userId?: number, sessionId?: string) {
+export async function getCart(userId?: number, sessionId?: string): Promise<Cart> {
     if (!userId && !sessionId) {
         throw new AppError('User ID or Session ID required', 400);
     }
 
-    const where: WhereOptions = {};
-    if (userId) (where as any).user_id = userId;
-    else (where as any).session_id = sessionId;
+    const where: any = {}; // Using any for dynamic user_id/session_id assignment
+    if (userId) where.user_id = userId;
+    else where.session_id = sessionId;
 
     let cart = await getCartWithItems(where);
 
@@ -50,7 +51,7 @@ export async function getCart(userId?: number, sessionId?: string) {
             subtotal: 0,
             total: 0,
             discount_amount: 0,
-            expires_at: !userId ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) : null // 7 days for guest
+            expires_at: !userId ? new Date(Date.now() + CART_CONFIG.GUEST_EXPIRY_DAYS * 24 * 60 * 60 * 1000) : null // guest cart expiry
         });
 
         // Reload with includes
@@ -73,6 +74,8 @@ export async function getCart(userId?: number, sessionId?: string) {
 
     // Update cart if needed (skip for now to avoid side effects on GET, handling in actions usually)
 
+    if (!cart) throw new AppError('Cart not found after creation', 500);
+
     return cart;
 }
 
@@ -80,7 +83,7 @@ export async function addToCart(
     userId: number | undefined,
     sessionId: string | undefined,
     data: AddToCartDTO
-) {
+): Promise<Cart> {
     const cart = await getCart(userId, sessionId);
     if (!cart) throw new AppError('Could not initialize cart', 500);
 
@@ -131,7 +134,7 @@ export async function updateItem(
     sessionId: string | undefined,
     itemId: number,
     quantity: number
-) {
+): Promise<Cart> {
     const cart = await getCart(userId, sessionId);
     if (!cart) throw new AppError('Cart not found', 404);
 
@@ -162,7 +165,7 @@ export async function removeItem(
     userId: number | undefined,
     sessionId: string | undefined,
     itemId: number
-) {
+): Promise<Cart> {
     const cart = await getCart(userId, sessionId);
     if (!cart) throw new AppError('Cart not found', 404);
 
@@ -175,7 +178,7 @@ export async function removeItem(
     return getCart(userId, sessionId);
 }
 
-async function updateCartTotals(cartId: number) {
+async function updateCartTotals(cartId: number): Promise<void> {
     const items = await CartItem.findAll({ where: { cart_id: cartId } });
     let subtotal = 0;
 
@@ -198,7 +201,7 @@ async function updateCartTotals(cartId: number) {
 export async function clearCart(
     userId: number | undefined,
     sessionId: string | undefined
-) {
+): Promise<Cart> {
     const cart = await getCart(userId, sessionId);
     if (!cart) throw new AppError('Cart not found', 404);
 
@@ -223,7 +226,7 @@ export async function clearCart(
 export async function mergeGuestCartToUser(
     userId: number,
     sessionId: string
-) {
+): Promise<Cart> {
     // Find guest cart
     const guestCart = await Cart.findOne({
         where: { session_id: sessionId },
@@ -271,7 +274,7 @@ export async function mergeGuestCartToUser(
             // Update quantity (combine)
             const newQuantity = existingItem.quantity + guestItem.quantity;
             const variant = guestItem.productVariant;
-            
+
             // Check stock before merging
             if (variant && variant.stock >= newQuantity) {
                 await existingItem.update({

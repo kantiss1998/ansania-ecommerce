@@ -10,6 +10,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { useUiStore } from '@/store/uiStore';
+import { USER_ROLES } from '@repo/shared/constants';
 
 
 /**
@@ -80,7 +81,7 @@ export function Header() {
                             <span className="absolute inset-x-4 -bottom-0.5 h-0.5 bg-gradient-primary transform scale-x-0 origin-left transition-transform group-hover:scale-x-100 rounded-full" />
                         </Link>
                     ))}
-                    {mounted && user?.role === 'admin' && (
+                    {mounted && user?.role === USER_ROLES.ADMIN && (
                         <Link
                             href="/admin/dashboard"
                             className="text-sm font-bold text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all"

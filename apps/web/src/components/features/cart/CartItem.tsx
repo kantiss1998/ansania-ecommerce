@@ -4,28 +4,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { formatCurrency } from '@/lib/utils';
 import { Minus, Plus, Trash2 } from 'lucide-react';
-
-/**
- * Cart item type
- */
-export interface CartItemViewModel {
-    id: number;
-    product_variant_id: number;
-    product_name: string;
-    product_slug: string;
-    variant_info: string;
-    product_image: string;
-    price: number;
-    quantity: number;
-    subtotal: number;
-    stock: number;
-}
+import { CartItem as CartItemType } from '@/services/cartService';
 
 /**
  * Cart item component
  */
 export interface CartItemProps {
-    item: CartItemViewModel;
+    item: CartItemType;
     onUpdateQuantity: (itemId: number, quantity: number) => void;
     onRemove: (itemId: number) => void;
     isUpdating?: boolean;
@@ -38,21 +23,26 @@ export function CartItem({
     isUpdating = false,
 }: CartItemProps) {
     const handleQuantityChange = (newQuantity: number) => {
-        if (newQuantity > 0 && newQuantity <= item.stock) {
+        const stock = item.variant?.stock || 0;
+        if (newQuantity > 0 && newQuantity <= stock) {
             onUpdateQuantity(item.id, newQuantity);
         }
     };
+
+    const variantInfo = [item.variant?.color, item.variant?.size, item.variant?.finishing]
+        .filter(Boolean)
+        .join(', ');
 
     return (
         <div className="flex gap-4 border-b border-gray-100 py-6 last:border-0 hover:bg-gray-50/50 transition-colors px-2 -mx-2 rounded-xl group/item">
             {/* Product Image */}
             <Link
-                href={`/products/${item.product_slug}`}
+                href={`/products/${item.product.slug}`}
                 className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-gray-50 group"
             >
                 <Image
-                    src={item.product_image}
-                    alt={item.product_name}
+                    src={item.product.thumbnail_url || '/placeholder-product.svg'}
+                    alt={item.product.name}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="96px"
@@ -64,14 +54,14 @@ export function CartItem({
                 <div className="flex justify-between gap-4">
                     <div className="space-y-1">
                         <Link
-                            href={`/products/${item.product_slug}`}
+                            href={`/products/${item.product.slug}`}
                             className="text-base font-bold text-gray-900 hover:text-primary-700 hover:underline active:text-primary-800 line-clamp-2"
                         >
-                            {item.product_name}
+                            {item.product.name}
                         </Link>
-                        {item.variant_info && (
+                        {variantInfo && (
                             <p className="text-sm font-medium text-gray-500">
-                                {item.variant_info}
+                                {variantInfo}
                             </p>
                         )}
                         <p className="text-sm font-semibold text-primary-700">
@@ -105,7 +95,7 @@ export function CartItem({
                         />
                         <button
                             onClick={() => handleQuantityChange(item.quantity + 1)}
-                            disabled={isUpdating || item.quantity >= item.stock}
+                            disabled={isUpdating || item.quantity >= (item.variant?.stock || 0)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                             type="button"
                         >

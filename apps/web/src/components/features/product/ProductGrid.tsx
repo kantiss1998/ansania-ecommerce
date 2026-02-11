@@ -1,3 +1,5 @@
+'use client';
+
 import { ProductCard } from './ProductCard';
 import { Product } from '@/services/productService';
 import { motion } from 'framer-motion';

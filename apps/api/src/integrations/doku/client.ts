@@ -6,7 +6,7 @@
 
 import crypto from 'crypto';
 
-import { AppError } from '@repo/shared/errors';
+import { AppError, BadRequestError, ServiceUnavailableError } from '@repo/shared/errors';
 
 // Doku API Configuration
 interface DokuConfig {
@@ -176,10 +176,8 @@ export class DokuClient {
 
         } catch (error) {
             console.error('[DOKU] Payment generation failed:', error);
-            throw new AppError(
-                `Failed to generate payment: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                500
-            );
+            if (error instanceof AppError) throw error;
+            throw new ServiceUnavailableError('Doku Payment Service');
         }
     }
 
@@ -294,9 +292,8 @@ export class DokuClient {
                 }
             };
         } catch (error) {
-            throw new AppError(
-                `Invalid webhook payload: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                400
+            throw new BadRequestError(
+                `Invalid webhook payload: ${error instanceof Error ? error.message : 'Unknown error'}`
             );
         }
     }
@@ -339,7 +336,8 @@ export class DokuClient {
 
         } catch (error) {
             console.error('[DOKU] Failed to get payment status:', error);
-            throw error;
+            if (error instanceof AppError) throw error;
+            throw new ServiceUnavailableError('Doku Payment Status');
         }
     }
 

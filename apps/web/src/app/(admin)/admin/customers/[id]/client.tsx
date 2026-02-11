@@ -1,5 +1,6 @@
 'use client';
 
+import { REVIEW_STATUS } from '@repo/shared/constants';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
@@ -266,7 +267,7 @@ export default function AdminCustomerDetailClient({ customerId }: AdminCustomerD
                             {reviews.length > 0 ? (
                                 reviews.map((review) => (
                                     <div key={review.id} className="rounded-lg border border-gray-200 p-4">
-                                        <div className="flex items-start justify-between">
+                                        <div className="items-start justify-between flex">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
                                                     <StarRating rating={review.rating} />
@@ -282,9 +283,9 @@ export default function AdminCustomerDetailClient({ customerId }: AdminCustomerD
                                                 )}
                                             </div>
                                             <Badge variant={
-                                                review.status === 'approved' ? 'success' :
-                                                    review.status === 'pending' ? 'warning' :
-                                                        'error'
+                                                review.status === REVIEW_STATUS.APPROVED ? 'success' :
+                                                    review.status === REVIEW_STATUS.PENDING ? 'warning' :
+                                                        review.status === REVIEW_STATUS.REJECTED ? 'error' : 'default'
                                             }>
                                                 {review.status}
                                             </Badge>

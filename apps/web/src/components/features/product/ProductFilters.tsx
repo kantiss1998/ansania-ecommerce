@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Filter, RotateCcw, Sparkles } from 'lucide-react';
+import { STOCK_STATUS } from '@repo/shared/constants';
 
 /**
  * Filter options type
@@ -226,9 +227,9 @@ export function ProductFilters({
                     className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-medium focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
                 >
                     <option value="">Semua</option>
-                    <option value="in_stock">Tersedia</option>
-                    <option value="limited_stock">Stok Terbatas</option>
-                    <option value="pre_order">Pre-Order</option>
+                    <option value={STOCK_STATUS.IN_STOCK}>Tersedia</option>
+                    <option value={STOCK_STATUS.LIMITED_STOCK}>Stok Terbatas</option>
+                    <option value={STOCK_STATUS.PRE_ORDER}>Pre-Order</option>
                 </select>
             </div>
 

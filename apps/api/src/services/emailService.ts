@@ -1,5 +1,6 @@
 
 import { EmailQueue } from '@repo/database';
+import { EMAIL_STATUS } from '@repo/shared/constants';
 
 export async function queueEmail(
     recipientString: string,
@@ -12,7 +13,7 @@ export async function queueEmail(
         recipient_email: recipientString,
         subject,
         body,
-        status: 'pending',
+        status: EMAIL_STATUS.PENDING,
         attempts: 0
     });
 }

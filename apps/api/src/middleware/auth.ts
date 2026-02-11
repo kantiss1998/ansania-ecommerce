@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { HTTP_STATUS, USER_ROLES } from '@repo/shared/constants';
 
 import { AuthenticatedRequest } from '../types/express';
 
@@ -7,7 +8,7 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        res.status(401).json({
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
             success: false,
             error: 'No token provided',
         });
@@ -21,7 +22,7 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
         req.user = decoded as { userId: number; email: string; role: string };
         next();
     } catch (error) {
-        res.status(401).json({
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({
             success: false,
             error: 'Invalid token',
         });
@@ -30,8 +31,8 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
 };
 
 export const authorizeAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    if (req.user?.role !== 'admin') {
-        res.status(403).json({
+    if (req.user?.role !== USER_ROLES.ADMIN) {
+        res.status(HTTP_STATUS.FORBIDDEN).json({
             success: false,
             error: 'Forbidden: Admin access required',
         });

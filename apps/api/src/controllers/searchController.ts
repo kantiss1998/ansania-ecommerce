@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { BadRequestError, UnauthorizedError } from '@repo/shared/errors';
 
 import * as searchService from '../services/searchService';
 import { AuthenticatedRequest } from '../types/express';
@@ -8,10 +9,7 @@ export async function search(req: Request, res: Response, next: NextFunction) {
         const { q, category, minPrice, maxPrice, page, limit } = req.query;
 
         if (!q || typeof q !== 'string') {
-            return res.status(400).json({
-                success: false,
-                error: 'Search query (q) is required'
-            });
+            throw new BadRequestError('Search query (q) is required');
         }
 
         const results = await searchService.searchProducts({
@@ -37,10 +35,7 @@ export async function autocomplete(req: Request, res: Response, next: NextFuncti
         const { q, limit } = req.query;
 
         if (!q || typeof q !== 'string') {
-            return res.status(400).json({
-                success: false,
-                error: 'Search query (q) is required'
-            });
+            throw new BadRequestError('Search query (q) is required');
         }
 
         const results = await searchService.autocompleteSearch(
@@ -75,7 +70,7 @@ export async function deleteHistory(req: Request, res: Response, next: NextFunct
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
-            return res.status(401).json({ success: false, error: 'Unauthorized' });
+            throw new UnauthorizedError();
         }
 
         const result = await searchService.deleteSearchHistory(userId);

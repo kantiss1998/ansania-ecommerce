@@ -1,6 +1,7 @@
 
 import { CreateAddressDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+import { UnauthorizedError } from '@repo/shared/errors';
 
 import * as addressService from '../services/addressService';
 import { AuthenticatedRequest } from '../types/express';
@@ -8,7 +9,7 @@ import { AuthenticatedRequest } from '../types/express';
 export async function createAddress(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
-        if (!userId) throw new Error('User not found');
+        if (!userId) throw new UnauthorizedError();
 
         const body = req.body as CreateAddressDTO;
         const address = await addressService.createAddress(userId, body);
@@ -24,7 +25,7 @@ export async function createAddress(req: Request, res: Response, next: NextFunct
 export async function getAddresses(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
-        if (!userId) throw new Error('User not found');
+        if (!userId) throw new UnauthorizedError();
 
         const addresses = await addressService.getAddresses(userId);
         res.json({
@@ -39,7 +40,7 @@ export async function getAddresses(req: Request, res: Response, next: NextFuncti
 export async function getAddress(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
-        if (!userId) throw new Error('User not found');
+        if (!userId) throw new UnauthorizedError();
 
         const { id } = req.params;
         const address = await addressService.getAddress(userId, Number(id));
@@ -55,7 +56,7 @@ export async function getAddress(req: Request, res: Response, next: NextFunction
 export async function updateAddress(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
-        if (!userId) throw new Error('User not found');
+        if (!userId) throw new UnauthorizedError();
 
         const { id } = req.params;
         const body = req.body as Partial<CreateAddressDTO>;
@@ -72,7 +73,7 @@ export async function updateAddress(req: Request, res: Response, next: NextFunct
 export async function deleteAddress(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
-        if (!userId) throw new Error('User not found');
+        if (!userId) throw new UnauthorizedError();
 
         const { id } = req.params;
         await addressService.deleteAddress(userId, Number(id));
@@ -88,7 +89,7 @@ export async function deleteAddress(req: Request, res: Response, next: NextFunct
 export async function setDefaultAddress(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
-        if (!userId) throw new Error('User not found');
+        if (!userId) throw new UnauthorizedError();
 
         const { id } = req.params;
         const address = await addressService.setDefaultAddress(userId, Number(id));
@@ -101,4 +102,3 @@ export async function setDefaultAddress(req: Request, res: Response, next: NextF
         next(error);
     }
 }
-

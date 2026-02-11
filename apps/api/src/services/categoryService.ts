@@ -1,30 +1,51 @@
-
 import { Category, Product, ProductCategories, ProductVariant, ProductImage } from '@repo/database';
 import { NotFoundError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
 
-// Build hierarchical category tree
-export async function getCategoryTree() {
+export interface CategoryNode extends Category {
+    children: CategoryNode[];
+}
+
+export interface CategoryWithProducts {
+    category: any;
+    products: Product[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+export interface CategoryFilters {
+    colors: string[];
+    sizes: string[];
+    finishings: string[];
+    priceRange: { min: number; max: number };
+}
+export async function getCategoryTree(): Promise<CategoryNode[]> {
     const categories = await Category.findAll({
         where: { is_active: true },
         order: [['sort_order', 'ASC'], ['name', 'ASC']]
     });
 
     // Build tree structure
-    const categoryMap = new Map();
-    const rootCategories: any[] = [];
+    const categoryMap = new Map<number, CategoryNode>();
+    const rootCategories: CategoryNode[] = [];
 
     // First pass: create map
     categories.forEach(cat => {
         categoryMap.set(cat.id, {
             ...cat.toJSON(),
             children: []
-        });
+        } as unknown as CategoryNode);
     });
 
     // Second pass: build hierarchy
     categories.forEach(cat => {
         const categoryData = categoryMap.get(cat.id);
+        if (!categoryData) return;
+
         if (cat.parent_id) {
             const parent = categoryMap.get(cat.parent_id);
             if (parent) {
@@ -44,7 +65,7 @@ export async function getCategoryBySlug(slug: string, options?: {
     limit?: number;
     sortBy?: string;
     order?: 'ASC' | 'DESC';
-}) {
+}): Promise<CategoryWithProducts> {
     const { page = 1, limit = 20, sortBy: _sortBy = 'name', order: _order = 'ASC' } = options || {};
     const offset = (page - 1) * limit;
 
@@ -102,7 +123,7 @@ export async function getCategoryBySlug(slug: string, options?: {
         distinct: true
     });
 
-    const products = productRelations.map((rel: any) => rel.product);
+    const products = productRelations.map((rel) => (rel as any).product as Product);
 
     return {
         category: category.toJSON(),
@@ -117,7 +138,7 @@ export async function getCategoryBySlug(slug: string, options?: {
 }
 
 // Get available filters for a category
-export async function getAvailableFilters(categoryId: number) {
+export async function getAvailableFilters(categoryId: number): Promise<CategoryFilters> {
     // Get all subcategory IDs
     const categoryIds = await getAllSubcategoryIds(categoryId);
 
@@ -176,7 +197,7 @@ export async function getAvailableFilters(categoryId: number) {
 }
 
 // Get immediate children of a category
-export async function getCategoryChildren(categoryId: number) {
+export async function getCategoryChildren(categoryId: number): Promise<Category[]> {
     const category = await Category.findByPk(categoryId);
 
     if (!category) {

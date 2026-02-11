@@ -12,6 +12,8 @@ import {
 import { sequelize } from '../config/database';
 
 import { Order } from './Order';
+import { Product } from './Product';
+import { ProductVariant } from './ProductVariant';
 
 export interface OrderItemAttributes {
     id: number;
@@ -49,8 +51,13 @@ export class OrderItem extends Model<
 
     // Associations
     declare order?: NonAttribute<Order>;
+    declare product?: NonAttribute<Product>;
+    declare productVariant?: NonAttribute<ProductVariant>;
+
     declare static associations: {
         order: Association<OrderItem, Order>;
+        product: Association<OrderItem, Product>;
+        productVariant: Association<OrderItem, ProductVariant>;
     };
 }
 

@@ -1,5 +1,7 @@
 'use client';
 
+import { Review } from '@repo/shared';
+import { REVIEW_STATUS } from '@repo/shared/constants';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
@@ -7,24 +9,6 @@ import { Button } from '@/components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import apiClient from '@/lib/api';
 
-interface Review {
-    id: number;
-    user_id: number;
-    product_id: number;
-    rating: number;
-    comment: string;
-    status: 'pending' | 'approved' | 'rejected';
-    created_at: string;
-    user?: {
-        full_name: string;
-        email: string;
-    };
-    product?: {
-        name: string;
-        slug: string;
-        image?: string;
-    };
-}
 
 export default function AdminPendingReviewsClient() {
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -38,7 +22,7 @@ export default function AdminPendingReviewsClient() {
     const fetchPendingReviews = async () => {
         setIsLoading(true);
         try {
-            const response = await apiClient.get<{ data: { items: Review[] } }>('/admin/reviews?status=pending');
+            const response = await apiClient.get<{ data: { items: Review[] } }>(`/admin/reviews?status=${REVIEW_STATUS.PENDING}`);
             setReviews(response.data.data?.items || []);
         } catch (error) {
             console.error('Failed to fetch pending reviews:', error);

@@ -7,47 +7,12 @@ export * from './status';
 // Export API constants
 export * from './api';
 
-// Order Status Constants
-export const ORDER_STATUS = {
-    PENDING_PAYMENT: 'pending_payment',
-    PAID: 'paid',
-    PROCESSING: 'processing',
-    SHIPPED: 'shipped',
-    DELIVERED: 'delivered',
-    CANCELLED: 'cancelled',
-    REFUNDED: 'refunded',
-} as const;
-
-// Payment Status Constants
-export const PAYMENT_STATUS = {
-    PENDING: 'pending',
-    PAID: 'paid',
-    FAILED: 'failed',
-    REFUNDED: 'refunded',
-} as const;
-
 // Stock Status Constants
 export const STOCK_STATUS = {
     IN_STOCK: 'in_stock',
     LIMITED_STOCK: 'limited_stock',
     OUT_OF_STOCK: 'out_of_stock',
     PRE_ORDER: 'pre_order',
-} as const;
-
-// Voucher Type Constants
-export const VOUCHER_TYPE = {
-    PERCENTAGE: 'percentage',
-    FIXED_AMOUNT: 'fixed_amount',
-    FREE_SHIPPING: 'free_shipping',
-} as const;
-
-// Payment Method Constants
-export const PAYMENT_METHOD = {
-    VIRTUAL_ACCOUNT: 'virtual_account',
-    CREDIT_CARD: 'credit_card',
-    EWALLET: 'ewallet',
-    QRIS: 'qris',
-    CONVENIENCE_STORE: 'convenience_store',
 } as const;
 
 // Courier Constants

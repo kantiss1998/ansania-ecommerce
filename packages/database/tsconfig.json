@@ -23,14 +23,15 @@
         "declarationMap": true,
         "sourceMap": true,
         "baseUrl": ".",
-        "paths": {
-            "@repo/shared": [
-                "../shared/src"
-            ]
-        }
+        "paths": {}
     },
     "include": [
         "src/**/*"
+    ],
+    "references": [
+        {
+            "path": "../shared"
+        }
     ],
     "exclude": [
         "node_modules",

@@ -99,7 +99,10 @@ Order.hasMany(Review, { foreignKey: 'order_id', as: 'reviews' });
 Order.hasMany(VoucherUsage, { foreignKey: 'order_id', as: 'voucherUsages' });
 
 // OrderItem Associations
+// OrderItem Associations
 OrderItem.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
+OrderItem.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
+OrderItem.belongsTo(ProductVariant, { foreignKey: 'product_variant_id', as: 'productVariant' });
 
 // Payment Associations
 Payment.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });

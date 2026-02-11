@@ -2,6 +2,7 @@
 import { User } from '@repo/database';
 import { NotFoundError, UnauthorizedError } from '@repo/shared/errors';
 import { UpdateProfileDTO, ChangePasswordDTO } from '@repo/shared/schemas';
+import { formatPhone } from '@repo/shared/utils';
 import bcrypt from 'bcryptjs';
 
 export async function getProfile(userId: number) {
@@ -15,6 +16,10 @@ export async function getProfile(userId: number) {
 export async function updateProfile(userId: number, data: UpdateProfileDTO) {
     const user = await User.findByPk(userId);
     if (!user) throw new NotFoundError('User');
+
+    if (data.phone) {
+        data.phone = formatPhone(data.phone);
+    }
 
     await user.update(data);
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { Order, PaginatedResponse } from '@repo/shared';
+import { ORDER_STATUS } from '@repo/shared/constants';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
@@ -48,15 +49,16 @@ function AdminOrdersContent({ initialData }: AdminOrdersClientProps) {
 
     const getStatusBadgeVariant = (status: string) => {
         switch (status) {
-            case 'paid':
-            case 'delivered':
+            case ORDER_STATUS.PAID:
+            case ORDER_STATUS.DELIVERED:
                 return 'success';
-            case 'pending_payment':
+            case ORDER_STATUS.PENDING_PAYMENT:
                 return 'warning';
-            case 'shipped':
-            case 'processing':
+            case ORDER_STATUS.SHIPPED:
+            case ORDER_STATUS.PROCESSING:
                 return 'info';
-            case 'cancelled':
+            case ORDER_STATUS.CANCELLED:
+            case ORDER_STATUS.FAILED:
                 return 'error';
             default:
                 return 'default';
@@ -65,12 +67,14 @@ function AdminOrdersContent({ initialData }: AdminOrdersClientProps) {
 
     const getStatusLabel = (status: string) => {
         switch (status) {
-            case 'paid': return 'Dibayar';
-            case 'pending_payment': return 'Belum Dibayar';
-            case 'processing': return 'Diproses';
-            case 'shipped': return 'Dikirim';
-            case 'delivered': return 'Selesai';
-            case 'cancelled': return 'Dibatalkan';
+            case ORDER_STATUS.PAID: return 'Dibayar';
+            case ORDER_STATUS.PENDING_PAYMENT: return 'Belum Dibayar';
+            case ORDER_STATUS.PROCESSING: return 'Diproses';
+            case ORDER_STATUS.SHIPPED: return 'Dikirim';
+            case ORDER_STATUS.DELIVERED: return 'Selesai';
+            case ORDER_STATUS.CANCELLED: return 'Dibatalkan';
+            case ORDER_STATUS.REFUNDED: return 'Dikembalikan';
+            case ORDER_STATUS.FAILED: return 'Gagal';
             default: return status;
         }
     };
@@ -115,12 +119,14 @@ function AdminOrdersContent({ initialData }: AdminOrdersClientProps) {
                         onChange={(e) => handleStatusFilter(e.target.value)}
                     >
                         <option value="">Semua Status</option>
-                        <option value="pending_payment">Belum Dibayar</option>
-                        <option value="paid">Dibayar</option>
-                        <option value="processing">Diproses</option>
-                        <option value="shipped">Dikirim</option>
-                        <option value="delivered">Selesai</option>
-                        <option value="cancelled">Dibatalkan</option>
+                        <option value={ORDER_STATUS.PENDING_PAYMENT}>Belum Dibayar</option>
+                        <option value={ORDER_STATUS.PAID}>Dibayar</option>
+                        <option value={ORDER_STATUS.PROCESSING}>Diproses</option>
+                        <option value={ORDER_STATUS.SHIPPED}>Dikirim</option>
+                        <option value={ORDER_STATUS.DELIVERED}>Selesai</option>
+                        <option value={ORDER_STATUS.CANCELLED}>Dibatalkan</option>
+                        <option value={ORDER_STATUS.REFUNDED}>Dikembalikan</option>
+                        <option value={ORDER_STATUS.FAILED}>Gagal</option>
                     </select>
                 </div>
             </div>

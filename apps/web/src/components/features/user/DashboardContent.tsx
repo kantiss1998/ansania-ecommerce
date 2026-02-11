@@ -19,6 +19,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/utils';
 import { orderService, Order } from '@/services/orderService';
+import { ORDER_STATUS } from '@repo/shared/constants';
 
 interface DashboardStats {
     totalOrders: number;
@@ -51,9 +52,9 @@ export function DashboardContent() {
                 const allOrders = ordersResponse.items;
                 setStats({
                     totalOrders: allOrders.length,
-                    pendingPayment: allOrders.filter((o) => o.status === 'pending_payment').length,
-                    processing: allOrders.filter((o) => o.status === 'processing').length,
-                    delivered: allOrders.filter((o) => o.status === 'delivered').length,
+                    pendingPayment: allOrders.filter((o) => o.status === ORDER_STATUS.PENDING_PAYMENT).length,
+                    processing: allOrders.filter((o) => o.status === ORDER_STATUS.PROCESSING).length,
+                    delivered: allOrders.filter((o) => o.status === ORDER_STATUS.DELIVERED).length,
                 });
             } catch (err) {
                 console.error('Failed to fetch dashboard data', err);
@@ -133,11 +134,13 @@ export function DashboardContent() {
 
     const getStatusBadge = (status: string) => {
         const statusConfig: Record<string, { label: string; className: string }> = {
-            pending_payment: { label: 'Belum Bayar', className: 'bg-orange-100 text-orange-700' },
-            processing: { label: 'Diproses', className: 'bg-blue-100 text-blue-700' },
-            shipped: { label: 'Dikirim', className: 'bg-purple-100 text-purple-700' },
-            delivered: { label: 'Selesai', className: 'bg-green-100 text-green-700' },
-            cancelled: { label: 'Dibatalkan', className: 'bg-gray-100 text-gray-700' },
+            [ORDER_STATUS.PENDING_PAYMENT]: { label: 'Belum Bayar', className: 'bg-orange-100 text-orange-700' },
+            [ORDER_STATUS.PROCESSING]: { label: 'Diproses', className: 'bg-blue-100 text-blue-700' },
+            [ORDER_STATUS.SHIPPED]: { label: 'Dikirim', className: 'bg-purple-100 text-purple-700' },
+            [ORDER_STATUS.DELIVERED]: { label: 'Selesai', className: 'bg-green-100 text-green-700' },
+            [ORDER_STATUS.CANCELLED]: { label: 'Dibatalkan', className: 'bg-gray-100 text-gray-700' },
+            [ORDER_STATUS.REFUNDED]: { label: 'Dikembalikan', className: 'bg-gray-100 text-gray-700' },
+            [ORDER_STATUS.FAILED]: { label: 'Gagal', className: 'bg-red-100 text-red-700' },
         };
 
         const config = statusConfig[status] || { label: status, className: 'bg-gray-100 text-gray-700' };

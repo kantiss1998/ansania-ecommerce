@@ -1,11 +1,11 @@
 import apiClient, { ApiResponse, getErrorMessage } from '@/lib/api';
-// Import DTOs from shared package if possible, or define locally
-// import { AddToCartDTO } from '@repo/shared/schemas/dtos'; 
 
 export interface CartItem {
     id: number;
     product_variant_id: number;
     quantity: number;
+    price: number;
+    subtotal: number;
     product: {
         id: number;
         name: string;
@@ -15,17 +15,29 @@ export interface CartItem {
     };
     variant?: {
         id: number;
-        color: string;
-        size: string;
+        color?: string;
+        size?: string;
+        finishing?: string;
         price: number;
         stock: number;
+        sku: string;
     };
 }
 
+export interface Voucher {
+    code: string;
+    discount_type: 'percentage' | 'fixed' | 'free_shipping';
+    discount_value: number;
+    discount_amount: number;
+}
+
 export interface Cart {
+    id?: number;
     items: CartItem[];
-    total_quantity: number;
-    total_amount: number;
+    subtotal: number;
+    discount_amount: number;
+    voucher: Voucher | null;
+    total: number;
 }
 
 export const cartService = {

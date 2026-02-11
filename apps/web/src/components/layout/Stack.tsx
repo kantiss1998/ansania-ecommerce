@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 interface StackProps extends React.HTMLAttributes<HTMLDivElement> {
     direction?: 'row' | 'col';
-    spacing?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 20;
+    spacing?: 0 | 0.5 | 1 | 1.5 | 2 | 2.5 | 3 | 3.5 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 20;
     align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline';
     justify?: 'start' | 'center' | 'end' | 'between' | 'around';
     wrap?: boolean;

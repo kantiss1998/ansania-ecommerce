@@ -1,4 +1,6 @@
 import { User, Order, Wishlist, Review, Product, ProductView } from '@repo/database';
+import { ORDER_STATUS, PAYMENT_STATUS } from '@repo/shared/constants';
+import { NotFoundError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
 
 // Get user dashboard summary
@@ -8,7 +10,7 @@ export async function getUserDashboard(userId: number): Promise<any> {
     });
 
     if (!user) {
-        throw new Error('User not found');
+        throw new NotFoundError('User');
     }
 
     // Get counts
@@ -57,8 +59,8 @@ export async function getUserStats(userId: number) {
         wishlistCount
     ] = await Promise.all([
         Order.count({ where: { user_id: userId } }),
-        Order.count({ where: { user_id: userId, status: 'completed' } }),
-        Order.sum('total_amount', { where: { user_id: userId, payment_status: 'paid' } }),
+        Order.count({ where: { user_id: userId, status: ORDER_STATUS.DELIVERED } }),
+        Order.sum('total_amount', { where: { user_id: userId, payment_status: PAYMENT_STATUS.PAID } }),
         Order.count({ where: { user_id: userId, created_at: { [Op.gte]: thirtyDaysAgo } } }),
         Review.count({ where: { user_id: userId } }),
         Wishlist.count({ where: { user_id: userId } })
@@ -148,7 +150,7 @@ export async function subscribeNewsletter(userId: number, email: string) {
     const user = await User.findByPk(userId);
 
     if (!user) {
-        throw new Error('User not found');
+        throw new NotFoundError('User');
     }
 
     // Update user's newsletter subscription status

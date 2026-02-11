@@ -24,9 +24,11 @@ export const PAYMENT_STATUS = {
     PENDING: 'pending',
     PROCESSING: 'processing',
     SUCCESS: 'success',
+    PAID: 'paid',
     FAILED: 'failed',
     EXPIRED: 'expired',
     CANCELLED: 'cancelled',
+    REFUNDED: 'refunded',
 } as const;
 
 export type PaymentStatus = typeof PAYMENT_STATUS[keyof typeof PAYMENT_STATUS];
@@ -80,9 +82,11 @@ export type VoucherType = typeof VOUCHER_TYPE[keyof typeof VOUCHER_TYPE];
  * Payment Methods
  */
 export const PAYMENT_METHOD = {
-    DOKU_VA: 'doku_va',
-    DOKU_CREDIT_CARD: 'doku_credit_card',
-    DOKU_EWALLET: 'doku_ewallet',
+    VIRTUAL_ACCOUNT: 'virtual_account',
+    CREDIT_CARD: 'credit_card',
+    EWALLET: 'ewallet',
+    QRIS: 'qris',
+    CONVENIENCE_STORE: 'convenience_store',
     COD: 'cod',
 } as const;
 
@@ -99,3 +103,35 @@ export const SHIPPING_PROVIDER = {
 } as const;
 
 export type ShippingProvider = typeof SHIPPING_PROVIDER[keyof typeof SHIPPING_PROVIDER];
+
+/**
+ * Payment Providers
+ */
+export const PAYMENT_PROVIDER = {
+    DOKU: 'doku',
+} as const;
+
+export type PaymentProvider = typeof PAYMENT_PROVIDER[keyof typeof PAYMENT_PROVIDER];
+
+/**
+ * Review Status
+ */
+export const REVIEW_STATUS = {
+    PENDING: 'pending',
+    APPROVED: 'approved',
+    REJECTED: 'rejected',
+} as const;
+
+
+export type ReviewStatus = typeof REVIEW_STATUS[keyof typeof REVIEW_STATUS];
+
+/**
+ * Email Status
+ */
+export const EMAIL_STATUS = {
+    PENDING: 'pending',
+    SENT: 'sent',
+    FAILED: 'failed',
+} as const;
+
+export type EmailStatus = typeof EMAIL_STATUS[keyof typeof EMAIL_STATUS];

@@ -1,11 +1,15 @@
+'use client';
+
 import { ShoppingCart, Star, Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/utils';
 import { Product } from '@/services/productService';
+import { STOCK_STATUS } from '@repo/shared/constants';
 
 /**
  * Product card component for grid display
@@ -15,6 +19,7 @@ export interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+    const router = useRouter();
     const discountPercentage = product.discount_price
         ? Math.round(
             ((product.base_price - product.discount_price) /
@@ -24,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps) {
         : 0;
 
     const price = product.discount_price || product.base_price;
-    const isOutOfStock = product.stock_status === 'out_of_stock';
+    const isOutOfStock = product.stock_status === STOCK_STATUS.OUT_OF_STOCK;
 
     return (
         <div className="group relative flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white transition-all duration-300 hover:shadow-2xl hover:shadow-primary-500/10 hover:-translate-y-2 hover:border-primary-200 h-full">
@@ -80,7 +85,7 @@ export function ProductCard({ product }: ProductCardProps) {
                         onClick={(e) => {
                             e.preventDefault();
                             // Logic to add to cart or view details
-                            window.location.href = `/products/${product.slug}`;
+                            router.push(`/products/${product.slug}`);
                         }}
                     >
                         <ShoppingCart className="mr-2 h-4 w-4" />
@@ -135,13 +140,13 @@ export function ProductCard({ product }: ProductCardProps) {
                     </div>
 
                     {/* Stock Status Text */}
-                    {product.stock_status === 'limited_stock' && (
+                    {product.stock_status === STOCK_STATUS.LIMITED_STOCK && (
                         <p className="mt-3 text-[11px] font-bold text-amber-600 flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-orange-50 px-2 py-1 rounded-lg w-fit shadow-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                             Stok Terbatas
                         </p>
                     )}
-                    {product.stock_status === 'pre_order' && (
+                    {product.stock_status === STOCK_STATUS.PRE_ORDER && (
                         <p className="mt-3 text-[11px] font-bold text-blue-600 flex items-center gap-1.5 bg-gradient-to-r from-blue-50 to-cyan-50 px-2 py-1 rounded-lg w-fit shadow-sm">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                             Pre-Order

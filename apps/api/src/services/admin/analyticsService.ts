@@ -1,8 +1,22 @@
-
 import { ProductView, SearchHistory, Product, Cart, Order, OrderItem, ProductVariant, Category } from '@repo/database';
 import { Op, fn, col, literal } from 'sequelize';
+import { PAYMENT_STATUS } from '@repo/shared/constants';
 
-export async function getProductViewStats(startDate: Date, endDate: Date) {
+export interface ConversionStats {
+    totalViews: number;
+    totalCarts: number;
+    totalOrders: number;
+    viewToCartRate: number;
+    cartToOrderRate: number;
+    overallConversionRate: number;
+}
+
+export interface AbandonedCartStats {
+    count: number;
+    potential_revenue: string | number;
+}
+
+export async function getProductViewStats(startDate: Date, endDate: Date): Promise<ProductView[]> {
     return ProductView.findAll({
         attributes: [
             'product_id',
@@ -19,7 +33,7 @@ export async function getProductViewStats(startDate: Date, endDate: Date) {
     });
 }
 
-export async function getSearchAnalytics(startDate: Date, endDate: Date) {
+export async function getSearchAnalytics(startDate: Date, endDate: Date): Promise<SearchHistory[]> {
     return SearchHistory.findAll({
         attributes: [
             'search_query',
@@ -35,14 +49,14 @@ export async function getSearchAnalytics(startDate: Date, endDate: Date) {
     });
 }
 
-export async function getConversionStats(startDate: Date, endDate: Date) {
+export async function getConversionStats(startDate: Date, endDate: Date): Promise<ConversionStats> {
     const totalViews = await ProductView.count({
         where: { created_at: { [Op.between]: [startDate, endDate] } }
     });
 
     const totalOrders = await Order.count({
         where: {
-            payment_status: 'paid',
+            payment_status: PAYMENT_STATUS.PAID,
             created_at: { [Op.between]: [startDate, endDate] }
         }
     });
@@ -61,7 +75,7 @@ export async function getConversionStats(startDate: Date, endDate: Date) {
     };
 }
 
-export async function getAbandonedCartStats(startDate: Date, endDate: Date) {
+export async function getAbandonedCartStats(startDate: Date, endDate: Date): Promise<AbandonedCartStats> {
     // We count carts that were created in range.
     const abandonedCarts = await Cart.findAll({
         attributes: [
@@ -74,10 +88,10 @@ export async function getAbandonedCartStats(startDate: Date, endDate: Date) {
         raw: true
     });
 
-    return abandonedCarts[0];
+    return abandonedCarts[0] as unknown as AbandonedCartStats;
 }
 
-export async function getRevenueByCategory(startDate: Date, endDate: Date) {
+export async function getRevenueByCategory(startDate: Date, endDate: Date): Promise<OrderItem[]> {
 
 
     return OrderItem.findAll({
@@ -98,7 +112,7 @@ export async function getRevenueByCategory(startDate: Date, endDate: Date) {
             as: 'order',
             attributes: [],
             where: {
-                payment_status: 'paid',
+                payment_status: PAYMENT_STATUS.PAID,
                 created_at: { [Op.between]: [startDate, endDate] }
             }
         }],
@@ -107,7 +121,7 @@ export async function getRevenueByCategory(startDate: Date, endDate: Date) {
     });
 }
 
-export async function getRevenueByProduct(startDate: Date, endDate: Date, limit: number = 10) {
+export async function getRevenueByProduct(startDate: Date, endDate: Date, limit: number = 10): Promise<OrderItem[]> {
 
 
     return OrderItem.findAll({
@@ -124,7 +138,7 @@ export async function getRevenueByProduct(startDate: Date, endDate: Date, limit:
             as: 'order',
             attributes: [],
             where: {
-                payment_status: 'paid',
+                payment_status: PAYMENT_STATUS.PAID,
                 created_at: { [Op.between]: [startDate, endDate] }
             }
         }],
@@ -133,7 +147,7 @@ export async function getRevenueByProduct(startDate: Date, endDate: Date, limit:
         limit
     });
 }
-export async function getAnalyticsOverview(startDate: Date, endDate: Date) {
+export async function getAnalyticsOverview(startDate: Date, endDate: Date): Promise<any> {
     const conversion = await getConversionStats(startDate, endDate);
     const abandoned = await getAbandonedCartStats(startDate, endDate);
 
@@ -146,7 +160,7 @@ export async function getAnalyticsOverview(startDate: Date, endDate: Date) {
             [fn('COUNT', col('id')), 'orders']
         ],
         where: {
-            payment_status: 'paid',
+            payment_status: PAYMENT_STATUS.PAID,
             created_at: { [Op.between]: [startDate, endDate] }
         },
         group: ['date'],
@@ -161,7 +175,7 @@ export async function getAnalyticsOverview(startDate: Date, endDate: Date) {
     };
 }
 
-export async function getCustomerBehavior(startDate: Date, endDate: Date) {
+export async function getCustomerBehavior(startDate: Date, endDate: Date): Promise<{ topSearches: SearchHistory[]; topViews: ProductView[] }> {
     const topSearches = await getSearchAnalytics(startDate, endDate);
     const topViews = await getProductViewStats(startDate, endDate);
 

@@ -2,8 +2,20 @@ import { Review, Order, OrderItem, ReviewImage, ProductRatingsSummary, Product, 
 import { AppError, UnauthorizedError } from '@repo/shared/errors';
 import { CreateReviewDTO } from '@repo/shared/schemas';
 import { Includeable } from 'sequelize';
+import { PAYMENT_STATUS, REVIEW_LIMITS } from '@repo/shared/constants';
 
-export async function createReview(userId: number, data: CreateReviewDTO) {
+export interface PendingReview {
+    order_id: number;
+    order_number: string;
+    product_id: number;
+    product_name: string;
+    variant_name: string | null;
+    price: string | number;
+    purchased_at: Date;
+    product: Product | null;
+}
+
+export async function createReview(userId: number, data: CreateReviewDTO & { product_id: number }): Promise<Review> {
     const { order_id, rating, comment, title } = data; // Using order_id from DTO instead of inferring from product
 
     // 1. Verify if user purchased the product and it is delivered
@@ -16,7 +28,7 @@ export async function createReview(userId: number, data: CreateReviewDTO) {
         where: {
             id: order_id,
             user_id: userId,
-            payment_status: 'paid'
+            payment_status: PAYMENT_STATUS.PAID
         },
         include: [{
             model: OrderItem,
@@ -44,7 +56,7 @@ export async function createReview(userId: number, data: CreateReviewDTO) {
     // I will assume `product_id` IS in the body, and add it to schema later.
     // For now I will cast data to `CreateReviewDTO & { product_id: number }`.
 
-    const productId = (data as any).product_id;
+    const productId = data.product_id;
     if (!productId) throw new AppError('Product ID is required', 400);
 
     // Verify product is in order
@@ -99,7 +111,7 @@ export async function createReview(userId: number, data: CreateReviewDTO) {
     return review;
 }
 
-async function updateProductRatings(productId: number) {
+async function updateProductRatings(productId: number): Promise<void> {
     const reviews = await Review.findAll({
         where: { product_id: productId, is_approved: true }
     });
@@ -110,7 +122,7 @@ async function updateProductRatings(productId: number) {
     const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     let totalRating = 0;
 
-    reviews.forEach((review: any) => {
+    reviews.forEach((review) => {
         const rating = review.rating as 1 | 2 | 3 | 4 | 5;
         if (rating >= 1 && rating <= 5) {
             ratingCounts[rating]++;
@@ -133,7 +145,7 @@ async function updateProductRatings(productId: number) {
     });
 }
 
-export async function getReviewsByProduct(productId: number) {
+export async function getReviewsByProduct(productId: number): Promise<Review[]> {
     return Review.findAll({
         where: {
             product_id: productId,
@@ -145,7 +157,7 @@ export async function getReviewsByProduct(productId: number) {
 }
 
 // Update a review (user can only update their own)
-export async function updateReview(userId: number, reviewId: number, data: Partial<CreateReviewDTO>) {
+export async function updateReview(userId: number, reviewId: number, data: Partial<CreateReviewDTO>): Promise<Review> {
     const review = await Review.findByPk(reviewId);
 
     if (!review) {
@@ -170,7 +182,7 @@ export async function updateReview(userId: number, reviewId: number, data: Parti
 }
 
 // Delete a review
-export async function deleteReview(userId: number, reviewId: number) {
+export async function deleteReview(userId: number, reviewId: number): Promise<{ success: boolean }> {
     const review = await Review.findByPk(reviewId);
 
     if (!review) {
@@ -196,7 +208,7 @@ export async function deleteReview(userId: number, reviewId: number) {
 }
 
 // Add an image to an existing review
-export async function addReviewImage(userId: number, reviewId: number, imageUrl: string) {
+export async function addReviewImage(userId: number, reviewId: number, imageUrl: string): Promise<ReviewImage> {
     const review = await Review.findByPk(reviewId);
 
     if (!review) {
@@ -207,10 +219,10 @@ export async function addReviewImage(userId: number, reviewId: number, imageUrl:
         throw new UnauthorizedError('You can only add images to your own reviews');
     }
 
-    // Check image count limit (e.g., 5 images)
+    // Check image count limit
     const currentImages = await ReviewImage.count({ where: { review_id: reviewId } });
-    if (currentImages >= 5) {
-        throw new AppError('Maximum 5 images allowed per review', 400);
+    if (currentImages >= REVIEW_LIMITS.MAX_IMAGES) {
+        throw new AppError(`Maximum ${REVIEW_LIMITS.MAX_IMAGES} images allowed per review`, 400);
     }
 
     const reviewImage = await ReviewImage.create({
@@ -222,7 +234,7 @@ export async function addReviewImage(userId: number, reviewId: number, imageUrl:
 }
 
 // Delete an image from a review
-export async function deleteReviewImage(userId: number, reviewId: number, imageId: number) {
+export async function deleteReviewImage(userId: number, reviewId: number, imageId: number): Promise<{ success: boolean }> {
     const review = await Review.findByPk(reviewId);
 
     if (!review) {
@@ -247,10 +259,10 @@ export async function deleteReviewImage(userId: number, reviewId: number, imageI
 }
 
 // Get products that are paid/delivered but not yet reviewed
-export async function getPendingReviews(userId: number) {
+export async function getPendingReviews(userId: number): Promise<PendingReview[]> {
     // 1. Get all paid orders for the user
     const orders = await Order.findAll({
-        where: { user_id: userId, payment_status: 'paid' },
+        where: { user_id: userId, payment_status: PAYMENT_STATUS.PAID },
         include: [{
             model: OrderItem,
             as: 'items',
@@ -266,7 +278,7 @@ export async function getPendingReviews(userId: number) {
     const reviewedProductIds = reviewedProducts.map(r => r.product_id);
 
     // 3. Find items in orders that are not in reviewedProductIds
-    const pendingReviews: any[] = [];
+    const pendingReviews: PendingReview[] = [];
 
     for (const order of orders) {
         if (!order.items) continue;
@@ -281,7 +293,7 @@ export async function getPendingReviews(userId: number) {
                     variant_name: item.variant_name,
                     price: item.price,
                     purchased_at: order.created_at,
-                    product: (item as any).product
+                    product: (item as any).product as Product
                 });
             }
         }
@@ -291,7 +303,7 @@ export async function getPendingReviews(userId: number) {
 }
 
 // Mark a review as helpful
-export async function markReviewHelpful(_userId: number, reviewId: number): Promise<any> {
+export async function markReviewHelpful(_userId: number, reviewId: number): Promise<{ success: boolean; helpful_count: number }> {
     const review = await Review.findByPk(reviewId);
 
     if (!review) {

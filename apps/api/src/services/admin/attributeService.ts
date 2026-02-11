@@ -3,21 +3,21 @@ import { FilterColor, FilterSize, FilterFinishing } from '@repo/database';
 import { NotFoundError } from '@repo/shared/errors';
 
 // Colors
-export async function listColors() {
+export async function listColors(): Promise<FilterColor[]> {
     return FilterColor.findAll({ order: [['name', 'ASC']] });
 }
 
-export async function createColor(data: any) {
-    return FilterColor.create(data);
+export async function createColor(data: Partial<FilterColor>): Promise<FilterColor> {
+    return FilterColor.create(data as any);
 }
 
-export async function updateColor(id: number, data: any) {
+export async function updateColor(id: number, data: Partial<FilterColor>): Promise<FilterColor> {
     const color = await FilterColor.findByPk(id);
     if (!color) throw new NotFoundError('Color not found');
     return color.update(data);
 }
 
-export async function deleteColor(id: number) {
+export async function deleteColor(id: number): Promise<{ success: boolean }> {
     const color = await FilterColor.findByPk(id);
     if (!color) throw new NotFoundError('Color not found');
     await color.destroy();
@@ -25,21 +25,21 @@ export async function deleteColor(id: number) {
 }
 
 // Sizes
-export async function listSizes() {
+export async function listSizes(): Promise<FilterSize[]> {
     return FilterSize.findAll({ order: [['name', 'ASC']] });
 }
 
-export async function createSize(data: any) {
-    return FilterSize.create(data);
+export async function createSize(data: Partial<FilterSize>): Promise<FilterSize> {
+    return FilterSize.create(data as any);
 }
 
-export async function updateSize(id: number, data: any) {
+export async function updateSize(id: number, data: Partial<FilterSize>): Promise<FilterSize> {
     const size = await FilterSize.findByPk(id);
     if (!size) throw new NotFoundError('Size not found');
     return size.update(data);
 }
 
-export async function deleteSize(id: number) {
+export async function deleteSize(id: number): Promise<{ success: boolean }> {
     const size = await FilterSize.findByPk(id);
     if (!size) throw new NotFoundError('Size not found');
     await size.destroy();
@@ -47,28 +47,43 @@ export async function deleteSize(id: number) {
 }
 
 // Finishing
-export async function listFinishing() {
+export async function listFinishing(): Promise<FilterFinishing[]> {
     return FilterFinishing.findAll({ order: [['name', 'ASC']] });
 }
 
-export async function createFinishing(data: any) {
-    return FilterFinishing.create(data);
+export async function createFinishing(data: Partial<FilterFinishing>): Promise<FilterFinishing> {
+    return FilterFinishing.create(data as any);
 }
 
-export async function updateFinishing(id: number, data: any) {
+export async function updateFinishing(id: number, data: Partial<FilterFinishing>): Promise<FilterFinishing> {
     const finishing = await FilterFinishing.findByPk(id);
     if (!finishing) throw new NotFoundError('Finishing not found');
     return finishing.update(data);
 }
 
-export async function deleteFinishing(id: number) {
+export async function deleteFinishing(id: number): Promise<{ success: boolean }> {
     const finishing = await FilterFinishing.findByPk(id);
     if (!finishing) throw new NotFoundError('Finishing not found');
     await finishing.destroy();
     return { success: true };
 }
 
-export async function listAllAttributes() {
+export interface AttributeResult {
+    id: number;
+    name: string;
+    code: string;
+    type: string;
+    is_required: boolean;
+    values: {
+        id: number;
+        attribute_id: number;
+        label: string;
+        value: string;
+        extra_data?: string | null;
+    }[];
+}
+
+export async function listAllAttributes(): Promise<AttributeResult[]> {
     const [colors, sizes, finishing] = await Promise.all([
         listColors(),
         listSizes(),
@@ -82,7 +97,7 @@ export async function listAllAttributes() {
             code: 'color',
             type: 'select',
             is_required: true,
-            values: colors.map((c: any) => ({
+            values: colors.map(c => ({
                 id: c.id,
                 attribute_id: 1,
                 label: c.name,
@@ -96,7 +111,7 @@ export async function listAllAttributes() {
             code: 'size',
             type: 'select',
             is_required: true,
-            values: sizes.map((s: any) => ({
+            values: sizes.map(s => ({
                 id: s.id,
                 attribute_id: 2,
                 label: s.name,
@@ -109,7 +124,7 @@ export async function listAllAttributes() {
             code: 'finishing',
             type: 'select',
             is_required: false,
-            values: finishing.map((f: any) => ({
+            values: finishing.map(f => ({
                 id: f.id,
                 attribute_id: 3,
                 label: f.name,

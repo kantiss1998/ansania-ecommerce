@@ -151,6 +151,7 @@ export const checkoutSchemas = {
 export const reviewSchemas = {
     create: z.object({
         order_id: z.number().int().positive('Order ID is required'),
+        product_id: z.number().int().positive('Product ID is required'),
         rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
         title: z.string().min(2, 'Title is required').max(255, 'Title is too long').optional(),
         comment: z.string().max(2000, 'Comment is too long').optional(),

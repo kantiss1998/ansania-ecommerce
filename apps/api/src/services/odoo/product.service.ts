@@ -9,6 +9,8 @@ import {
     FilterFinishing
 } from '@repo/database';
 import { slugify } from '@repo/shared/utils';
+import { ServiceUnavailableError, InternalServerError } from '@repo/shared/errors';
+import { ODOO_CONFIG } from '@repo/shared/constants';
 
 import { odooClient } from './odoo.client';
 
@@ -62,7 +64,7 @@ export class OdooProductService {
             };
         } catch (error) {
             console.error("❌ Product sync failed:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Product sync failed: ${error instanceof Error ? error.message : String(error)}`);
+            throw new ServiceUnavailableError('Odoo Product Sync');
         }
     }
 
@@ -185,7 +187,7 @@ export class OdooProductService {
             const context = warehouseId ? { warehouse_id: warehouseId } : {};
 
             // Fetch in chunks to avoid URL too long errors if many products
-            const chunkSize = 100;
+            const chunkSize = ODOO_CONFIG.CHUNK_SIZE;
             let allVariants: any[] = [];
 
             for (let i = 0; i < productIds.length; i += chunkSize) {
@@ -213,7 +215,7 @@ export class OdooProductService {
             return allVariants;
         } catch (error) {
             console.error("❌ Failed to get product variants:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get product variants: ${error instanceof Error ? error.message : String(error)}`);
+            throw new ServiceUnavailableError('Odoo Product Variants');
         }
     }
 
@@ -261,7 +263,7 @@ export class OdooProductService {
             };
         } catch (error) {
             console.error("❌ Failed to get attribute values:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get attribute values: ${error instanceof Error ? error.message : String(error)}`);
+            throw new ServiceUnavailableError('Odoo Attributes');
         }
     }
 
@@ -378,7 +380,7 @@ export class OdooProductService {
                             const variantData = {
                                 product_id: localProduct.id,
                                 odoo_product_id: odooVariant.id,
-                                sku: odooVariant.default_code || `VAR-${odooVariant.id}`,
+                                sku: odooVariant.default_code || `VAR - ${odooVariant.id}`,
                                 price: odooVariant.lst_price ?? 0,
                                 stock: odooVariant.qty_available || 0,
                                 is_visible: odooVariant.active || false,
@@ -518,7 +520,7 @@ export class OdooProductService {
 
         // For now, return as data URL
         if (imageData) {
-            return `data: image / jpeg; base64, ${imageData} `;
+            return `data:image/jpeg;base64,${imageData}`;
         }
         return null;
     }
@@ -544,7 +546,7 @@ export class OdooProductService {
             };
         } catch (error) {
             console.error("❌ Failed to get sync status:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get sync status: ${error instanceof Error ? error.message : String(error)} `);
+            throw new InternalServerError(`Failed to get sync status: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 
@@ -580,7 +582,7 @@ export class OdooProductService {
     // Get single product by Odoo ID
     async getProductByOdooId(odooProductId: number) {
         try {
-            console.log(`📖 Getting Odoo product with ID: ${odooProductId} `);
+            console.log(`📖 Getting Odoo product with ID: ${odooProductId}`);
 
             const products = await this.safeSearchRead(
                 "product.template",
@@ -601,23 +603,17 @@ export class OdooProductService {
                 return null;
             }
 
-            console.log(`✅ Found Odoo product: ${products[0].name} `);
+            console.log(`✅ Found Odoo product: ${products[0].name}`);
             return products[0];
         } catch (error) {
             console.error("❌ Failed to get Odoo product:", error instanceof Error ? error.message : String(error));
-            throw new Error(`Failed to get product: ${error instanceof Error ? error.message : String(error)} `);
+            throw new ServiceUnavailableError('Odoo Product');
         }
     }
 
     // Original syncStock method for compatibility if called elsewhere, adjusted to use new pattern if needed
     // or just kept as utility. The controller calls syncStock.
     async syncStock() {
-        // Reuse existing logic or user's new logic? User didn't provide specific stock sync logic in the request
-        // but it was present in the original file. I should probably keep it or adapt it.
-        // The user request FOCUSED on "syncProductsFromOdoo".
-        // I will keep a minimal compatible syncStock from the original implementation 
-        // effectively re-implementing it or just preserving it to satisfy the Interface if any.
-
         console.log('[ODOO_SYNC] Starting Stock Sync (Legacy Support)...');
         try {
             const warehouse = await this.getValidWarehouse();
@@ -636,7 +632,7 @@ export class OdooProductService {
 
             // Batch fetch stock from Odoo
             const odooIds = variants.map(v => v.odoo_product_id);
-            const chunkSize = 100;
+            const chunkSize = ODOO_CONFIG.CHUNK_SIZE;
             let syncedCount = 0;
 
             for (let i = 0; i < odooIds.length; i += chunkSize) {
@@ -684,16 +680,13 @@ export class OdooProductService {
                             syncedCount++;
                         }
                     }
-                    console.log(`[ODOO_SYNC] Synced stock for chunk ${i} - ${i + chunk.length} `);
+                    console.log(`[ODOO_SYNC] Synced stock for chunk ${i} - ${i + chunk.length}`);
                 } catch (chunkError) {
                     console.error(`[ODOO_SYNC] ❌ Failed to sync stock for chunk ${i} - ${i + chunk.length}: `, chunkError);
                 }
             }
 
             return { updated: variants.length };
-
-
-
         } catch (error) {
             console.error('[ODOO_SYNC] Stock sync failed:', error);
             throw error;
@@ -710,7 +703,7 @@ export class OdooProductService {
 
             // Sync Colors
             for (const [name, hex] of colors.entries()) {
-                console.log(`  - Syncing Color: "${name}"(${hex || 'no hex'})`);
+                console.log(`  - Syncing Color: "${name}" (${hex || 'no hex'})`);
                 await FilterColor.findOrCreate({
                     where: { name },
                     defaults: {

@@ -63,20 +63,6 @@ function CartContent() {
         }
     };
 
-    // Map store cart items to component props
-    const cartItems = cart?.items.map((item) => ({
-        id: item.id,
-        product_variant_id: item.variant.id,
-        product_name: item.product.name,
-        product_slug: item.product.slug,
-        variant_info: [item.variant.color, item.variant.size, item.variant.finishing].filter(Boolean).join(', '),
-        product_image: item.product.image || '/placeholder-product.svg',
-        price: item.price,
-        quantity: item.quantity,
-        subtotal: item.subtotal,
-        stock: item.stock_available,
-    })) || [];
-
     const summary = {
         subtotal: cart?.subtotal || 0,
         discount: cart?.discount_amount || 0,
@@ -146,7 +132,7 @@ function CartContent() {
                     {/* Items Card */}
                     <div className="rounded-2xl border border-gray-100 bg-white p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                         <div className="space-y-6">
-                            {cartItems.map((item, index) => (
+                            {cart.items.map((item, index) => (
                                 <div
                                     key={item.id}
                                     className="animate-slide-up"
@@ -186,7 +172,7 @@ function CartContent() {
                         <CartSummary
                             summary={summary}
                             onCheckout={() => router.push('/checkout')}
-                            isCheckoutDisabled={cartItems.length === 0}
+                            isCheckoutDisabled={cart.items.length === 0}
                         />
 
                         {/* Info Card */}

@@ -3,7 +3,10 @@ import { Category, Product } from '@repo/database';
 import { NotFoundError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
 
-export async function listAdminCategories(query: any) {
+export async function listAdminCategories(query: {
+    search?: string;
+    is_active?: string | boolean;
+}): Promise<{ items: Category[] }> {
     const { search, is_active } = query;
     const where: any = {};
 
@@ -24,7 +27,7 @@ export async function listAdminCategories(query: any) {
     return { items };
 }
 
-export async function getCategoryDetail(id: number) {
+export async function getCategoryDetail(id: number): Promise<Category> {
     const category = await Category.findByPk(id, {
         include: [
             { model: Category, as: 'parent' },
@@ -36,29 +39,29 @@ export async function getCategoryDetail(id: number) {
     return category;
 }
 
-export async function updateCategory(id: number, data: any) {
+export async function updateCategory(id: number, data: Partial<Category>): Promise<Category> {
     const category = await Category.findByPk(id);
     if (!category) throw new NotFoundError('Category');
 
-    // Limited updates: description, image_url, sort_order, is_active
-    const { description, image_url, sort_order, is_active } = data;
-    await category.update({ description, image_url, sort_order, is_active });
+    // Limited updates: description, image_url, sort_order, is_active, SEO fields
+    const { description, image_url, sort_order, is_active, meta_title, meta_description, keywords } = data;
+    await category.update({ description, image_url, sort_order, is_active, meta_title, meta_description, keywords });
     return category;
 }
 
-export async function toggleCategoryActive(id: number) {
+export async function toggleCategoryActive(id: number): Promise<Category> {
     const category = await Category.findByPk(id);
     if (!category) throw new NotFoundError('Category');
     await category.update({ is_active: !category.is_active });
     return category;
 }
 
-export async function getCategoryStats(id: number) {
+export async function getCategoryStats(id: number): Promise<{ productCount: number }> {
     const productCount = await Product.count({ where: { category_id: id } });
     return { productCount };
 }
 
-export async function reorderCategories(orders: { id: number, order: number }[]) {
+export async function reorderCategories(orders: { id: number, order: number }[]): Promise<{ success: boolean }> {
     for (const item of orders) {
         await Category.update({ sort_order: item.order }, { where: { id: item.id } });
     }

@@ -75,6 +75,9 @@ export const PRODUCT_LIMITS = {
     MAX_DESCRIPTION_LENGTH: 5000,
     MAX_SKU_LENGTH: 100,
     MAX_IMAGES: 10,
+    NEW_ARRIVAL_DAYS: 30,
+    RELATED_PRODUCTS: 4,
+    SIMILAR_PRODUCTS: 6,
 } as const;
 
 /**
@@ -134,4 +137,68 @@ export const CACHE_TTL = {
     CATEGORIES: 600, // 10 minutes
     USER_SESSION: 900, // 15 minutes
     SHIPPING_RATES: 1800, // 30 minutes
+} as const;
+
+/**
+ * Odoo Configuration
+ */
+export const ODOO_CONFIG = {
+    CHUNK_SIZE: 100,
+    DEFAULT_WAREHOUSE_ID: 1,
+} as const;
+
+/**
+ * Shipping Configuration
+ */
+export const SHIPPING_CONFIG = {
+    DEFAULT_WEIGHT_G: 500,
+} as const;
+
+/**
+ * Search Ranking Weights
+ */
+export const SEARCH_WEIGHTS = {
+    SKU: 10,
+    FULL_NAME: 8,
+    PARTIAL_NAME: 5,
+    DESCRIPTION: 2,
+} as const;
+
+/**
+ * Cart Configuration
+ */
+export const CART_CONFIG = {
+    GUEST_EXPIRY_DAYS: 7,
+} as const;
+
+/**
+ * Review Limits
+ */
+export const REVIEW_LIMITS = {
+    MAX_IMAGES: 5,
+} as const;
+
+/**
+ * Dashboard Configuration
+ */
+export const DASHBOARD_CONFIG = {
+    SALES_PERFORMANCE_DAYS: 30,
+    LOW_STOCK_THRESHOLD: 10,
+    RECENT_LIMIT: 5,
+} as const;
+
+/**
+ * Marketing Configuration
+ */
+export const MARKETING_CONFIG = {
+    ABANDONED_CART_MIN_HOURS: 24,
+    ABANDONED_CART_MAX_HOURS: 48,
+    INACTIVE_USER_DAYS: 30,
+} as const;
+
+/**
+ * Report Limits
+ */
+export const REPORT_LIMITS = {
+    DEFAULT_TOP_ITEMS: 10,
 } as const;

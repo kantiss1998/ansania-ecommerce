@@ -1,6 +1,6 @@
-
 import { CreateOrderDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+import { HTTP_STATUS } from '@repo/shared/constants';
 
 import * as cartService from '../services/cartService'; // To get active cart
 import * as orderService from '../services/orderService';
@@ -18,13 +18,13 @@ export async function getShippingRates(req: Request, res: Response, next: NextFu
         // Let's assume User for now or Guest if they provide address ID (which implies they created it).
 
         if (!userId && !sessionId) {
-            res.status(400).json({ success: false, error: 'Session required' });
+            res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: 'Session required' });
             return;
         }
 
         const cart = await cartService.getCart(userId, sessionId);
         if (!cart || !cart.items || cart.items.length === 0) {
-            res.status(400).json({ success: false, error: 'Cart is empty' });
+            res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: 'Cart is empty' });
             return;
         }
 
@@ -43,13 +43,13 @@ export async function createOrder(req: Request, res: Response, next: NextFunctio
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
-            res.status(401).json({ success: false, error: 'Unauthorized' });
+            res.status(HTTP_STATUS.UNAUTHORIZED).json({ success: false, error: 'Unauthorized' });
             return;
         }
 
         const body = req.body as CreateOrderDTO;
         const order = await orderService.createOrder(userId, body);
-        res.status(201).json({
+        res.status(HTTP_STATUS.CREATED).json({
             success: true,
             data: order,
         });
@@ -62,7 +62,7 @@ export async function validateCheckout(req: Request, res: Response, next: NextFu
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
-            return res.status(401).json({ success: false, error: 'Unauthorized' });
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json({ success: false, error: 'Unauthorized' });
         }
 
         const validationResult = await orderService.validateCheckout(userId, req.body);
@@ -75,4 +75,3 @@ export async function validateCheckout(req: Request, res: Response, next: NextFu
         return next(error);
     }
 }
-

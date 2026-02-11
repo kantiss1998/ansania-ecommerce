@@ -1,5 +1,17 @@
 import { Product, ProductImage, ProductVariant, Category, SearchHistory } from '@repo/database';
 import { Op } from 'sequelize';
+import { calculatePagination } from '@repo/shared/utils';
+import { PAGINATION } from '@repo/shared/constants';
+import { MappedProduct, mapProduct } from './productService';
+
+export interface SearchResult {
+    products: MappedProduct[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    filters?: any;
+}
 
 // Main search with filters
 export async function searchProducts(query: {
@@ -9,9 +21,9 @@ export async function searchProducts(query: {
     maxPrice?: number;
     page?: number;
     limit?: number;
-}) {
-    const { q, category, minPrice, maxPrice, page = 1, limit = 20 } = query;
-    const offset = (page - 1) * limit;
+}): Promise<SearchResult> {
+    const { q, category, minPrice, maxPrice, page = PAGINATION.DEFAULT_PAGE, limit = PAGINATION.DEFAULT_LIMIT } = query;
+    const offset = (Number(page) - 1) * Number(limit);
 
     const whereClause: any = {
         is_active: true,
@@ -44,18 +56,17 @@ export async function searchProducts(query: {
     const { count, rows } = await Product.findAndCountAll({
         where: whereClause,
         include,
-        limit,
+        limit: Number(limit),
         offset,
         distinct: true,
         order: [['name', 'ASC']]
     });
 
+    const pagination = calculatePagination(Number(page), Number(limit), count);
+
     return {
-        products: rows,
-        total: count,
-        page,
-        limit,
-        totalPages: Math.ceil(count / limit)
+        products: rows.map(mapProduct).filter((p): p is MappedProduct => p !== null),
+        ...pagination
     };
 }
 
@@ -71,11 +82,11 @@ export async function autocompleteSearch(query: string, limit: number = 10): Pro
         order: [['name', 'ASC']]
     });
 
-    return products.map(p => ({
+    return products.map((p: Product) => ({
         id: p.id,
         name: p.name,
         slug: p.slug,
-        price: p.selling_price
+        price: Number(p.selling_price)
     }));
 }
 
@@ -92,7 +103,7 @@ export async function advancedSearch(filters: {
     page?: number;
     limit?: number;
     sortBy?: 'price_asc' | 'price_desc' | 'name_asc' | 'newest' | 'rating';
-}) {
+}): Promise<SearchResult> {
     const {
         keywords,
         categories,
@@ -102,8 +113,8 @@ export async function advancedSearch(filters: {
         isFeatured,
         isNew,
         hasDiscount,
-        page = 1,
-        limit = 20,
+        page = PAGINATION.DEFAULT_PAGE,
+        limit = PAGINATION.DEFAULT_LIMIT,
         sortBy = 'newest'
     } = filters;
 
@@ -164,12 +175,11 @@ export async function advancedSearch(filters: {
         order
     });
 
+    const pagination = calculatePagination(Number(page), Number(limit), count);
+
     return {
-        products: rows,
-        total: count,
-        page,
-        limit,
-        totalPages: Math.ceil(count / limit),
+        products: rows.map(mapProduct).filter((p): p is MappedProduct => p !== null),
+        ...pagination,
         filters: {
             keywords,
             categories,
@@ -183,10 +193,27 @@ export async function advancedSearch(filters: {
 }
 
 // Delete search history for a user
-export async function deleteSearchHistory(userId: number) {
+export async function deleteSearchHistory(userId: number): Promise<{ success: boolean; message: string }> {
     await SearchHistory.destroy({
         where: { user_id: userId }
     });
 
     return { success: true, message: 'Search history cleared' };
+}
+
+/**
+ * Record a search query
+ */
+export async function recordSearch(data: {
+    query: string;
+    filters?: any;
+    results_count?: number;
+    user_id?: number;
+}): Promise<SearchHistory> {
+    return SearchHistory.create({
+        search_query: data.query,
+        filters_applied: data.filters,
+        results_count: data.results_count || 0,
+        user_id: data.user_id
+    });
 }

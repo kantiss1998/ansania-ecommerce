@@ -12,15 +12,21 @@ import {
 import { sequelize } from '../config/database';
 
 import { Order } from './Order';
+import { PAYMENT_METHOD, PAYMENT_STATUS } from '@repo/shared';
 
 export type PaymentMethod =
-    | 'virtual_account'
-    | 'credit_card'
-    | 'ewallet'
-    | 'qris'
-    | 'convenience_store';
+    | typeof PAYMENT_METHOD.VIRTUAL_ACCOUNT
+    | typeof PAYMENT_METHOD.CREDIT_CARD
+    | typeof PAYMENT_METHOD.EWALLET
+    | typeof PAYMENT_METHOD.QRIS
+    | typeof PAYMENT_METHOD.CONVENIENCE_STORE;
 
-export type PaymentStatus = 'pending' | 'success' | 'failed' | 'expired' | 'cancelled';
+export type PaymentStatus =
+    | typeof PAYMENT_STATUS.PENDING
+    | typeof PAYMENT_STATUS.SUCCESS
+    | typeof PAYMENT_STATUS.FAILED
+    | typeof PAYMENT_STATUS.EXPIRED
+    | typeof PAYMENT_STATUS.CANCELLED;
 
 export interface PaymentAttributes {
     id: number;
@@ -87,7 +93,13 @@ Payment.init(
             onDelete: 'CASCADE',
         },
         payment_method: {
-            type: DataTypes.ENUM('virtual_account', 'credit_card', 'ewallet', 'qris', 'convenience_store'),
+            type: DataTypes.ENUM(
+                PAYMENT_METHOD.VIRTUAL_ACCOUNT,
+                PAYMENT_METHOD.CREDIT_CARD,
+                PAYMENT_METHOD.EWALLET,
+                PAYMENT_METHOD.QRIS,
+                PAYMENT_METHOD.CONVENIENCE_STORE
+            ),
             allowNull: false,
         },
         payment_channel: {
@@ -121,9 +133,15 @@ Payment.init(
             allowNull: false,
         },
         status: {
-            type: DataTypes.ENUM('pending', 'success', 'failed', 'expired', 'cancelled'),
+            type: DataTypes.ENUM(
+                PAYMENT_STATUS.PENDING,
+                PAYMENT_STATUS.SUCCESS,
+                PAYMENT_STATUS.FAILED,
+                PAYMENT_STATUS.EXPIRED,
+                PAYMENT_STATUS.CANCELLED
+            ),
             allowNull: false,
-            defaultValue: 'pending',
+            defaultValue: PAYMENT_STATUS.PENDING,
         },
         payment_response: {
             type: DataTypes.JSON,

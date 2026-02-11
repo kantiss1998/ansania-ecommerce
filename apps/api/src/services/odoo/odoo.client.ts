@@ -1,4 +1,5 @@
-import { AppError } from '@repo/shared/errors';
+
+import { AppError, UnauthorizedError, ServiceUnavailableError, InternalServerError } from '@repo/shared/errors';
 
 export class OdooClient {
     private baseUrl!: string;
@@ -106,10 +107,14 @@ export class OdooClient {
 
         } catch (error) {
             console.error('[ODOO] Authentication error:', error);
-            throw new AppError(
-                `Odoo authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                500
-            );
+            if (error instanceof AppError) throw error;
+
+            // If it's an auth failure, throw UnauthorizedError, else ServiceUnavailable
+            const msg = error instanceof Error ? error.message : 'Unknown error';
+            if (msg.includes('Authentication failed') || msg.includes('Auth Error')) {
+                throw new UnauthorizedError(`Odoo: ${msg}`);
+            }
+            throw new ServiceUnavailableError('Odoo Authentication');
         }
     }
 
@@ -164,10 +169,8 @@ export class OdooClient {
 
         } catch (error) {
             console.error(`[ODOO] Error calling ${model}.${method}:`, error);
-            throw new AppError(
-                `Odoo API call failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                500
-            );
+            if (error instanceof AppError) throw error;
+            throw new InternalServerError(`Odoo API call failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 

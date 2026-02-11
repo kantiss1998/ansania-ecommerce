@@ -1,6 +1,7 @@
 'use client';
 
 import { DashboardStats } from '@repo/shared';
+import { ORDER_STATUS } from '@repo/shared/constants';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -112,15 +113,15 @@ function AdminDashboardContent({ stats }: { stats: DashboardStats | null }) {
                                 stats.activity.recentOrders.map((order) => (
                                     <tr key={order.order_number} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 font-medium text-gray-900">{order.order_number}</td>
-                                        <td className="px-6 py-4">{(order as any).user?.full_name || 'Pelanggan'}</td>
+                                        <td className="px-6 py-4">{order.user?.full_name || 'Pelanggan'}</td>
                                         <td className="px-6 py-4">{new Date(order.created_at).toLocaleDateString('id-ID')}</td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${order.status === 'paid' || order.status === 'delivered' ? 'bg-success-50 text-success-700 border border-success-100' :
-                                                    order.status === 'pending_payment' ? 'bg-warning-50 text-warning-700 border border-warning-100' :
-                                                        'bg-gray-50 text-gray-700 border border-gray-100'
+                                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${order.status === ORDER_STATUS.PAID || order.status === ORDER_STATUS.DELIVERED ? 'bg-success-50 text-success-700 border border-success-100' :
+                                                order.status === ORDER_STATUS.PENDING_PAYMENT ? 'bg-warning-50 text-warning-700 border border-warning-100' :
+                                                    'bg-gray-50 text-gray-700 border border-gray-100'
                                                 }`}>
-                                                {order.status === 'paid' ? 'Dibayar' :
-                                                    order.status === 'pending_payment' ? 'Menunggu Pembayaran' :
+                                                {order.status === ORDER_STATUS.PAID ? 'Dibayar' :
+                                                    order.status === ORDER_STATUS.PENDING_PAYMENT ? 'Menunggu Pembayaran' :
                                                         order.status}
                                             </span>
                                         </td>

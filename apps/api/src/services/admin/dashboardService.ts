@@ -1,14 +1,28 @@
-
 import { Order, User, Product, ProductStock, OrderItem, ProductVariant } from '@repo/database';
 import { Op, fn, col, literal } from 'sequelize';
+import { PAYMENT_STATUS, USER_ROLES, DASHBOARD_CONFIG } from '@repo/shared/constants';
 
-export async function getStatsOverview() {
+export interface DashboardStats {
+    totalSales: number;
+    totalOrders: number;
+    totalUsers: number;
+    totalProducts: number;
+    avgOrderValue: number;
+}
+
+export interface SalesPerformanceResult {
+    date: string;
+    sales: string | number;
+    orders: number;
+}
+
+export async function getStatsOverview(): Promise<DashboardStats> {
     const totalSales = await Order.sum('total_amount', {
-        where: { payment_status: 'paid' }
+        where: { payment_status: PAYMENT_STATUS.PAID }
     });
 
     const totalOrders = await Order.count();
-    const totalUsers = await User.count({ where: { role: 'customer' } });
+    const totalUsers = await User.count({ where: { role: USER_ROLES.CUSTOMER } });
     const totalProducts = await Product.count({ where: { is_active: true } });
 
     const avgOrderValue = totalOrders > 0 ? (totalSales || 0) / totalOrders : 0;
@@ -22,7 +36,7 @@ export async function getStatsOverview() {
     };
 }
 
-export async function getSalesPerformance(period: 'daily' | 'monthly' = 'daily') {
+export async function getSalesPerformance(period: 'daily' | 'monthly' = 'daily'): Promise<SalesPerformanceResult[]> {
     const dateFormat = period === 'daily' ? '%Y-%m-%d' : '%Y-%m';
 
     const sales = await Order.findAll({
@@ -32,9 +46,9 @@ export async function getSalesPerformance(period: 'daily' | 'monthly' = 'daily')
             [fn('COUNT', col('id')), 'orders']
         ],
         where: {
-            payment_status: 'paid',
+            payment_status: PAYMENT_STATUS.PAID,
             created_at: {
-                [Op.gte]: literal("DATE_SUB(NOW(), INTERVAL 30 DAY)")
+                [Op.gte]: literal(`DATE_SUB(NOW(), INTERVAL ${DASHBOARD_CONFIG.SALES_PERFORMANCE_DAYS} DAY)`)
             }
         },
         group: ['date'],
@@ -42,19 +56,19 @@ export async function getSalesPerformance(period: 'daily' | 'monthly' = 'daily')
         raw: true
     }) as any;
 
-    return sales;
+    return sales as unknown as SalesPerformanceResult[];
 }
 
-export async function getRecentActivity() {
+export async function getRecentActivity(): Promise<{ recentOrders: Order[]; recentUsers: User[] }> {
     const recentOrders = await Order.findAll({
-        limit: 5,
+        limit: DASHBOARD_CONFIG.RECENT_LIMIT,
         order: [['created_at', 'DESC']],
         include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
     });
 
     const recentUsers = await User.findAll({
-        where: { role: 'customer' },
-        limit: 5,
+        where: { role: USER_ROLES.CUSTOMER },
+        limit: DASHBOARD_CONFIG.RECENT_LIMIT,
         order: [['created_at', 'DESC']],
         attributes: ['id', 'full_name', 'email', 'created_at']
     });
@@ -65,9 +79,9 @@ export async function getRecentActivity() {
     };
 }
 
-export async function getInventoryStatus() {
+export async function getInventoryStatus(): Promise<{ lowStockCount: number; outOfStockCount: number }> {
     const lowStockCount = await ProductStock.count({
-        where: { available_quantity: { [Op.gt]: 0, [Op.lte]: 10 } }
+        where: { available_quantity: { [Op.gt]: 0, [Op.lte]: DASHBOARD_CONFIG.LOW_STOCK_THRESHOLD } }
     });
     const outOfStockCount = await ProductStock.count({
         where: { available_quantity: { [Op.lte]: 0 } }
@@ -79,7 +93,7 @@ export async function getInventoryStatus() {
     };
 }
 
-export async function getTopProducts(limit: number = 5) {
+export async function getTopProducts(limit: number = DASHBOARD_CONFIG.RECENT_LIMIT): Promise<OrderItem[]> {
     const items = await OrderItem.findAll({
         attributes: [
             'product_variant_id',

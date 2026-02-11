@@ -33,8 +33,14 @@
       "@repo/shared": [
         "../../packages/shared/src"
       ],
+      "@repo/shared/*": [
+        "../../packages/shared/src/*"
+      ],
       "@repo/ui": [
         "../../packages/ui/src"
+      ],
+      "@repo/ui/*": [
+        "../../packages/ui/src/*"
       ]
     },
     "allowJs": true,

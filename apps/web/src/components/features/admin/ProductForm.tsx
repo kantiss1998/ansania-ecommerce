@@ -1,13 +1,16 @@
 'use client';
 
-import { Product, Category } from '@repo/shared';
+import { Category } from '@repo/shared';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { getAccessToken } from '@/lib/auth';
+import { useToast } from '@/components/ui/Toast';
+import { formatCurrency } from '@/lib/utils';
+import { adminProductService } from '@/services/adminProductService';
+import { Product } from '@/services/productService';
 
 interface ProductFormProps {
     initialData?: Product;
@@ -16,16 +19,18 @@ interface ProductFormProps {
 
 export function ProductForm({ initialData, categories }: ProductFormProps) {
     const router = useRouter();
+    const { success, error: showError } = useToast();
     const [activeTab, setActiveTab] = useState('general');
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<Partial<Product>>(initialData || {
         name: '',
         slug: '',
         description: '',
-        selling_price: 0,
-        compare_price: 0,
-        category_id: categories[0]?.id,
-        is_visible: true,
+        base_price: 0,
+        discount_price: 0,
+        category: categories[0] ? { id: categories[0].id, name: categories[0].name, slug: categories[0].slug } : undefined,
+        is_featured: false,
+        is_new: true,
         images: [],
         variants: []
     });
@@ -36,29 +41,18 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
         e.preventDefault();
         try {
             setIsLoading(true);
-            const token = getAccessToken();
-            const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000').replace(/\/$/, '');
-            const method = isEdit ? 'PUT' : 'POST';
-            const endpoint = isEdit ? `/admin/products/${initialData.id}` : '/admin/products';
-
-            const response = await fetch(`${baseUrl}${endpoint}`, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                router.push('/admin/products');
-                router.refresh();
+            if (isEdit && initialData.id) {
+                await adminProductService.updateProduct(initialData.id, formData);
+                success('Produk berhasil diperbarui.');
             } else {
-                alert('Gagal menyimpan produk.');
+                await adminProductService.createProduct(formData);
+                success('Produk berhasil ditambahkan.');
             }
+            router.push('/admin/products');
+            router.refresh();
         } catch (error) {
             console.error('Submit product error:', error);
-            alert('Terjadi kesalahan.');
+            showError(error instanceof Error ? error.message : 'Gagal menyimpan produk.');
         } finally {
             setIsLoading(false);
         }
@@ -121,8 +115,14 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                     <label className="text-sm font-semibold text-gray-700">Category</label>
                                     <select
                                         className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
-                                        value={formData.category_id}
-                                        onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })}
+                                        value={formData.category?.id}
+                                        onChange={(e) => {
+                                            const catId = Number(e.target.value);
+                                            const cat = categories.find(c => c.id === catId);
+                                            if (cat) {
+                                                setFormData({ ...formData, category: { id: cat.id, name: cat.name, slug: cat.slug } });
+                                            }
+                                        }}
                                     >
                                         {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
@@ -132,8 +132,8 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                     <input
                                         type="number"
                                         className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
-                                        value={formData.selling_price}
-                                        onChange={(e) => setFormData({ ...formData, selling_price: Number(e.target.value) })}
+                                        value={formData.base_price}
+                                        onChange={(e) => setFormData({ ...formData, base_price: Number(e.target.value) })}
                                         required
                                     />
                                 </div>
@@ -142,8 +142,8 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                     <input
                                         type="number"
                                         className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
-                                        value={formData.compare_price || 0}
-                                        onChange={(e) => setFormData({ ...formData, compare_price: Number(e.target.value) })}
+                                        value={formData.discount_price || 0}
+                                        onChange={(e) => setFormData({ ...formData, discount_price: Number(e.target.value) })}
                                     />
                                 </div>
                             </div>
@@ -164,14 +164,14 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
-                                        {(formData.variants as unknown as any[])?.map((v, i) => (
+                                        {(formData.variants as any[])?.map((v, i) => (
                                             <tr key={v.id || i}>
                                                 <td className="px-4 py-3 text-gray-900">{v.sku}</td>
                                                 <td className="px-4 py-3">
                                                     <span className="text-xs text-gray-500">{v.color} / {v.size}</span>
                                                 </td>
                                                 <td className="px-4 py-3 font-medium text-gray-900">
-                                                    Rp {v.price?.toLocaleString('id-ID')}
+                                                    {formatCurrency(v.price || 0)}
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <Badge variant={(v.stock || 0) > 0 ? 'success' : 'error'}>
@@ -195,7 +195,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                     <div key={idx} className="relative aspect-square rounded-lg border border-gray-200 overflow-hidden bg-gray-50 group">
                                         <div className="relative w-full h-full">
                                             <Image
-                                                src={img}
+                                                src={img.image_url}
                                                 alt={`Product image ${idx + 1}`}
                                                 fill
                                                 className="object-cover"
@@ -233,7 +233,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                                 rows={12}
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="Tuliskan detail produk, bahan, dan cara perawatan..."
+                                placeholder="Tuliskan detail produk, bahan, and cara perawatan..."
                             ></textarea>
                         </div>
                     )}

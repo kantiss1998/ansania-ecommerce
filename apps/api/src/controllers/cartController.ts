@@ -1,6 +1,6 @@
-
 import { AddToCartDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+import { HTTP_STATUS } from '@repo/shared/constants';
 
 import * as cartService from '../services/cartService';
 import { AuthenticatedRequest } from '../types/express';
@@ -23,7 +23,7 @@ export async function getCart(req: Request, res: Response, next: NextFunction) {
             // Better to Ask frontend to generate UUID for session.
             // Or return empty with a new session ID hint?
             // For now, assume client sends x-session-id or is logged in.
-            res.status(400).json({ success: false, error: 'Session ID or Login required' });
+            res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: 'Session ID or Login required' });
             return;
         }
 
@@ -41,13 +41,13 @@ export async function addItem(req: Request, res: Response, next: NextFunction) {
     try {
         const { userId, sessionId } = getSession(req);
         if (!userId && !sessionId) {
-            res.status(400).json({ success: false, error: 'Session ID required' });
+            res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: 'Session ID required' });
             return;
         }
 
         const body = req.body as AddToCartDTO;
         const cart = await cartService.addToCart(userId, sessionId, body);
-        res.status(201).json({
+        res.status(HTTP_STATUS.CREATED).json({
             success: true,
             data: cart,
         });
@@ -91,7 +91,7 @@ export async function clearCart(req: Request, res: Response, next: NextFunction)
     try {
         const { userId, sessionId } = getSession(req);
         if (!userId && !sessionId) {
-            res.status(400).json({ success: false, error: 'Session ID or Login required' });
+            res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: 'Session ID or Login required' });
             return;
         }
 
@@ -110,13 +110,13 @@ export async function mergeCart(req: Request, res: Response, next: NextFunction)
     try {
         const { userId } = getSession(req);
         if (!userId) {
-            res.status(401).json({ success: false, error: 'User must be logged in' });
+            res.status(HTTP_STATUS.UNAUTHORIZED).json({ success: false, error: 'User must be logged in' });
             return;
         }
 
         const { session_id } = req.body as { session_id: string };
         if (!session_id) {
-            res.status(400).json({ success: false, error: 'Guest session_id is required' });
+            res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, error: 'Guest session_id is required' });
             return;
         }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { PaginatedResponse } from '@repo/shared';
+import { EMAIL_STATUS } from '@repo/shared/constants';
 import { Suspense } from 'react';
 
 import { Badge } from '@/components/ui/Badge';
@@ -63,8 +64,8 @@ function AdminEmailQueueContent({ initialData }: AdminEmailQueueClientProps) {
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant={
-                                            email.status === 'sent' ? 'success' :
-                                                email.status === 'pending' ? 'info' :
+                                            email.status === EMAIL_STATUS.SENT ? 'success' :
+                                                email.status === EMAIL_STATUS.PENDING ? 'info' :
                                                     'error'
                                         }>
                                             {email.status}
@@ -74,7 +75,7 @@ function AdminEmailQueueContent({ initialData }: AdminEmailQueueClientProps) {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        {email.status !== 'sent' && (
+                                        {email.status !== EMAIL_STATUS.SENT && (
                                             <Button variant="outline" size="sm" onClick={() => handleRetry(email.id)}>
                                                 Retry
                                             </Button>

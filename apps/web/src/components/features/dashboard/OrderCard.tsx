@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/Badge';
 import { formatCurrency } from '@/lib/utils';
 import { Order } from '@/services/orderService';
+import { ORDER_STATUS } from '@repo/shared/constants';
 
 export interface OrderCardProps {
     order: Order;
@@ -14,40 +15,52 @@ export function OrderCard({ order }: OrderCardProps) {
         string,
         { label: string; variant: 'warning' | 'info' | 'success' | 'error'; gradient: string; bgGradient: string }
     > = {
-        pending_payment: {
+        [ORDER_STATUS.PENDING_PAYMENT]: {
             label: 'Belum Bayar',
             variant: 'warning',
             gradient: 'from-orange-500 to-amber-500',
             bgGradient: 'from-orange-50 to-amber-50',
         },
-        processing: {
+        [ORDER_STATUS.PROCESSING]: {
             label: 'Diproses',
             variant: 'info',
             gradient: 'from-blue-500 to-cyan-500',
             bgGradient: 'from-blue-50 to-cyan-50',
         },
-        shipped: {
+        [ORDER_STATUS.SHIPPED]: {
             label: 'Dikirim',
             variant: 'info',
             gradient: 'from-purple-500 to-pink-500',
             bgGradient: 'from-purple-50 to-pink-50',
         },
-        delivered: {
+        [ORDER_STATUS.DELIVERED]: {
             label: 'Selesai',
             variant: 'success',
             gradient: 'from-green-500 to-emerald-500',
             bgGradient: 'from-green-50 to-emerald-50',
         },
-        cancelled: {
+        [ORDER_STATUS.CANCELLED]: {
             label: 'Dibatalkan',
             variant: 'error',
             gradient: 'from-red-500 to-rose-500',
             bgGradient: 'from-red-50 to-rose-50',
         },
+        [ORDER_STATUS.REFUNDED]: {
+            label: 'Dikembalikan',
+            variant: 'info',
+            gradient: 'from-gray-500 to-slate-500',
+            bgGradient: 'from-gray-50 to-slate-50',
+        },
+        [ORDER_STATUS.FAILED]: {
+            label: 'Gagal',
+            variant: 'error',
+            gradient: 'from-red-600 to-rose-600',
+            bgGradient: 'from-red-100 to-rose-100',
+        },
     };
 
-    const status = order.status || 'pending_payment';
-    const config = statusConfig[status] || statusConfig.pending_payment;
+    const status = order.status || ORDER_STATUS.PENDING_PAYMENT;
+    const config = statusConfig[status] || statusConfig[ORDER_STATUS.PENDING_PAYMENT]!;
 
     return (
         <Link href={`/user/orders/${order.order_number}`}>

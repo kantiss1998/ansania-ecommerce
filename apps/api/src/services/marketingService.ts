@@ -1,6 +1,7 @@
 
-import { Cart, CartItem, User, Product } from '@repo/database';
+import { Cart, CartItem, User, Product, ProductVariant } from '@repo/database';
 import { Op } from 'sequelize';
+import { USER_ROLES, MARKETING_CONFIG } from '@repo/shared/constants';
 
 import { queueEmail } from './emailService';
 
@@ -9,8 +10,8 @@ import { queueEmail } from './emailService';
  * Criteria: Cart updated more than 24 hours ago but less than 48 hours ago
  */
 export async function processAbandonedCarts() {
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const oneDayAgo = new Date(Date.now() - MARKETING_CONFIG.ABANDONED_CART_MIN_HOURS * 60 * 60 * 1000);
+    const twoDaysAgo = new Date(Date.now() - MARKETING_CONFIG.ABANDONED_CART_MAX_HOURS * 60 * 60 * 1000);
 
     const abandonedCarts = await Cart.findAll({
         where: {
@@ -24,7 +25,13 @@ export async function processAbandonedCarts() {
             {
                 model: CartItem,
                 as: 'items',
-                include: [{ model: Product, as: 'product' }]
+                include: [
+                    {
+                        model: ProductVariant,
+                        as: 'productVariant',
+                        include: [{ model: Product, as: 'product' }]
+                    }
+                ]
             }
         ]
     });
@@ -34,7 +41,7 @@ export async function processAbandonedCarts() {
         if (!cart.user || !cart.user.email) continue;
 
         const itemsList = (cart.items || [])
-            .map(item => `- ${item.product?.name || 'Product'} (x${item.quantity})`)
+            .map(item => `- ${item.productVariant?.product?.name || 'Product'} (x${item.quantity})`)
             .join('\n');
 
         await queueEmail(
@@ -54,11 +61,11 @@ export async function processAbandonedCarts() {
  * Send promotional offers to inactive users
  */
 export async function sendPromotionalOffers() {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 60 * 60 * 1000 * 24);
+    const thirtyDaysAgo = new Date(Date.now() - MARKETING_CONFIG.INACTIVE_USER_DAYS * 24 * 60 * 60 * 1000);
 
     const inactiveUsers = await User.findAll({
         where: {
-            role: 'customer',
+            role: USER_ROLES.CUSTOMER,
             updated_at: { [Op.lt]: thirtyDaysAgo }
         }
     });

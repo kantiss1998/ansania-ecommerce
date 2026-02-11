@@ -1,5 +1,26 @@
 import apiClient, { ApiResponse, getErrorMessage } from '@/lib/api';
 
+export interface ProductVariant {
+    id: number;
+    color?: string;
+    size?: string;
+    finishing?: string;
+    price: number;
+    stock: number;
+    sku: string;
+}
+
+export interface Review {
+    id: number;
+    user_name: string;
+    rating: number;
+    title: string;
+    comment: string;
+    created_at: string;
+    helpful_count: number;
+    user_avatar?: string;
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -18,8 +39,10 @@ export interface Product {
         name: string;
         slug: string;
     };
+    category_name?: string;
     images?: { image_url: string; is_primary?: boolean }[];
-    variants?: unknown[]; // Refine type as needed
+    variants?: ProductVariant[];
+    reviews?: Review[];
     related_products?: Product[];
 }
 
@@ -163,9 +186,9 @@ export const productService = {
         }
     },
 
-    async getReviews(productId: number): Promise<unknown[]> {
+    async getReviews(productId: number): Promise<Review[]> {
         try {
-            const response = await apiClient.get<ApiResponse<unknown[]>>(`/reviews/${productId}`);
+            const response = await apiClient.get<ApiResponse<Review[]>>(`/reviews/${productId}`);
             return response.data.data!;
         } catch (error) {
             console.error('Failed to fetch reviews:', error);

@@ -117,7 +117,7 @@ export function CartDrawer() {
                                                 onClick={closeCartDrawer}
                                             >
                                                 <Image
-                                                    src={item.product.image}
+                                                    src={item.product.thumbnail_url || `/placeholder.jpg`}
                                                     alt={item.product.name}
                                                     fill
                                                     className="object-cover group-hover:scale-105 transition-transform duration-300"

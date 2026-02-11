@@ -1,13 +1,14 @@
 
-import { SearchHistory } from '@repo/database';
 import { Request, Response, NextFunction } from 'express';
 
 import { OdooProductService } from '../services/odoo/product.service';
 import * as productService from '../services/productService';
+import * as searchService from '../services/searchService';
 
 const odooProductService = new OdooProductService();
 import { ListProductsQuery } from '@repo/shared/schemas';
 import { NotFoundError } from '@repo/shared/errors';
+import { HTTP_STATUS, PAGINATION, PRODUCT_LIMITS } from '@repo/shared/constants';
 
 export async function getProducts(req: Request, res: Response, next: NextFunction) {
     try {
@@ -73,7 +74,7 @@ export async function getAttributes(req: Request, res: Response, next: NextFunct
         const { attribute } = req.params;
 
         if (!['color', 'size', 'finishing'].includes(attribute)) {
-            return res.status(400).json({ success: false, message: 'Invalid attribute type' });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: 'Invalid attribute type' });
         }
 
         const values = await productService.getDistinctAttributes(attribute as 'color' | 'size' | 'finishing');
@@ -92,18 +93,18 @@ export async function recordSearch(req: Request, res: Response, next: NextFuncti
         const { query, filters, results_count } = req.body;
 
         if (!query) {
-            return res.status(400).json({ success: false, message: 'Query is required' });
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({ success: false, message: 'Query is required' });
         }
 
 
 
-        await SearchHistory.create({
-            search_query: query,
-            filters_applied: filters,
-            results_count: results_count || 0
-        } as any);
+        await searchService.recordSearch({
+            query,
+            filters,
+            results_count
+        });
 
-        return res.status(201).json({
+        return res.status(HTTP_STATUS.CREATED).json({
             success: true,
         });
     } catch (error) {
@@ -114,7 +115,7 @@ export async function recordSearch(req: Request, res: Response, next: NextFuncti
 
 export async function getFeaturedProducts(req: Request, res: Response, next: NextFunction) {
     try {
-        const limit = req.query.limit ? Number(req.query.limit) : 10;
+        const limit = req.query.limit ? Number(req.query.limit) : PAGINATION.DEFAULT_LIMIT;
         const products = await productService.getFeaturedProducts(limit);
 
         res.json({
@@ -128,8 +129,8 @@ export async function getFeaturedProducts(req: Request, res: Response, next: Nex
 
 export async function getNewArrivals(req: Request, res: Response, next: NextFunction) {
     try {
-        const limit = req.query.limit ? Number(req.query.limit) : 10;
-        const days = req.query.days ? Number(req.query.days) : 30;
+        const limit = req.query.limit ? Number(req.query.limit) : PAGINATION.DEFAULT_LIMIT;
+        const days = req.query.days ? Number(req.query.days) : PRODUCT_LIMITS.NEW_ARRIVAL_DAYS;
         const products = await productService.getNewArrivals(limit, days);
 
         res.json({
@@ -161,7 +162,7 @@ export async function getProductVariants(req: Request, res: Response, next: Next
 
 export async function getRecommendedProducts(req: Request, res: Response, next: NextFunction) {
     try {
-        const limit = req.query.limit ? Number(req.query.limit) : 10;
+        const limit = req.query.limit ? Number(req.query.limit) : PAGINATION.DEFAULT_LIMIT;
         const products = await productService.getRecommendedProducts(limit);
 
         res.json({
@@ -176,7 +177,7 @@ export async function getRecommendedProducts(req: Request, res: Response, next: 
 export async function getSimilarProducts(req: Request, res: Response, next: NextFunction) {
     try {
         const { productId } = req.params;
-        const limit = req.query.limit ? Number(req.query.limit) : 6;
+        const limit = req.query.limit ? Number(req.query.limit) : PRODUCT_LIMITS.SIMILAR_PRODUCTS;
         const products = await productService.getSimilarProducts(Number(productId), limit);
 
         res.json({
@@ -191,7 +192,7 @@ export async function getSimilarProducts(req: Request, res: Response, next: Next
 export async function getRelatedProducts(req: Request, res: Response, next: NextFunction) {
     try {
         const { productId } = req.params;
-        const limit = req.query.limit ? Number(req.query.limit) : 4;
+        const limit = req.query.limit ? Number(req.query.limit) : PRODUCT_LIMITS.RELATED_PRODUCTS;
         const products = await productService.getRelatedProducts(Number(productId), limit);
 
         res.json({

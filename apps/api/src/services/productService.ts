@@ -1,9 +1,41 @@
-import { Product, ProductVariant, Category, ProductImage, ProductRatingsSummary , sequelize } from '@repo/database';
+import { Product, ProductVariant, Category, ProductImage, ProductRatingsSummary, sequelize } from '@repo/database';
 import { ListProductsQuery } from '@repo/shared/schemas';
 import { Op, Includeable, Order } from 'sequelize';
+import { PAGINATION, PRODUCT_LIMITS } from '@repo/shared/constants';
 
+import { getDaysDifference, calculatePagination } from '@repo/shared/utils';
+import { NotFoundError } from '@repo/shared/errors';
 
-export function mapProduct(product: any) {
+export interface MappedProduct {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+    category_id: number;
+    base_price: number;
+    discount_price?: number;
+    selling_price: string; // from DB
+    compare_price?: string; // from DB
+    rating_average: number;
+    total_reviews: number;
+    thumbnail_url: string | null;
+    is_new: boolean;
+    is_featured: boolean;
+    is_active: boolean;
+    images: string[];
+    stock_status: 'in_stock' | 'out_of_stock';
+    [key: string]: any; // for other fields from DB
+}
+
+export interface ProductListResult {
+    items: MappedProduct[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+}
+
+export function mapProduct(product: any): MappedProduct | null {
     if (!product) return null;
     const data = product.toJSON ? product.toJSON() : product;
 
@@ -23,10 +55,7 @@ export function mapProduct(product: any) {
     const total_reviews = Number(data.ratingsSummary?.total_reviews || 0);
 
     // Derive is_new (created within 30 days)
-    const now = new Date();
-    const createdAt = new Date(data.created_at);
-    const diffDays = Math.ceil(Math.abs(now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-    const is_new = diffDays <= 30;
+    const is_new = getDaysDifference(new Date(), data.created_at) <= PRODUCT_LIMITS.NEW_ARRIVAL_DAYS;
 
     // Derive thumbnail_url
     const thumbnail_url = data.images?.find((img: any) => img.is_primary)?.image_url ||
@@ -48,10 +77,10 @@ export function mapProduct(product: any) {
     };
 }
 
-export async function listProducts(query: ListProductsQuery) {
+export async function listProducts(query: ListProductsQuery): Promise<ProductListResult> {
     const {
-        page = 1,
-        limit = 10,
+        page = PAGINATION.DEFAULT_PAGE,
+        limit = PAGINATION.DEFAULT_LIMIT,
         sort = 'newest',
         category,
         search,
@@ -140,16 +169,15 @@ export async function listProducts(query: ListProductsQuery) {
         order,
     });
 
+    const pagination = calculatePagination(Number(page), Number(limit), count);
+
     return {
-        items: rows.map(mapProduct),
-        total: count,
-        page,
-        limit,
-        totalPages: Math.ceil(count / limit),
+        items: rows.map(mapProduct).filter((p): p is MappedProduct => p !== null),
+        ...pagination
     };
 }
 
-export async function getDistinctAttributes(attribute: 'color' | 'size' | 'finishing') {
+export async function getDistinctAttributes(attribute: 'color' | 'size' | 'finishing'): Promise<string[]> {
     // Check if column exists in ProductVariant
     const variants = await ProductVariant.findAll({
         attributes: [[sequelize.fn('DISTINCT', sequelize.col(attribute)), attribute]],
@@ -163,7 +191,7 @@ export async function getDistinctAttributes(attribute: 'color' | 'size' | 'finis
     return variants.map((v: any) => v[attribute]).filter(Boolean);
 }
 
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string): Promise<MappedProduct | null> {
     const product = await Product.findOne({
         where: { slug, is_active: true },
         include: [
@@ -177,7 +205,7 @@ export async function getProductBySlug(slug: string) {
     return mapProduct(product);
 }
 
-export async function getRelatedProducts(productId: number, limit: number = 4) {
+export async function getRelatedProducts(productId: number, limit: number = 4): Promise<MappedProduct[]> {
     const product = await Product.findByPk(productId);
     if (!product) return [];
 
@@ -196,11 +224,11 @@ export async function getRelatedProducts(productId: number, limit: number = 4) {
         order: sequelize.random() // Random selection for variety
     });
 
-    return related.map(mapProduct);
+    return related.map(mapProduct).filter((p): p is MappedProduct => p !== null);
 }
 
 // Get featured products
-export async function getFeaturedProducts(limit: number = 10) {
+export async function getFeaturedProducts(limit: number = 10): Promise<MappedProduct[]> {
     const products = await Product.findAll({
         where: {
             is_featured: true,
@@ -215,11 +243,11 @@ export async function getFeaturedProducts(limit: number = 10) {
         order: [['created_at', 'DESC']]
     });
 
-    return products.map(mapProduct);
+    return products.map(mapProduct).filter((p): p is MappedProduct => p !== null);
 }
 
 // Get new arrivals (products created within last N days)
-export async function getNewArrivals(limit: number = 10, days: number = 30) {
+export async function getNewArrivals(limit: number = 10, days: number = PRODUCT_LIMITS.NEW_ARRIVAL_DAYS): Promise<MappedProduct[]> {
     const dateThreshold = new Date();
     dateThreshold.setDate(dateThreshold.getDate() - days);
 
@@ -237,11 +265,11 @@ export async function getNewArrivals(limit: number = 10, days: number = 30) {
         order: [['created_at', 'DESC']]
     });
 
-    return products.map(mapProduct);
+    return products.map(mapProduct).filter((p): p is MappedProduct => p !== null);
 }
 
 // Get all variants for a product
-export async function getProductVariants(productId: number): Promise<any> {
+export async function getProductVariants(productId: number): Promise<{ product: { id: number; name: string; slug: string }; variants: ProductVariant[] } | null> {
     const product = await Product.findByPk(productId);
     if (!product) return null;
 
@@ -264,7 +292,7 @@ export async function getProductVariants(productId: number): Promise<any> {
 }
 
 // Get recommended products (combination of featured + most viewed)
-export async function getRecommendedProducts(limit: number = 10) {
+export async function getRecommendedProducts(limit: number = 10): Promise<MappedProduct[]> {
     // For now, return featured + random popular products
     // In the future, this can be enhanced with ML recommendations
     const products = await Product.findAll({
@@ -286,11 +314,11 @@ export async function getRecommendedProducts(limit: number = 10) {
         ]
     });
 
-    return products.map(mapProduct);
+    return products.map(mapProduct).filter((p): p is MappedProduct => p !== null);
 }
 
 // Get similar products (same category, similar price range)
-export async function getSimilarProducts(productId: number, limit: number = 6) {
+export async function getSimilarProducts(productId: number, limit: number = 6): Promise<MappedProduct[]> {
     const product = await Product.findByPk(productId);
     if (!product) return [];
 
@@ -316,13 +344,13 @@ export async function getSimilarProducts(productId: number, limit: number = 6) {
         order: sequelize.random()
     });
 
-    return similar.map(mapProduct);
+    return similar.map(mapProduct).filter((p): p is MappedProduct => p !== null);
 }
 
 /**
  * Track a product view
  */
-export async function trackProductView(productId: number) {
+export async function trackProductView(productId: number): Promise<Product> {
     const product = await Product.findByPk(productId);
     if (!product) throw new NotFoundError('Product');
 
@@ -330,4 +358,3 @@ export async function trackProductView(productId: number) {
     return product;
 }
 
-import { NotFoundError } from '@repo/shared/errors';

@@ -6,6 +6,7 @@
 import { Address, Cart, CartItem, ProductVariant, Product, ShippingCostsCache } from '@repo/database';
 import { NotFoundError, AppError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
+import { SHIPPING_PROVIDER, SHIPPING_CONFIG } from '@repo/shared/constants';
 
 import { jntClient, JNTRateResponse } from '../integrations/jnt/client';
 
@@ -49,7 +50,7 @@ export async function calculateShipping(addressId: number, cartId: number): Prom
         const product = variant?.product;
 
         // Get weight from product (assuming weight is in grams)
-        let itemWeight = 500; // Default 500g if not specified
+        let itemWeight: number = SHIPPING_CONFIG.DEFAULT_WEIGHT_G; // Default if not specified
 
         if (product && product.weight) {
             itemWeight = Number(product.weight);
@@ -167,7 +168,7 @@ async function cacheShippingRates(
         const cacheEntries = rates.map(rate => ({
             origin_city_id: originCity,
             destination_city_id: destinationCity,
-            courier: 'JNT',
+            courier: SHIPPING_PROVIDER.JNT,
             service: rate.service,
             weight: weight,
             cost: rate.price,
@@ -230,7 +231,7 @@ export async function getCouriers() {
     // Currently we only integration with J&T, but we can expand this
     return [
         {
-            code: 'JNT',
+            code: SHIPPING_PROVIDER.JNT,
             name: 'J&T Express',
             description: 'Fast and reliable shipping across Indonesia',
             logo_url: '/images/couriers/jnt.png'

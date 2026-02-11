@@ -1,4 +1,11 @@
 // Common API Response types
+import {
+    OrderStatus,
+    PaymentStatus,
+    ReviewStatus,
+    VoucherType,
+} from '../constants/status';
+
 export interface ApiResponse<T = unknown> {
     success: boolean;
     data?: T;
@@ -96,6 +103,9 @@ export interface Category {
     slug: string;
     image?: string;
     description?: string;
+    meta_title?: string;
+    meta_description?: string;
+    keywords?: string;
     is_active: boolean;
     parent_id?: number;
 }
@@ -124,7 +134,7 @@ export interface Review {
     rating: number;
     comment: string;
     is_approved: boolean;
-    status: 'pending' | 'approved' | 'rejected';
+    status: ReviewStatus;
     created_at: string;
     updated_at: string;
     user?: {
@@ -149,8 +159,6 @@ export interface StockItem {
     last_sync_at: string;
 }
 
-// ProductVariant moved to line 55
-
 // Cart types
 export interface CartItem {
     id: number;
@@ -174,18 +182,7 @@ export interface Cart {
 }
 
 // Order types
-export type OrderStatus =
-    | 'pending'
-    | 'pending_payment'
-    | 'paid'
-    | 'processing'
-    | 'shipped'
-    | 'delivered'
-    | 'cancelled'
-    | 'refunded'
-    | 'expired';
-
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+export type { OrderStatus, PaymentStatus };
 
 export interface OrderItem {
     id: number;
@@ -233,6 +230,7 @@ export interface Order {
     shipping_address?: OrderAddress;
     billing_address?: OrderAddress;
     items?: OrderItem[];
+    user?: User;
     created_at: string;
     updated_at: string;
     paid_at?: string;
@@ -241,7 +239,7 @@ export interface Order {
 }
 
 // Voucher types
-export type VoucherType = 'percentage' | 'fixed_amount' | 'free_shipping';
+export type { VoucherType };
 
 export interface Voucher {
     id: number;

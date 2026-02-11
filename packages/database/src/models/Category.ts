@@ -21,6 +21,9 @@ export interface CategoryAttributes {
     name: string;
     slug: string;
     description: string | null;
+    meta_title: string | null;
+    meta_description: string | null;
+    keywords: string | null;
     image_url: string | null;
     is_active: boolean;
     sort_order: number;
@@ -40,6 +43,9 @@ export class Category extends Model<
     declare name: string;
     declare slug: string;
     declare description: string | null;
+    declare meta_title: string | null;
+    declare meta_description: string | null;
+    declare keywords: string | null;
     declare image_url: string | null;
     declare is_active: CreationOptional<boolean>;
     declare sort_order: CreationOptional<number>;
@@ -93,6 +99,18 @@ Category.init(
         },
         description: {
             type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        meta_title: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+        },
+        meta_description: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        keywords: {
+            type: DataTypes.STRING(255),
             allowNull: true,
         },
         image_url: {

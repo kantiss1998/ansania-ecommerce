@@ -1,9 +1,35 @@
-
 import { Order, OrderItem, User, Shipping, Payment } from '@repo/database';
 import { NotFoundError } from '@repo/shared/errors';
 import { Op } from 'sequelize';
+import { ORDER_STATUS, PAYMENT_STATUS } from '@repo/shared/constants';
 
-export async function listAllOrders(query: any) {
+export interface ListOrdersQuery {
+    page?: number | string;
+    limit?: number | string;
+    status?: string;
+    payment_status?: string;
+    search?: string;
+    startDate?: string;
+    endDate?: string;
+    export?: string;
+}
+
+export interface AdminOrderListResult {
+    items: Order[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+export interface ShippingUpdateData {
+    tracking_number: string;
+    shipped_at?: Date;
+}
+
+export async function listAllOrders(query: ListOrdersQuery): Promise<AdminOrderListResult> {
     const {
         page = 1,
         limit = 10,
@@ -30,8 +56,8 @@ export async function listAllOrders(query: any) {
 
     if (startDate && endDate) {
         where.created_at = {
-            [Op.between]: [new Date(startDate), new Date(endDate)]
-        } as any;
+            [Op.between]: [new Date(startDate as string), new Date(endDate as string)]
+        };
     }
 
     const { count, rows } = await Order.findAndCountAll({
@@ -57,7 +83,7 @@ export async function listAllOrders(query: any) {
     };
 }
 
-export async function getAdminOrderDetail(orderNumber: string) {
+export async function getAdminOrderDetail(orderNumber: string): Promise<Order> {
     const order = await Order.findOne({
         where: { order_number: orderNumber },
         include: [
@@ -72,37 +98,37 @@ export async function getAdminOrderDetail(orderNumber: string) {
     return order;
 }
 
-export async function updateOrderStatus(orderNumber: string, status: string, adminNote?: string) {
+export async function updateOrderStatus(orderNumber: string, status: string, adminNote?: string): Promise<Order> {
     const order = await Order.findOne({ where: { order_number: orderNumber } });
     if (!order) throw new NotFoundError('Order');
 
-    const updateData: any = { status };
+    const updateData: Partial<Order> = { status: status as any };
     if (adminNote) updateData.admin_note = adminNote;
 
     // Specific timestamp updates
-    if (status === 'paid') updateData.paid_at = new Date();
-    if (status === 'shipped') updateData.shipped_at = new Date();
-    if (status === 'delivered') updateData.delivered_at = new Date();
-    if (status === 'cancelled') updateData.cancelled_at = new Date();
+    if (status === ORDER_STATUS.PAID) updateData.paid_at = new Date();
+    if (status === ORDER_STATUS.SHIPPED) updateData.shipped_at = new Date();
+    if (status === ORDER_STATUS.DELIVERED) updateData.delivered_at = new Date();
+    if (status === ORDER_STATUS.CANCELLED) updateData.cancelled_at = new Date();
 
     await order.update(updateData);
     return order;
 }
 
-export async function updatePaymentStatus(orderNumber: string, payment_status: string) {
+export async function updatePaymentStatus(orderNumber: string, payment_status: string): Promise<Order> {
     const order = await Order.findOne({ where: { order_number: orderNumber } });
     if (!order) throw new NotFoundError('Order');
 
     await order.update({ payment_status: payment_status as any });
 
-    if (payment_status === 'paid') {
-        await order.update({ status: 'paid', paid_at: new Date() } as any);
+    if (payment_status === PAYMENT_STATUS.PAID) {
+        await order.update({ status: ORDER_STATUS.PAID as any, paid_at: new Date() });
     }
 
     return order;
 }
 
-export async function updateShippingInfo(orderNumber: string, shippingData: { tracking_number: string; shipped_at?: Date }) {
+export async function updateShippingInfo(orderNumber: string, shippingData: ShippingUpdateData): Promise<Order> {
     const order = await Order.findOne({
         where: { order_number: orderNumber },
         include: [{ model: Shipping, as: 'shipping' }]
@@ -115,27 +141,27 @@ export async function updateShippingInfo(orderNumber: string, shippingData: { tr
         shipped_at: shippingData.shipped_at || new Date()
     });
 
-    if (order.status === 'paid') {
-        await order.update({ status: 'shipped', shipped_at: shippingData.shipped_at || new Date() });
+    if (order.status === ORDER_STATUS.PAID) {
+        await order.update({ status: ORDER_STATUS.SHIPPED as any, shipped_at: shippingData.shipped_at || new Date() });
     }
 
     return order;
 }
 
-export async function processRefund(orderNumber: string, refundReason: string) {
+export async function processRefund(orderNumber: string, refundReason: string): Promise<Order> {
     const order = await Order.findOne({ where: { order_number: orderNumber } });
     if (!order) throw new NotFoundError('Order');
 
     await order.update({
-        status: 'refunded' as any,
-        payment_status: 'refunded' as any,
+        status: ORDER_STATUS.REFUNDED as any,
+        payment_status: PAYMENT_STATUS.REFUNDED as any,
         admin_note: order.admin_note ? `${order.admin_note}\nRefund Reason: ${refundReason}` : `Refund Reason: ${refundReason}`
     });
 
     return order;
 }
 
-export async function updateOrderNotes(orderNumber: string, adminNote: string) {
+export async function updateOrderNotes(orderNumber: string, adminNote: string): Promise<Order> {
     const order = await Order.findOne({ where: { order_number: orderNumber } });
     if (!order) throw new NotFoundError('Order');
 
@@ -143,12 +169,12 @@ export async function updateOrderNotes(orderNumber: string, adminNote: string) {
     return order;
 }
 
-export async function exportOrders(query: any) {
+export async function exportOrders(query: ListOrdersQuery): Promise<Order[]> {
     const orders = await listAllOrders({ ...query, limit: 1000, page: 1 });
     return orders.items;
 }
 
-export async function deleteOrder(orderNumber: string) {
+export async function deleteOrder(orderNumber: string): Promise<{ success: boolean }> {
     const order = await Order.findOne({ where: { order_number: orderNumber } });
     if (!order) throw new NotFoundError('Order');
 

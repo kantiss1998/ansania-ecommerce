@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { CreditCard, Wallet, Banknote, Building, Check } from 'lucide-react';
 
 /**
@@ -109,7 +109,7 @@ export function PaymentMethodSelector({
                                         <div className="flex items-center gap-3 shrink-0">
                                             {method.fee && method.fee > 0 ? (
                                                 <span className="text-sm font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
-                                                    +Rp {method.fee.toLocaleString('id-ID')}
+                                                    +{formatCurrency(method.fee)}
                                                 </span>
                                             ) : (
                                                 <span className="text-sm font-bold text-success-600 bg-success-50 px-2 py-1 rounded-full border border-success-100">

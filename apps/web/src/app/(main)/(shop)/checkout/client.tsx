@@ -14,6 +14,7 @@ import { addressService, Address } from '@/services/addressService';
 import { checkoutService } from '@/services/checkoutService';
 import { useCartStore } from '@/store/cartStore';
 import { getErrorMessage } from '@/lib/api';
+import { formatCurrency } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 function CheckoutContent() {
@@ -45,13 +46,11 @@ function CheckoutContent() {
         fetchAddresses();
     }, []);
 
-    // Fetch shipping rates when address changes (simplified for now to fixed cost or mock calc)
-    // Real implementation would call checkoutService.getShippingRates(selectedAddress.id)
+    // Fetch shipping rates when address changes
     useEffect(() => {
         const calculateShipping = async () => {
             if (selectedAddress) {
                 try {
-                    // Try to fetch real rates
                     const rates = await checkoutService.getShippingRates(selectedAddress.id);
                     if (rates && rates.length > 0) {
                         setShippingCost(rates[0].cost); // Default to first rate
@@ -67,7 +66,7 @@ function CheckoutContent() {
         calculateShipping();
     }, [selectedAddress]);
 
-    // Mock payment methods (since no API endpoint yet)
+    // Mock payment methods
     const mockPaymentMethods: PaymentMethod[] = [
         {
             id: 'bca',
@@ -116,7 +115,7 @@ function CheckoutContent() {
     const orderSummary: OrderSummaryData = {
         items: cart?.items.map(item => ({
             product_name: item.product.name,
-            variant_info: `${item.variant.color || ''} ${item.variant.size || ''}`,
+            variant_info: item.variant ? [item.variant.color, item.variant.size, item.variant.finishing].filter(Boolean).join(', ') : '',
             quantity: item.quantity,
             price: item.price,
             subtotal: item.subtotal
@@ -126,6 +125,7 @@ function CheckoutContent() {
         payment_fee: selectedPayment?.fee || 0,
         discount: cart?.discount_amount || 0,
         total: (cart?.subtotal || 0) + shippingCost + (selectedPayment?.fee || 0) - (cart?.discount_amount || 0),
+        voucher_code: cart?.voucher?.code,
     };
 
     const handleAddressSubmit = async (formData: any) => {
@@ -157,18 +157,15 @@ function CheckoutContent() {
 
         setIsProcessing(true);
         try {
-            // Map payment method to API expectations
-            // This maps 'bca' -> 'bank_transfer' provider? Or 'doku'?
-            // Assuming simplified 'doku' provider for now based on paymentController
             const order = await checkoutService.createOrder({
                 shipping_address_id: selectedAddress.id,
-                payment_method: selectedPayment.id, // e.g., 'bca'
+                payment_method: selectedPayment.id,
                 payment_provider: 'doku', // Defaulting to doku
-                items: cart?.items.map(i => ({ product_variant_id: i.variant.id, quantity: i.quantity })),
+                items: cart?.items.map(i => ({ product_variant_id: i.product_variant_id, quantity: i.quantity })),
             });
 
             success('Pesanan berhasil dibuat!');
-            router.push(`/orders/confirmation/${order.order_number}`); // Use real order number
+            router.push(`/orders/confirmation/${order.order_number}`);
         } catch (err) {
             error(getErrorMessage(err));
             setIsProcessing(false);
@@ -219,7 +216,7 @@ function CheckoutContent() {
                     <p className="mt-2 text-gray-600">Lengkapi informasi untuk menyelesaikan pesanan Anda</p>
                 </div>
 
-                {/* Enhanced Stepper */}
+                {/* Stepper */}
                 <div className="mb-12">
                     <div className="flex items-center justify-between">
                         {steps.map((step, index) => (
@@ -231,7 +228,6 @@ function CheckoutContent() {
                                     transition={{ delay: index * 0.1 }}
                                 >
                                     <div className="relative">
-                                        {/* Glow effect */}
                                         {currentStep >= step.number && (
                                             <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${step.color} blur-lg opacity-30`} />
                                         )}
@@ -307,7 +303,7 @@ function CheckoutContent() {
                             )}
                         </div>
 
-                        {/* Enhanced Navigation Buttons */}
+                        {/* Navigation Buttons */}
                         <div className="mt-6 flex gap-3">
                             {currentStep > 1 && (
                                 <Button
@@ -343,7 +339,7 @@ function CheckoutContent() {
                         </div>
                     </motion.div>
 
-                    {/* Enhanced Order Summary Sidebar */}
+                    {/* Order Summary Sidebar */}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -367,7 +363,7 @@ function CheckoutContent() {
                                             {item.product_name} × {item.quantity}
                                         </span>
                                         <span className="font-medium text-gray-900">
-                                            Rp {item.subtotal.toLocaleString('id-ID')}
+                                            {formatCurrency(item.subtotal)}
                                         </span>
                                     </div>
                                 ))}
@@ -376,20 +372,20 @@ function CheckoutContent() {
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Subtotal</span>
                                     <span className="font-medium text-gray-900">
-                                        Rp {orderSummary.subtotal.toLocaleString('id-ID')}
+                                        {formatCurrency(orderSummary.subtotal)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Ongkir</span>
                                     <span className="font-medium text-gray-900">
-                                        Rp {orderSummary.shipping_cost.toLocaleString('id-ID')}
+                                        {formatCurrency(orderSummary.shipping_cost)}
                                     </span>
                                 </div>
                                 {orderSummary.payment_fee > 0 && (
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-600">Biaya Pembayaran</span>
                                         <span className="font-medium text-gray-900">
-                                            Rp {orderSummary.payment_fee.toLocaleString('id-ID')}
+                                            {formatCurrency(orderSummary.payment_fee)}
                                         </span>
                                     </div>
                                 )}
@@ -399,7 +395,7 @@ function CheckoutContent() {
                                             Total
                                         </span>
                                         <span className="text-lg font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                                            Rp {orderSummary.total.toLocaleString('id-ID')}
+                                            {formatCurrency(orderSummary.total)}
                                         </span>
                                     </div>
                                 </div>
@@ -426,9 +422,13 @@ function CheckoutContent() {
 
 export default function CheckoutClient() {
     return (
-        <Suspense fallback={<div>Loading checkout...</div>}>
+        <Suspense fallback={
+            <div className="container mx-auto p-12 text-center">
+                <div className="h-12 w-12 mx-auto animate-spin rounded-full border-4 border-primary-200 border-t-primary-600 mb-4"></div>
+                <p className="text-gray-500 animate-pulse">Menyiapkan halaman checkout...</p>
+            </div>
+        }>
             <CheckoutContent />
         </Suspense>
     );
 }
-

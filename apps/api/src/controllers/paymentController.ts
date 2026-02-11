@@ -3,14 +3,10 @@
  * Handles Doku payment webhook notifications and payment status updates
  */
 
-import { Order, sequelize, Payment } from '@repo/database';
+import { Order, Payment } from '@repo/database';
 import { Request, Response, NextFunction } from 'express';
-import { Transaction } from 'sequelize';
 
-import { dokuClient, DokuWebhookPayload } from '../integrations/doku/client';
-import { OdooOrderService } from '../services/odoo/order.service';
-
-const odooOrderService = new OdooOrderService();
+import { dokuClient } from '../integrations/doku/client';
 import { AppError } from '@repo/shared/errors';
 
 import * as paymentService from '../services/paymentService';
@@ -20,12 +16,8 @@ import * as paymentService from '../services/paymentService';
  * This endpoint receives payment status updates from Doku
  */
 export async function handleNotification(req: Request, res: Response, next: NextFunction) {
-    const transaction = await sequelize.transaction();
-
     try {
         console.log('[PAYMENT_WEBHOOK] Received webhook from Doku');
-        console.log('[PAYMENT_WEBHOOK] Headers:', req.headers);
-        console.log('[PAYMENT_WEBHOOK] Body:', req.body);
 
         // 1. Verify Signature
         const isValidSignature = dokuClient.verifySignature(req.headers, req.body);
@@ -36,7 +28,7 @@ export async function handleNotification(req: Request, res: Response, next: Next
         }
 
         // 2. Parse and validate webhook payload
-        const payload: DokuWebhookPayload = dokuClient.parseWebhook(req.body);
+        const payload = dokuClient.parseWebhook(req.body);
 
         console.log('[PAYMENT_WEBHOOK] Parsed payload:', {
             invoice: payload.order.invoice_number,
@@ -44,176 +36,24 @@ export async function handleNotification(req: Request, res: Response, next: Next
             method: payload.payment.method
         });
 
-        // 3. Find Order
-        const order = await Order.findOne({
-            where: { order_number: payload.order.invoice_number },
-            transaction
-        });
+        // 3. Process via service
+        const result = await paymentService.handleWebhook(payload);
 
-        if (!order) {
-            console.error('[PAYMENT_WEBHOOK] Order not found:', payload.order.invoice_number);
-            await transaction.commit();
-            // Return 200 to prevent Doku from retrying
-            return res.status(200).json({
-                success: false,
-                message: 'Order not found'
-            });
+        // 4. Return response
+        if (!result.success) {
+            return res.status(200).json(result);
         }
 
-        // 4. Check if payment already processed
-        const existingPayment = await Payment.findOne({
-            where: {
-                order_id: order.id,
-                status: 'success'
-            },
-            transaction
-        });
-
-        if (existingPayment) {
-            console.warn('[PAYMENT_WEBHOOK] Payment already processed for order:', order.order_number);
-            await transaction.commit();
-            return res.json({
-                success: true,
-                message: 'Payment already processed'
-            });
-        }
-
-        // 5. Process payment based on status
-        if (payload.transaction.status === 'SUCCESS') {
-            await handleSuccessfulPayment(order, payload, transaction);
-        } else if (payload.transaction.status === 'FAILED') {
-            await handleFailedPayment(order, payload, transaction);
-        } else if (payload.transaction.status === 'EXPIRED') {
-            await handleExpiredPayment(order, payload, transaction);
-        } else {
-            console.log('[PAYMENT_WEBHOOK] Pending payment status, no action taken');
-        }
-
-        await transaction.commit();
-
-        // Return success response to Doku
         return res.json({ success: true });
 
     } catch (error) {
-        await transaction.rollback();
         console.error('[PAYMENT_WEBHOOK] Error processing webhook:', error);
         return next(error);
     }
 }
 
 /**
- * Handle successful payment
- */
-async function handleSuccessfulPayment(
-    order: Order,
-    payload: DokuWebhookPayload,
-    transaction: Transaction
-) {
-    console.log('[PAYMENT] Processing successful payment for:', order.order_number);
-
-    // Update order status
-    await order.update({
-        status: 'processing', // Paid, move to processing
-        payment_status: 'paid',
-        paid_at: new Date()
-    }, { transaction });
-
-    // Create Payment Record
-    await Payment.create({
-        order_id: order.id,
-        payment_method: payload.payment.method as any,
-        payment_provider: 'doku',
-        transaction_id: payload.transaction.id,
-        amount: order.total_amount,
-        status: 'success',
-        payment_response: payload,
-        paid_at: new Date()
-    }, { transaction });
-
-    console.log('[PAYMENT] Payment record created successfully');
-
-    // Trigger Odoo Sync asynchronously
-    // In production, this should be queued (e.g., BullMQ, Redis Queue)
-    odooOrderService.syncOrder(order.id).then(() => {
-        console.log('[PAYMENT] Order synced to Odoo successfully');
-    }).catch(err => {
-        console.error('[PAYMENT] Odoo Sync Failed:', err);
-        // Don't fail the transaction - log for manual retry
-        // In production: add to retry queue
-    });
-
-    // TODO: Send confirmation email
-    // TODO: Send notification to customer
-    // TODO: Update stock reservation
-}
-
-/**
- * Handle failed payment
- */
-async function handleFailedPayment(
-    order: Order,
-    payload: DokuWebhookPayload,
-    transaction: Transaction
-) {
-    console.log('[PAYMENT] Processing failed payment for:', order.order_number);
-
-    await order.update({
-        status: 'payment_failed' as any,
-        payment_status: 'failed' as any
-    }, { transaction });
-
-    // Create Payment Record (Failed)
-    await Payment.create({
-        order_id: order.id,
-        payment_method: payload.payment.method,
-        payment_provider: 'doku',
-        transaction_id: payload.transaction.id,
-        amount: order.total_amount,
-        status: 'failed',
-        payment_response: payload
-    } as any, { transaction });
-
-    console.log('[PAYMENT] Failed payment recorded');
-
-    // TODO: Release stock reservation
-    // TODO: Send failure notification to customer
-}
-
-/**
- * Handle expired payment
- */
-async function handleExpiredPayment(
-    order: Order,
-    payload: DokuWebhookPayload,
-    transaction: Transaction
-) {
-    console.log('[PAYMENT] Processing expired payment for:', order.order_number);
-
-    await order.update({
-        status: 'payment_expired' as any,
-        payment_status: 'expired' as any
-    }, { transaction });
-
-    // Create Payment Record (Expired)
-    await Payment.create({
-        order_id: order.id,
-        payment_method: payload.payment.method,
-        payment_provider: 'doku',
-        transaction_id: payload.transaction.id,
-        amount: order.total_amount,
-        status: 'expired',
-        payment_response: payload
-    } as any, { transaction });
-
-    console.log('[PAYMENT] Expired payment recorded');
-
-    // TODO: Release stock reservation
-    // TODO: Send expiry notification to customer
-}
-
-/**
  * Get payment status by order number
- * Optional endpoint for manual status checking
  */
 export async function getPaymentStatus(req: Request, res: Response, next: NextFunction) {
     try {
@@ -243,7 +83,6 @@ export async function getPaymentStatus(req: Request, res: Response, next: NextFu
 
 /**
  * Test webhook endpoint for development
- * Simulates a successful payment webhook
  */
 export async function testWebhook(req: Request, res: Response, next: NextFunction) {
     if (process.env.NODE_ENV === 'production') {
@@ -274,7 +113,7 @@ export async function testWebhook(req: Request, res: Response, next: NextFunctio
             }
         };
 
-        // Process the webhook
+        // Process the webhook by calling the notification handler
         req.body = mockWebhook;
         return await handleNotification(req, res, next);
 

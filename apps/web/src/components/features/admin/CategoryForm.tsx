@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { getAccessToken } from '@/lib/auth';
+import { useToast } from '@/components/ui/Toast';
+import { adminCategoryService } from '@/services/adminCategoryService';
 
 interface CategoryFormProps {
     initialData?: Category;
@@ -14,6 +15,7 @@ interface CategoryFormProps {
 
 export function CategoryForm({ initialData }: CategoryFormProps) {
     const router = useRouter();
+    const { success, error: showError } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<Partial<Category>>(initialData || {
         name: '',
@@ -28,28 +30,18 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
         e.preventDefault();
         try {
             setIsLoading(true);
-            const token = getAccessToken();
-            const method = isEdit ? 'PUT' : 'POST';
-            const endpoint = isEdit ? `/api/admin/categories/${initialData?.id}` : '/api/admin/categories';
-
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${endpoint}`, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                router.push('/admin/categories');
-                router.refresh();
+            if (isEdit && initialData.id) {
+                await adminCategoryService.updateCategory(initialData.id, formData);
+                success('Kategori berhasil diperbarui.');
             } else {
-                alert('Gagal menyimpan kategori.');
+                await adminCategoryService.createCategory(formData);
+                success('Kategori berhasil ditambahkan.');
             }
+            router.push('/admin/categories');
+            router.refresh();
         } catch (error) {
             console.error('Submit category error:', error);
-            alert('Terjadi kesalahan.');
+            showError(error instanceof Error ? error.message : 'Gagal menyimpan kategori.');
         } finally {
             setIsLoading(false);
         }
@@ -118,6 +110,42 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                             placeholder="Jelaskan karakteristik produk dalam kategori ini..."
                         ></textarea>
                     </div>
+
+                    <div className="pt-6 border-t border-gray-100">
+                        <h3 className="font-semibold text-gray-900 mb-4">SEO Settings</h3>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-gray-700">Meta Title</label>
+                                <input
+                                    type="text"
+                                    className="w-full rounded-lg border-gray-200 p-2.5 border focus:ring-primary-500 focus:border-primary-500 text-sm"
+                                    value={formData.meta_title || ''}
+                                    onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                                    placeholder="Judul halaman untuk SEO"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-gray-700">Meta Description</label>
+                                <textarea
+                                    className="w-full rounded-lg border-gray-200 p-2.5 border focus:ring-primary-500 focus:border-primary-500 text-sm"
+                                    rows={3}
+                                    value={formData.meta_description || ''}
+                                    onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                                    placeholder="Deskripsi singkat untuk hasil pencarian Google"
+                                ></textarea>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-gray-700">Keywords</label>
+                                <input
+                                    type="text"
+                                    className="w-full rounded-lg border-gray-200 p-2.5 border focus:ring-primary-500 focus:border-primary-500 text-sm"
+                                    value={formData.keywords || ''}
+                                    onChange={(e) => setFormData({ ...formData, keywords: e.target.value })}
+                                    placeholder="Kata kunci dipisahkan koma (contoh: hijab, fashion, muslimah)"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="space-y-6">
@@ -165,8 +193,8 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                                 type="checkbox"
                                 id="is_active"
                                 className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                                checked={!!(formData as unknown as Record<string, unknown>).is_active !== false}
-                                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked } as unknown as Partial<Category>)}
+                                checked={!!(formData as any).is_active !== false}
+                                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked } as any)}
                             />
                             <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Kategori Aktif</label>
                         </div>

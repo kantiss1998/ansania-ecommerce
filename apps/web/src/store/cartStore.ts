@@ -2,53 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import { getErrorMessage } from '@/lib/api';
-import { cartService } from '@/services/cartService';
-
-/**
- * Cart item interface
- */
-interface CartItem {
-    id: number;
-    product: {
-        id: number;
-        name: string;
-        slug: string;
-        image: string;
-    };
-    variant: {
-        id: number;
-        sku: string;
-        color?: string;
-        finishing?: string;
-        size?: string;
-    };
-    quantity: number;
-    price: number;
-    subtotal: number;
-    stock_available: number;
-}
-
-/**
- * Voucher interface
- */
-interface Voucher {
-    code: string;
-    discount_type: 'percentage' | 'fixed' | 'free_shipping';
-    discount_value: number;
-    discount_amount: number;
-}
-
-/**
- * Cart interface
- */
-interface Cart {
-    id?: number;
-    items: CartItem[];
-    subtotal: number;
-    discount_amount: number;
-    voucher: Voucher | null;
-    total: number;
-}
+import { cartService, Cart } from '@/services/cartService';
 
 /**
  * Cart store state interface
@@ -86,14 +40,8 @@ export const useCartStore = create<CartState>()(
                 try {
                     const cart = await cartService.getCart();
 
-                    // Map service response to store Cart shape if needed
-                    // For now assuming identical shape or compatible
-                    // If cartService returns generic Cart structure, we might need mapping
-                    // But typically backend response should match what we expect or we adapt types
-
-
                     set({
-                        cart: cart as unknown as Cart,
+                        cart,
                         isLoading: false,
                         error: null,
                     });
@@ -113,7 +61,7 @@ export const useCartStore = create<CartState>()(
                     const cart = await cartService.addToCart({ product_variant_id: productVariantId, quantity });
 
                     set({
-                        cart: cart as unknown as Cart,
+                        cart,
                         isLoading: false,
                         error: null,
                     });
@@ -134,7 +82,7 @@ export const useCartStore = create<CartState>()(
                     const cart = await cartService.updateItem(itemId, quantity);
 
                     set({
-                        cart: cart as unknown as Cart,
+                        cart,
                         isLoading: false,
                         error: null,
                     });
@@ -155,7 +103,7 @@ export const useCartStore = create<CartState>()(
                     const cart = await cartService.removeItem(itemId);
 
                     set({
-                        cart: cart as unknown as Cart,
+                        cart,
                         isLoading: false,
                         error: null
                     });
@@ -174,7 +122,7 @@ export const useCartStore = create<CartState>()(
                 try {
                     const cart = await cartService.applyVoucher(code);
                     set({
-                        cart: cart as unknown as Cart,
+                        cart,
                         isLoading: false,
                         error: null,
                     });
@@ -191,7 +139,7 @@ export const useCartStore = create<CartState>()(
                 try {
                     const cart = await cartService.removeVoucher();
                     set({
-                        cart: cart as unknown as Cart,
+                        cart,
                         isLoading: false,
                         error: null,
                     });

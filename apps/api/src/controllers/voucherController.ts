@@ -1,5 +1,6 @@
 
 import { Request, Response, NextFunction } from 'express';
+import { BadRequestError, NotFoundError } from '@repo/shared/errors';
 
 import * as cartService from '../services/cartService';
 import * as voucherService from '../services/voucherService';
@@ -12,15 +13,13 @@ export async function applyVoucher(req: Request, res: Response, next: NextFuncti
         const { code } = req.body as { code: string };
 
         if (!code) {
-            res.status(400).json({ success: false, error: 'Voucher code is required' });
-            return;
+            throw new BadRequestError('Voucher code is required');
         }
 
         // Get Cart ID first
         const cart = await cartService.getCart(userId, sessionId);
         if (!cart) {
-            res.status(404).json({ success: false, error: 'Cart not found' });
-            return;
+            throw new NotFoundError('Cart');
         }
 
         const updatedCart = await voucherService.applyVoucher(cart.id, code);
@@ -41,8 +40,7 @@ export async function removeVoucher(req: Request, res: Response, next: NextFunct
 
         const cart = await cartService.getCart(userId, sessionId);
         if (!cart) {
-            res.status(404).json({ success: false, error: 'Cart not found' });
-            return;
+            throw new NotFoundError('Cart');
         }
 
         const updatedCart = await voucherService.removeVoucher(cart.id);
@@ -84,8 +82,7 @@ export async function validateVoucher(req: Request, res: Response, next: NextFun
     try {
         const { code, cart_total } = req.body;
         if (!code) {
-            res.status(400).json({ success: false, error: 'Voucher code is required' });
-            return;
+            throw new BadRequestError('Voucher code is required');
         }
 
         const voucher = await voucherService.validateVoucher(code, Number(cart_total || 0));

@@ -67,3 +67,15 @@ export class VoucherError extends AppError {
         super(message, 400, code);
     }
 }
+
+export class BadRequestError extends AppError {
+    constructor(message: string) {
+        super(message, 400, 'BAD_REQUEST');
+    }
+}
+
+export class InternalServerError extends AppError {
+    constructor(message = 'Internal server error') {
+        super(message, 500, 'INTERNAL_SERVER_ERROR');
+    }
+}

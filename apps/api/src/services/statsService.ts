@@ -1,6 +1,7 @@
 
 import { SearchHistory, ProductView, Product, ProductImage } from '@repo/database';
 import { literal, fn, col } from 'sequelize';
+import { PAGINATION } from '@repo/shared/constants';
 
 export async function recordSearch(userId: number | null, query: string, _ipAddress?: string) {
     if (!query || query.trim().length === 0) return;
@@ -19,7 +20,7 @@ export async function recordProductView(userId: number | null, productId: number
     });
 }
 
-export async function getTopSearches(limit: number = 10) {
+export async function getTopSearches(limit: number = PAGINATION.DEFAULT_LIMIT) {
     return SearchHistory.findAll({
         attributes: [
             ['search_query', 'query'],
@@ -31,7 +32,7 @@ export async function getTopSearches(limit: number = 10) {
     });
 }
 
-export async function getMostViewedProducts(limit: number = 10) {
+export async function getMostViewedProducts(limit: number = PAGINATION.DEFAULT_LIMIT) {
     return ProductView.findAll({
         attributes: [
             'product_id',

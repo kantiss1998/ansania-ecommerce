@@ -1,6 +1,7 @@
 'use client';
 
 import { Order } from '@repo/shared';
+import { ORDER_STATUS } from '@repo/shared/constants';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -89,14 +90,14 @@ export default function AdminOrderDetailClient({ order }: AdminOrderDetailClient
 
     const StatusBadge = ({ status }: { status: string }) => {
         const variants: Record<string, any> = {
-            pending: 'warning',
-            pending_payment: 'warning',
-            paid: 'success',
-            processing: 'info',
-            shipped: 'info',
-            delivered: 'success',
-            cancelled: 'error',
-            expired: 'default',
+            [ORDER_STATUS.PENDING_PAYMENT]: 'warning',
+            [ORDER_STATUS.PAID]: 'success',
+            [ORDER_STATUS.PROCESSING]: 'info',
+            [ORDER_STATUS.SHIPPED]: 'info',
+            [ORDER_STATUS.DELIVERED]: 'success',
+            [ORDER_STATUS.CANCELLED]: 'error',
+            [ORDER_STATUS.REFUNDED]: 'default',
+            [ORDER_STATUS.FAILED]: 'error',
         };
         return <Badge variant={variants[status] || 'default'}>{status.toUpperCase()}</Badge>;
     };
@@ -118,27 +119,27 @@ export default function AdminOrderDetailClient({ order }: AdminOrderDetailClient
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    {(order.status === 'pending' || order.status === 'pending_payment') && (
-                        <Button variant="primary" size="sm" onClick={() => updateStatus('paid')} isLoading={isUpdating}>
+                    {(order.status === ORDER_STATUS.PENDING_PAYMENT) && (
+                        <Button variant="primary" size="sm" onClick={() => updateStatus(ORDER_STATUS.PAID)} isLoading={isUpdating}>
                             Konfirmasi Pembayaran
                         </Button>
                     )}
-                    {order.status === 'paid' && (
-                        <Button variant="primary" size="sm" onClick={() => updateStatus('processing')} isLoading={isUpdating}>
+                    {order.status === ORDER_STATUS.PAID && (
+                        <Button variant="primary" size="sm" onClick={() => updateStatus(ORDER_STATUS.PROCESSING)} isLoading={isUpdating}>
                             Proses Pesanan
                         </Button>
                     )}
-                    {order.status === 'processing' && (
-                        <Button variant="primary" size="sm" onClick={() => updateStatus('shipped')} isLoading={isUpdating}>
+                    {order.status === ORDER_STATUS.PROCESSING && (
+                        <Button variant="primary" size="sm" onClick={() => updateStatus(ORDER_STATUS.SHIPPED)} isLoading={isUpdating}>
                             Masukkan Resi / Kirim
                         </Button>
                     )}
-                    {order.status !== 'delivered' && order.status !== 'cancelled' && (
-                        <Button variant="ghost" size="sm" className="text-error-600 hover:bg-error-50" onClick={() => updateStatus('cancelled')} isLoading={isUpdating}>
+                    {order.status !== ORDER_STATUS.DELIVERED && order.status !== ORDER_STATUS.CANCELLED && (
+                        <Button variant="ghost" size="sm" className="text-error-600 hover:bg-error-50" onClick={() => updateStatus(ORDER_STATUS.CANCELLED)} isLoading={isUpdating}>
                             Batalkan
                         </Button>
                     )}
-                    {(order.status === 'paid' || order.status === 'processing' || order.status === 'delivered') && (
+                    {(order.status === ORDER_STATUS.PAID || order.status === ORDER_STATUS.PROCESSING || order.status === ORDER_STATUS.DELIVERED) && (
                         <Button variant="outline" size="sm" onClick={() => setShowRefundModal(true)}>
                             💰 Process Refund
                         </Button>

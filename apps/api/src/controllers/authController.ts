@@ -1,14 +1,15 @@
-
 import { RegisterDTO, LoginDTO } from '@repo/shared/schemas';
 import { Request, Response, NextFunction } from 'express';
+import { HTTP_STATUS } from '@repo/shared/constants';
 
 import * as authService from '../services/authService';
+import { AuthenticatedRequest } from '../types/express';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
     try {
         const body = req.body as RegisterDTO;
         const result = await authService.register(body);
-        res.status(201).json({
+        res.status(HTTP_STATUS.CREATED).json({
             success: true,
             data: result,
         });
@@ -68,7 +69,6 @@ export async function logout(_req: Request, res: Response, next: NextFunction) {
         next(error);
     }
 }
-import { AuthenticatedRequest } from '../types/express';
 
 export async function verifyEmail(req: Request, res: Response, next: NextFunction) {
     try {
@@ -84,7 +84,7 @@ export async function deleteAccount(req: Request, res: Response, next: NextFunct
     try {
         const userId = (req as AuthenticatedRequest).user?.userId;
         if (!userId) {
-            res.status(401).json({ success: false, error: 'Unauthorized' });
+            res.status(HTTP_STATUS.UNAUTHORIZED).json({ success: false, error: 'Unauthorized' });
             return;
         }
 

@@ -13,6 +13,7 @@ import { Checkbox } from '@/components/ui/Checkbox';
 import { Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
 import { useAuthStore } from '@/store/authStore';
+import { USER_ROLES } from '@repo/shared/constants';
 
 
 type LoginFormData = LoginDTO;
@@ -41,7 +42,7 @@ export function LoginForm() {
 
             // Get user from store to check role
             const user = useAuthStore.getState().user;
-            if (user?.role === 'admin') {
+            if (user?.role === USER_ROLES.ADMIN) {
                 router.push('/admin');
             } else {
                 router.push('/');

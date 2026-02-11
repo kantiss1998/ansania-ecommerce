@@ -2,12 +2,30 @@
 import { Order, OrderItem, Cart, CartItem, ProductVariant, Product, sequelize, Shipping, Address, Voucher, VoucherUsage, Payment } from '@repo/database';
 import { AppError, NotFoundError, InsufficientStockError } from '@repo/shared/errors';
 import { CreateOrderDTO } from '@repo/shared/schemas';
-import { generateOrderNumber } from '@repo/shared/utils';
+import { generateOrderNumber, calculatePagination } from '@repo/shared/utils';
 import { WhereOptions } from 'sequelize';
+import { ORDER_STATUS, PAYMENT_STATUS, PAGINATION, SHIPPING_PROVIDER, DASHBOARD_CONFIG } from '@repo/shared/constants';
 
 import { calculateShipping } from './shippingService';
+import { JNTRateResponse } from '../integrations/jnt/client';
 
-export async function createOrder(userId: number, data: CreateOrderDTO) {
+export interface OrderListResult {
+    data: Order[];
+    meta: any; // Ideally this should be a proper PaginationMeta type from shared
+}
+
+export interface CheckoutValidationResult {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+    cart: {
+        items_count: number;
+        subtotal: number;
+        total: number;
+    };
+}
+
+export async function createOrder(userId: number, data: CreateOrderDTO): Promise<Order> {
     const transaction = await sequelize.transaction();
 
     try {
@@ -45,13 +63,8 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
         }
 
         // 3. Calculate Shipping Cost
-        // We re-calculate to ensure it's valid, though it might be expensive.
-        // Or we trust frontend? No, backend must validate.
-        // We use the same helper but we might need to Mock it or be careful with internal calls if they don't support transaction?
-        // `calculateShipping` uses `findByPk` without transaction. It's read-only, so mostly fine, but ideally consistent.
-        // Let's call it.
-        const shippingRates = await calculateShipping(data.shipping_address_id, cart.id);
-        const selectedRate = shippingRates.find((r: any) => r.service === data.shipping_service);
+        const shippingRates: JNTRateResponse[] = await calculateShipping(data.shipping_address_id, cart.id);
+        const selectedRate = shippingRates.find((r) => r.service === data.shipping_service);
 
         if (!selectedRate) {
             throw new AppError('Invalid shipping service selected', 400);
@@ -62,12 +75,12 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
         const totalAmount = subtotal + shippingCost - discountAmount;
 
         // 4. Create Order
-        const orderNumber = generateOrderNumber(); // You need to implement this util or import
+        const orderNumber = generateOrderNumber();
         const order = await Order.create({
             user_id: userId,
             order_number: orderNumber,
-            status: 'pending_payment',
-            payment_status: 'pending',
+            status: ORDER_STATUS.PENDING_PAYMENT,
+            payment_status: PAYMENT_STATUS.PENDING,
             subtotal,
             shipping_cost: shippingCost,
             discount_amount: discountAmount,
@@ -80,7 +93,6 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
         if (!shippingAddress) throw new NotFoundError('Shipping Address');
 
         // Create Shipping Record
-        // Create Shipping Record
         await Shipping.create({
             order_id: order.id,
             recipient_name: shippingAddress.recipient_name,
@@ -89,22 +101,23 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
             city: shippingAddress.city,
             province: shippingAddress.province,
             postal_code: shippingAddress.postal_code,
-            courier: (selectedRate as any).courier_name || 'JNT', // Assuming JNT if not specified
+            courier: (selectedRate as JNTRateResponse).serviceName || SHIPPING_PROVIDER.JNT,
             service: selectedRate.service,
             cost: shippingCost,
-            estimated_delivery: selectedRate.etd // e.g., "2-3 Days"
+            estimated_delivery: selectedRate.etd
         }, { transaction });
 
         // 5. Create Order Items and Update Stock
         for (const item of cart.items) {
             const variant = item.productVariant;
+            if (!variant) continue;
 
             await OrderItem.create({
                 order_id: order.id,
                 product_id: variant.product_id,
                 product_variant_id: variant.id,
-                product_name: variant.product.name,
-                variant_name: variant.option1_value ? `${variant.option1_value} ${variant.option2_value || ''}`.trim() : null,
+                product_name: variant.product?.name || 'Unknown Product',
+                variant_name: variant.color ? `${variant.color} ${variant.size || ''}`.trim() : (variant.size || null),
                 sku: variant.sku,
                 quantity: item.quantity,
                 price: item.price,
@@ -121,9 +134,6 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
         if (cart.voucher_id) {
             const voucher = await Voucher.findByPk(cart.voucher_id, { transaction });
             if (voucher) {
-                // Increment usage count on voucher (assuming method exists or do it manually)
-                // voucher.increment('used_count', { transaction }); // Sequelize helper or manual update
-                // Manual update to be safe with types
                 await voucher.update({ usage_count: (voucher.usage_count || 0) + 1 }, { transaction });
 
                 // Create Usage Record
@@ -153,7 +163,7 @@ export async function createOrder(userId: number, data: CreateOrderDTO) {
     }
 }
 
-export async function getUserOrders(userId: number, page: number = 1, limit: number = 10, status?: string) {
+export async function getUserOrders(userId: number, page: number = PAGINATION.DEFAULT_PAGE, limit: number = PAGINATION.DEFAULT_LIMIT, status?: string): Promise<OrderListResult> {
     const offset = (page - 1) * limit;
     const whereClause: WhereOptions = { user_id: userId };
 
@@ -170,8 +180,6 @@ export async function getUserOrders(userId: number, page: number = 1, limit: num
             {
                 model: OrderItem,
                 as: 'items',
-                // Assuming OrderItem has association to ProductVariant or Product to get details if needed
-                // For now, OrderItem has snapshot data (product_name, etc) so we might not need deep include for list view
             },
             {
                 model: Payment,
@@ -181,18 +189,15 @@ export async function getUserOrders(userId: number, page: number = 1, limit: num
         distinct: true
     });
 
+    const pagination = calculatePagination(Number(page), Number(limit), count);
+
     return {
         data: rows,
-        meta: {
-            total: count,
-            page,
-            limit,
-            totalPages: Math.ceil(count / limit)
-        }
+        meta: pagination
     };
 }
 
-export async function getOrderDetail(userId: number, orderNumber: string) {
+export async function getOrderDetail(userId: number, orderNumber: string): Promise<Order> {
     const order = await Order.findOne({
         where: {
             order_number: orderNumber,
@@ -202,7 +207,6 @@ export async function getOrderDetail(userId: number, orderNumber: string) {
             {
                 model: OrderItem,
                 as: 'items',
-                // If specific relations are missing, we rely on snapshot data in OrderItem
             },
             {
                 model: Payment,
@@ -223,7 +227,7 @@ export async function getOrderDetail(userId: number, orderNumber: string) {
 }
 
 // Validate checkout before creating order
-export async function validateCheckout(userId: number, data: any): Promise<any> {
+export async function validateCheckout(userId: number, data: { shipping_address_id?: number }): Promise<CheckoutValidationResult> {
     // Get Cart
     const cart = await Cart.findOne({
         where: { user_id: userId },
@@ -241,7 +245,13 @@ export async function validateCheckout(userId: number, data: any): Promise<any> 
     if (!cart || !cart.items || cart.items.length === 0) {
         return {
             valid: false,
-            errors: ['Cart is empty']
+            errors: ['Cart is empty'],
+            warnings: [],
+            cart: {
+                items_count: 0,
+                subtotal: 0,
+                total: 0
+            }
         };
     }
 
@@ -257,11 +267,11 @@ export async function validateCheckout(userId: number, data: any): Promise<any> 
         }
 
         if (variant.stock < item.quantity) {
-            errors.push(`Insufficient stock for ${variant.product.name}. Available: ${variant.stock}, Requested: ${item.quantity}`);
+            errors.push(`Insufficient stock for ${variant.product?.name || variant.sku}. Available: ${variant.stock}, Requested: ${item.quantity}`);
         }
 
-        if (variant.stock < 5) {
-            warnings.push(`Low stock for ${variant.product.name}`);
+        if (variant.stock < DASHBOARD_CONFIG.LOW_STOCK_THRESHOLD) {
+            warnings.push(`Low stock for ${variant.product?.name || variant.sku}`);
         }
     }
 
@@ -291,7 +301,7 @@ export async function validateCheckout(userId: number, data: any): Promise<any> 
 }
 
 // Cancel an order
-export async function cancelOrder(userId: number, orderNumber: string) {
+export async function cancelOrder(userId: number, orderNumber: string): Promise<Order> {
     const order = await Order.findOne({
         where: {
             order_number: orderNumber,
@@ -312,7 +322,7 @@ export async function cancelOrder(userId: number, orderNumber: string) {
     }
 
     // Can only cancel pending or processing orders
-    if (!['pending_payment', 'processing'].includes(order.status)) {
+    if (!([ORDER_STATUS.PENDING_PAYMENT, ORDER_STATUS.PROCESSING] as string[]).includes(order.status)) {
         throw new AppError('Order cannot be cancelled in current status', 400);
     }
 
@@ -331,7 +341,7 @@ export async function cancelOrder(userId: number, orderNumber: string) {
 
         // Update order status
         await order.update({
-            status: 'cancelled',
+            status: ORDER_STATUS.CANCELLED,
             cancelled_at: new Date()
         }, { transaction });
 
@@ -343,4 +353,3 @@ export async function cancelOrder(userId: number, orderNumber: string) {
         throw error;
     }
 }
-

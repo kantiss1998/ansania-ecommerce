@@ -1,9 +1,28 @@
 
-import { Wishlist, Product, ProductVariant, ProductImage } from '@repo/database';
+import { Wishlist, Product, ProductVariant, ProductImage, ProductRatingsSummary } from '@repo/database';
 import { AddToWishlistDTO, ListWishlistQuery } from '@repo/shared';
 import { NotFoundError, ConflictError } from '@repo/shared/errors';
+import { MappedProduct } from './productService';
 
-export async function addToWishlist(userId: number, data: AddToWishlistDTO) {
+export type MappedWishlistItem = Omit<Wishlist, 'product'> & {
+    product: MappedProduct | null;
+}
+
+export interface WishlistListResult {
+    items: MappedWishlistItem[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
+export interface SuccessResponse {
+    success: boolean;
+    message?: string;
+    [key: string]: any;
+}
+
+export async function addToWishlist(userId: number, data: AddToWishlistDTO): Promise<Wishlist> {
     // Check if product exists
     const product = await Product.findByPk(data.product_id);
     if (!product) throw new NotFoundError('Product');
@@ -37,7 +56,7 @@ export async function addToWishlist(userId: number, data: AddToWishlistDTO) {
     return wishlistItem;
 }
 
-export async function removeFromWishlist(userId: number, id: number) {
+export async function removeFromWishlist(userId: number, id: number): Promise<SuccessResponse> {
     const item = await Wishlist.findOne({ where: { id, user_id: userId } });
     if (!item) throw new NotFoundError('Wishlist Item');
 
@@ -47,7 +66,7 @@ export async function removeFromWishlist(userId: number, id: number) {
 
 import { mapProduct } from './productService';
 
-export async function getWishlist(userId: number, query: ListWishlistQuery) {
+export async function getWishlist(userId: number, query: ListWishlistQuery): Promise<WishlistListResult> {
     const { page = 1, limit = 10 } = query;
     const offset = (page - 1) * limit;
 
@@ -59,7 +78,7 @@ export async function getWishlist(userId: number, query: ListWishlistQuery) {
                 as: 'product',
                 include: [
                     { model: ProductImage, as: 'images' },
-                    { model: require('@repo/database').ProductRatingsSummary, as: 'ratingsSummary' }
+                    { model: ProductRatingsSummary as any, as: 'ratingsSummary' }
                 ]
             },
             {
@@ -78,7 +97,7 @@ export async function getWishlist(userId: number, query: ListWishlistQuery) {
             return {
                 ...data,
                 product: mapProduct(data.product)
-            };
+            } as MappedWishlistItem;
         }),
         total: count,
         page,
@@ -87,9 +106,9 @@ export async function getWishlist(userId: number, query: ListWishlistQuery) {
     };
 }
 
-import { WhereOptions } from 'sequelize';
+import { WhereOptions, Op } from 'sequelize';
 
-export async function checkWishlist(userId: number, productId: number, variantId?: number) {
+export async function checkWishlist(userId: number, productId: number, variantId?: number): Promise<boolean> {
     const where: WhereOptions = {
         user_id: userId,
         product_id: productId
@@ -100,7 +119,7 @@ export async function checkWishlist(userId: number, productId: number, variantId
     return !!item;
 }
 
-export async function moveToCart(userId: number, wishlistItemId: number) {
+export async function moveToCart(userId: number, wishlistItemId: number): Promise<SuccessResponse> {
     // Find wishlist item
     const wishlistItem = await Wishlist.findOne({
         where: {
@@ -125,7 +144,7 @@ export async function moveToCart(userId: number, wishlistItemId: number) {
     if (!variantId) {
         // Get first available variant for this product
         const variant = await ProductVariant.findOne({
-            where: { product_id: wishlistItem.product_id, stock: { [require('sequelize').Op.gt]: 0 } }
+            where: { product_id: wishlistItem.product_id, stock: { [Op.gt]: 0 } }
         });
 
         if (!variant) {
@@ -149,7 +168,7 @@ export async function moveToCart(userId: number, wishlistItemId: number) {
     return { success: true, message: 'Item moved to cart successfully' };
 }
 
-export async function clearWishlist(userId: number) {
+export async function clearWishlist(userId: number): Promise<SuccessResponse> {
     // Delete all wishlist items for the user
     const deletedCount = await Wishlist.destroy({
         where: { user_id: userId }

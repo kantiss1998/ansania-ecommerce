@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { formatCurrency } from '@/lib/utils';
 import { useCartStore } from '@/store/cartStore';
 import { useToast } from '@/components/ui/Toast';
-import { ReviewList, Review } from '@/components/features/reviews/ReviewList';
+import { ReviewList } from '@/components/features/reviews/ReviewList';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { FeaturedProducts } from '@/components/features/home/FeaturedProducts';
 import { Product } from '@/services/productService';
@@ -15,27 +15,8 @@ import { wishlistService } from '@/services/wishlistService';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, ShieldCheck, Truck, RotateCcw, Star, Sparkles } from 'lucide-react';
 
-// Define Product interface locally for now, matching the mock data structure
-export interface ProductDetailData {
-    id: number;
-    name: string;
-    slug: string;
-    description: string;
-    base_price: number;
-    discount_price?: number;
-    images: string[];
-    rating_average: number;
-    total_reviews: number;
-    is_featured: boolean;
-    is_new: boolean;
-    category: string;
-    variants: ProductVariant[];
-    reviews: Review[];
-    related_products?: Product[];
-}
-
 interface ProductDetailViewProps {
-    product: ProductDetailData;
+    product: Product;
 }
 
 export function ProductDetailView({ product }: ProductDetailViewProps) {
@@ -43,7 +24,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     const { success } = useToast();
 
     const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-        product.variants[0] || null
+        product.variants?.[0] || null
     );
     const [quantity, setQuantity] = useState(1);
 
@@ -65,6 +46,9 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     const currentPrice =
         selectedVariant?.price || product.discount_price || product.base_price;
 
+    // Map images to string array for gallery component
+    const galleryImages = product.images?.map(img => img.image_url) || [product.thumbnail_url || ''];
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-white via-gray-50/30 to-white">
             <div className="container mx-auto px-4 py-8 lg:py-12">
@@ -72,7 +56,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                 <div className="mb-8">
                     <Breadcrumb
                         items={[
-                            { label: product.category, href: `/products?category=${product.category}` },
+                            { label: product.category?.name || 'Produk', href: `/products?category=${product.category?.slug || ''}` },
                             { label: product.name },
                         ]}
                     />
@@ -86,7 +70,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                         transition={{ duration: 0.5 }}
                     >
                         <ProductImageGallery
-                            images={product.images}
+                            images={galleryImages}
                             productName={product.name}
                         />
                     </motion.div>
@@ -186,7 +170,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                             <div className="space-y-8 pt-8 border-t border-gray-100">
                                 {/* Variant Selector */}
                                 <VariantSelector
-                                    variants={product.variants}
+                                    variants={product.variants || []}
                                     selectedVariant={selectedVariant}
                                     onVariantChange={setSelectedVariant}
                                 />
@@ -298,12 +282,12 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                                 <Star className="h-5 w-5 text-amber-600" />
                             </div>
                             <h2 className="text-2xl font-bold font-heading bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                                Ulasan Pelanggan <span className="ml-2 text-lg font-normal text-gray-500">({product.reviews.length})</span>
+                                Ulasan Pelanggan <span className="ml-2 text-lg font-normal text-gray-500">({product.reviews?.length || 0})</span>
                             </h2>
                         </div>
                     </div>
                     <ReviewList
-                        reviews={product.reviews}
+                        reviews={product.reviews || []}
                         averageRating={product.rating_average}
                         totalReviews={product.total_reviews}
                     />

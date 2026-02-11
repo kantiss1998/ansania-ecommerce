@@ -1,14 +1,46 @@
 
 import { User } from '@repo/database';
 import { RegisterDTO, LoginDTO } from '@repo/shared/schemas';
+import { NotFoundError, AppError, ServiceUnavailableError } from '@repo/shared/errors';
+import { USER_ROLES } from '@repo/shared/constants';
+import { formatPhone } from '@repo/shared/utils';
 
 import { odooClient } from './odoo.client';
+
+export interface OdooCustomer {
+    uid: number;
+    partner_id: number;
+    name: string;
+    email: string;
+}
+
+export interface OdooCreateResult {
+    uid: number;
+    partner_id: number;
+}
+
+export interface OdooPartner {
+    id: number;
+    name: string;
+    email: string;
+    phone: string | false;
+    mobile: string | false;
+    street: string | false;
+    street2: string | false;
+    city: string | false;
+    zip: string | false;
+    state_id: [number, string] | false;
+    country_id: [number, string] | false;
+    type: string;
+    parent_id: [number, string] | false;
+    child_ids: number[];
+}
 
 export class OdooCustomerService {
     /**
      * Authenticate user against Odoo (mock/placeholder for now)
      */
-    async authenticate(credentials: LoginDTO) {
+    async authenticate(credentials: LoginDTO): Promise<OdooCustomer> {
         console.log('Verifying Odoo user:', credentials.email);
         // TODO: Implement actual Odoo auth check if needed
         // For now returning mock success to match previous behavior
@@ -23,7 +55,7 @@ export class OdooCustomerService {
     /**
      * Create customer in Odoo from registration data
      */
-    async createCustomer(data: RegisterDTO) {
+    async createCustomer(data: RegisterDTO): Promise<OdooCreateResult> {
         console.log('Creating Odoo customer:', data.email);
 
         if (odooClient.isMockMode()) {
@@ -38,7 +70,7 @@ export class OdooCustomerService {
             const partnerData = {
                 name: data.full_name,
                 email: data.email,
-                phone: data.phone || '',
+                phone: data.phone ? formatPhone(data.phone) : '',
                 customer_rank: 1,
                 is_company: false,
                 comment: `Registered via e-commerce`
@@ -57,7 +89,8 @@ export class OdooCustomerService {
             };
         } catch (error) {
             console.error('Failed to create Odoo customer:', error);
-            throw error;
+            if (error instanceof AppError) throw error;
+            throw new ServiceUnavailableError('Odoo Create Customer');
         }
     }
 
@@ -71,7 +104,7 @@ export class OdooCustomerService {
             const user = await User.findByPk(userId);
 
             if (!user) {
-                throw new Error(`User not found: ${userId}`);
+                throw new NotFoundError('User');
             }
 
             if (user.odoo_partner_id) {
@@ -90,7 +123,7 @@ export class OdooCustomerService {
             const partnerData = {
                 name: user.full_name,
                 email: user.email,
-                phone: user.phone || '',
+                phone: user.phone ? formatPhone(user.phone) : '',
                 customer_rank: 1,
                 is_company: false,
                 comment: `Registered via e-commerce on ${user.created_at.toISOString()}`
@@ -104,7 +137,8 @@ export class OdooCustomerService {
 
         } catch (error) {
             console.error('[ODOO_SYNC] Failed to sync customer:', error);
-            throw error;
+            if (error instanceof AppError) throw error;
+            throw new ServiceUnavailableError('Odoo Sync Customer');
         }
     }
 
@@ -118,7 +152,7 @@ export class OdooCustomerService {
             const user = await User.findByPk(userId);
 
             if (!user) {
-                throw new Error(`User not found: ${userId}`);
+                throw new NotFoundError('User');
             }
 
             if (!user.odoo_partner_id) {
@@ -136,7 +170,7 @@ export class OdooCustomerService {
             const updateData = {
                 name: user.full_name,
                 email: user.email,
-                phone: user.phone || '',
+                phone: user.phone ? formatPhone(user.phone) : '',
             };
 
             await odooClient.write('res.partner', [user.odoo_partner_id], updateData);
@@ -155,7 +189,7 @@ export class OdooCustomerService {
      * - Updates/Creates 'User' in local DB
      * - Updates/Creates 'Address' in local DB
      */
-    async syncCustomersFromOdoo(limit = 50) {
+    async syncCustomersFromOdoo(limit = 50): Promise<{ synced: number; errors: number }> {
         console.log("🚀 Starting Customer Sync from Odoo...");
         const startTime = Date.now();
         let syncedCount = 0;
@@ -173,7 +207,7 @@ export class OdooCustomerService {
                 'type', 'parent_id', 'child_ids'
             ];
 
-            const partners = await odooClient.searchRead('res.partner', domain, fields, { limit });
+            const partners = await odooClient.searchRead('res.partner', domain, fields, { limit }) as unknown as OdooPartner[];
             console.log(`📦 Found ${partners.length} partners in Odoo (Limit: ${limit})`);
 
             for (const partner of partners) {
@@ -188,7 +222,8 @@ export class OdooCustomerService {
 
         } catch (error) {
             console.error("❌ Fatal error in syncCustomersFromOdoo:", error);
-            throw error;
+            if (error instanceof AppError) throw error;
+            throw new ServiceUnavailableError('Odoo Sync Customers From Odoo');
         }
 
         const duration = (Date.now() - startTime) / 1000;
@@ -196,7 +231,7 @@ export class OdooCustomerService {
         return { synced: syncedCount, errors: errorsCount };
     }
 
-    private async processPartner(partner: any) {
+    private async processPartner(partner: OdooPartner): Promise<void> {
         if (!partner.email) return; // Skip if no email (cannot be a user)
 
         // 1. Find or Create User
@@ -214,7 +249,7 @@ export class OdooCustomerService {
         const userData = {
             email: partner.email,
             full_name: partner.name,
-            phone: partner.mobile || partner.phone,
+            phone: (partner.mobile || partner.phone) ? formatPhone((partner.mobile || partner.phone) as string) : null,
             odoo_partner_id: partner.id,
             email_verified: true, // Auto-verify if from Odoo
             // If creating new user, we need a password.
@@ -237,7 +272,7 @@ export class OdooCustomerService {
             user = await User.create({
                 ...userData,
                 password: '$2a$10$PlaceholderHashForOdooSyncedUserButIdeallyShouldBeReset',
-                role: 'customer'
+                role: USER_ROLES.CUSTOMER
             });
             console.log(`👤 Created new user: ${user.email}`);
         }
@@ -245,15 +280,9 @@ export class OdooCustomerService {
         // 2. Sync Address (Main Partner Address)
         // If the partner itself has address info, save it as a default address
         await this.syncAddress(user.id, partner, true);
-
-        // 3. Sync Child Addresses (Delivery, Invoice, etc)
-        // Note: 'searchRead' with 'child_ids' only gives IDs. We might need to fetch them if we want full details.
-        // For optimization, we can fetch child addresses in a separate batch if needed.
-        // But simpler: just use key address fields from the main partner for now.
-        // If 'child_ids' are important, Odoo Client usually requires fetching them separately.
     }
 
-    private async syncAddress(userId: number, partnerData: any, isDefault: boolean) {
+    private async syncAddress(userId: number, partnerData: OdooPartner, isDefault: boolean): Promise<void> {
         // Basic address check
         if (!partnerData.street && !partnerData.city) return;
 
@@ -261,7 +290,7 @@ export class OdooCustomerService {
         const addressData = {
             user_id: userId,
             recipient_name: partnerData.name,
-            phone: partnerData.mobile || partnerData.phone || '',
+            phone: (partnerData.mobile || partnerData.phone) ? formatPhone((partnerData.mobile || partnerData.phone) as string) : '',
             address_line1: partnerData.street || '',
             address_line2: partnerData.street2 || '',
             city: partnerData.city || '',

@@ -1,6 +1,7 @@
 'use client';
 
 import { Review, PaginatedResponse } from '@repo/shared';
+import { REVIEW_STATUS } from '@repo/shared/constants';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
 
@@ -8,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { getAccessToken } from '@/lib/auth';
+
 
 interface AdminReviewsClientProps {
     initialData: PaginatedResponse<Review> | null;
@@ -72,9 +74,9 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
                 </div>
                 <div className="flex gap-2">
                     <Button
-                        variant={currentStatus === 'pending' ? 'primary' : 'outline'}
+                        variant={currentStatus === REVIEW_STATUS.PENDING ? 'primary' : 'outline'}
                         size="sm"
-                        onClick={() => router.push('/admin/reviews?status=pending')}
+                        onClick={() => router.push(`/admin/reviews?status=${REVIEW_STATUS.PENDING}`)}
                     >
                         Butuh Moderasi
                     </Button>
@@ -132,9 +134,9 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant={
-                                            review.status === 'approved' ? 'success' :
-                                                review.status === 'pending' ? 'warning' :
-                                                    review.status === 'rejected' ? 'error' : 'default'
+                                            review.status === REVIEW_STATUS.APPROVED ? 'success' :
+                                                review.status === REVIEW_STATUS.PENDING ? 'warning' :
+                                                    review.status === REVIEW_STATUS.REJECTED ? 'error' : 'default'
                                         }>
                                             {review.status}
                                         </Badge>
@@ -144,7 +146,7 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex justify-center gap-1">
-                                            {review.status === 'pending' && (
+                                            {review.status === REVIEW_STATUS.PENDING && (
                                                 <>
                                                     <Button
                                                         variant="ghost"
