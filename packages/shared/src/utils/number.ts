@@ -1,6 +1,6 @@
 /**
  * Number Utility Functions
- * 
+ *
  * Pure utility functions for number manipulation
  * Following CODING_STANDARDS.md - Framework Agnostic
  */
@@ -12,13 +12,13 @@
  * @returns Formatted currency string
  */
 export function formatCurrency(amount: number, includeSymbol = true): string {
-    const formatted = new Intl.NumberFormat('id-ID', {
-        style: 'decimal',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(amount);
+  const formatted = new Intl.NumberFormat("id-ID", {
+    style: "decimal",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 
-    return includeSymbol ? `Rp ${formatted}` : formatted;
+  return includeSymbol ? `Rp ${formatted}` : formatted;
 }
 
 /**
@@ -27,7 +27,7 @@ export function formatCurrency(amount: number, includeSymbol = true): string {
  * @returns Formatted number string
  */
 export function formatNumber(num: number): string {
-    return new Intl.NumberFormat('id-ID').format(num);
+  return new Intl.NumberFormat("id-ID").format(num);
 }
 
 /**
@@ -37,9 +37,13 @@ export function formatNumber(num: number): string {
  * @param decimals - Number of decimal places (default: 2)
  * @returns Percentage value
  */
-export function calculatePercentage(value: number, total: number, decimals = 2): number {
-    if (total === 0) return 0;
-    return Number(((value / total) * 100).toFixed(decimals));
+export function calculatePercentage(
+  value: number,
+  total: number,
+  decimals = 2,
+): number {
+  if (total === 0) return 0;
+  return Number(((value / total) * 100).toFixed(decimals));
 }
 
 /**
@@ -48,8 +52,11 @@ export function calculatePercentage(value: number, total: number, decimals = 2):
  * @param discountPercentage - Discount percentage
  * @returns Discount amount
  */
-export function calculateDiscount(price: number, discountPercentage: number): number {
-    return Math.round(price * (discountPercentage / 100));
+export function calculateDiscount(
+  price: number,
+  discountPercentage: number,
+): number {
+  return Math.round(price * (discountPercentage / 100));
 }
 
 /**
@@ -58,9 +65,12 @@ export function calculateDiscount(price: number, discountPercentage: number): nu
  * @param discountPercentage - Discount percentage
  * @returns Final price
  */
-export function calculateFinalPrice(price: number, discountPercentage: number): number {
-    const discount = calculateDiscount(price, discountPercentage);
-    return price - discount;
+export function calculateFinalPrice(
+  price: number,
+  discountPercentage: number,
+): number {
+  const discount = calculateDiscount(price, discountPercentage);
+  return price - discount;
 }
 
 /**
@@ -70,7 +80,7 @@ export function calculateFinalPrice(price: number, discountPercentage: number): 
  * @returns Rounded number
  */
 export function roundNumber(num: number, decimals = 2): number {
-    return Number(num.toFixed(decimals));
+  return Number(num.toFixed(decimals));
 }
 
 /**
@@ -81,7 +91,7 @@ export function roundNumber(num: number, decimals = 2): number {
  * @returns Clamped number
  */
 export function clamp(num: number, min: number, max: number): number {
-    return Math.min(Math.max(num, min), max);
+  return Math.min(Math.max(num, min), max);
 }
 
 /**
@@ -92,7 +102,7 @@ export function clamp(num: number, min: number, max: number): number {
  * @returns True if in range
  */
 export function isInRange(num: number, min: number, max: number): boolean {
-    return num >= min && num <= max;
+  return num >= min && num <= max;
 }
 
 /**
@@ -102,7 +112,7 @@ export function isInRange(num: number, min: number, max: number): boolean {
  * @returns Random number
  */
 export function randomNumber(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 /**
@@ -112,7 +122,7 @@ export function randomNumber(min: number, max: number): number {
  * @returns Tax amount
  */
 export function calculateTax(amount: number, taxRate: number): number {
-    return Math.round(amount * (taxRate / 100));
+  return Math.round(amount * (taxRate / 100));
 }
 
 /**
@@ -122,6 +132,6 @@ export function calculateTax(amount: number, taxRate: number): number {
  * @returns Total with tax
  */
 export function calculateTotalWithTax(amount: number, taxRate: number): number {
-    const tax = calculateTax(amount, taxRate);
-    return amount + tax;
+  const tax = calculateTax(amount, taxRate);
+  return amount + tax;
 }

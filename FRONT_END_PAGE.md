@@ -3,6 +3,7 @@
 ## 📊 PROJECT OVERVIEW
 
 ### Total Count
+
 - **Pages**: ~120
 - **API Endpoints**: 210
 - **Development Time**: 8-12 weeks
@@ -12,19 +13,20 @@
 
 ## 🗂️ PAGE DISTRIBUTION
 
-| Route Group | Pages | Description |
-|-------------|-------|-------------|
-| **Public** | 16 | Customer-facing pages |
-| **Auth** | 5 | Login, register, password reset |
-| **User Dashboard** | 14 | User account management |
-| **Admin** | 85+ | Admin panel pages |
-| **Total** | **~120** | Complete application |
+| Route Group        | Pages    | Description                     |
+| ------------------ | -------- | ------------------------------- |
+| **Public**         | 16       | Customer-facing pages           |
+| **Auth**           | 5        | Login, register, password reset |
+| **User Dashboard** | 14       | User account management         |
+| **Admin**          | 85+      | Admin panel pages               |
+| **Total**          | **~120** | Complete application            |
 
 ---
 
 ## 📋 PAGE CHECKLIST
 
 ### ✅ Public Pages (16)
+
 - [x] Homepage
 - [x] Product Listing
 - [x] Product Detail
@@ -43,6 +45,7 @@
 - [x] CMS Dynamic Pages
 
 ### ✅ Auth Pages (5)
+
 - [x] Login
 - [x] Register
 - [x] Forgot Password
@@ -50,6 +53,7 @@
 - [x] Verify Email
 
 ### ✅ User Dashboard (14)
+
 - [x] Dashboard Overview
 - [x] Profile Management
 - [x] Address Book (List)
@@ -69,9 +73,11 @@
 ### ✅ Admin Pages (85+)
 
 **Dashboard (1)**
+
 - [x] Admin Dashboard
 
 **Products (7)**
+
 - [x] Admin Order Details
 - [x] Admin Product Form (create/edit)
 - [x] Admin Voucher Form (create/edit)
@@ -81,22 +87,26 @@
 - [x] Product SEO
 
 **Categories (3)**
+
 - [x] Categories List
 - [x] Category Detail
 - [x] Category Form (Create/Edit)
 
 **Stock (4)**
+
 - [x] Stock Levels
 - [x] Low Stock
 - [x] Out of Stock
 - [x] Stock Sync
 
 **Orders (3)**
+
 - [x] Orders List
 - [x] Order Detail
 - [x] Process Refund
 
 **Customers (7)**
+
 - [x] Customers List
 - [x] Customer Detail
 - [x] Customer Orders
@@ -107,6 +117,7 @@
 - [x] Block Customer
 
 **Vouchers (4)**
+
 - [x] Vouchers List
 - [x] Create Voucher
 - [x] Voucher Detail
@@ -114,22 +125,26 @@
 - [x] Voucher History
 
 **Flash Sales (4)**
+
 - [x] Flash Sales List
 - [x] Create Flash Sale
 - [x] Flash Sale Detail
 - [x] Flash Sale Products
 
 **Reviews (2)**
+
 - [x] All Reviews
 - [x] Pending Reviews
 
 **Attributes (4)**
+
 - [x] Attributes Overview
 - [x] Manage Colors
 - [x] Manage Sizes
 - [x] Manage Finishing (Material)
 
 **CMS (7)**
+
 - [x] Banners List
 - [x] Create Banner
 - [x] Edit Banner
@@ -139,6 +154,7 @@
 - [x] Site Settings
 
 **Reports (17)**
+
 - [x] Reports Overview
 - [x] Sales Reports
 - [x] Daily Sales
@@ -159,6 +175,7 @@
 - [x] Inventory Reports
 
 **Analytics (8)**
+
 - [x] Analytics Overview
 - [x] Product Views
 - [x] Search Analytics
@@ -169,11 +186,13 @@
 - [x] Customer Behavior
 
 **Marketing (3)**
+
 - [x] Marketing Overview
 - [x] Abandoned Cart Emails
 - [x] Send Promotions
 
 **Sync (8)**
+
 - [x] Sync Overview
 - [x] Product Sync
 - [x] Stock Sync
@@ -184,6 +203,7 @@
 - [x] Sync Settings
 
 **System (7)**
+
 - [x] System Overview
 - [x] Email Queue
 - [x] Email Detail
@@ -197,9 +217,11 @@
 ## 🎯 DEVELOPMENT PHASES
 
 ### Phase 1: Foundation (Week 1-2) ⏱️
+
 **Goal**: Setup & Core Infrastructure
 
 **Tasks**:
+
 - [x] Initialize Next.js project
 - [x] Setup Tailwind CSS
 - [x] Create folder structure
@@ -210,6 +232,7 @@
 - [x] Setup authentication
 
 **Key Files**:
+
 - `src/lib/api.ts`
 - `src/middleware.ts`
 - `src/types/*`
@@ -218,9 +241,11 @@
 ---
 
 ### Phase 2: Public Pages (Week 3-4) 🏪
+
 **Goal**: Customer-Facing Features
 
 **Tasks**:
+
 - [x] Homepage
 - [x] Product listing & filters
 - [x] Product detail page
@@ -231,6 +256,7 @@
 - [x] Static pages (about, contact)
 
 **Key Components**:
+
 - `ProductCard`
 - `ProductGrid`
 - `ProductFilter`
@@ -240,9 +266,11 @@
 ---
 
 ### Phase 3: User Dashboard (Week 5) 👤
+
 **Goal**: User Account Management
 
 **Tasks**:
+
 - [x] User dashboard
 - [x] Order history
 - [x] Profile management
@@ -252,6 +280,7 @@
 - [x] Notifications
 
 **Key Components**:
+
 - `OrderTable`
 - `AddressForm`
 - `WishlistCard`
@@ -260,9 +289,11 @@
 ---
 
 ### Phase 4: Admin Core (Week 6-8) 🔧
+
 **Goal**: Essential Admin Features
 
 **Tasks**:
+
 - [x] Admin dashboard
 - [x] Product management
 - [x] Category management
@@ -271,6 +302,7 @@
 - [x] Customer management
 
 **Key Components**:
+
 - `AdminTable`
 - `AdminForm`
 - `StatsCard`
@@ -279,9 +311,11 @@
 ---
 
 ### Phase 5: Admin Advanced (Week 9-10) 📊
+
 **Goal**: Marketing & Content Management
 
 **Tasks**:
+
 - [x] Product management (List + CRUD)
 - [x] Category management (List)
 - [x] Order management (List + Details)
@@ -292,6 +326,7 @@
 - [x] CMS (banners, pages, settings + CRUD)
 
 **Key Components**:
+
 - `VoucherForm`
 - `FlashSaleForm`
 - `BannerManager`
@@ -301,9 +336,11 @@
 ---
 
 ### Phase 6: Admin System (Week 11) ⚙️
+
 **Goal**: System Management & Integration
 
 **Tasks**:
+
 - [x] Odoo sync management
 - [x] Marketing tools
 - [x] Email queue
@@ -314,6 +351,7 @@
 - [x] Advanced analytics (Overview)
 
 **Key Components**:
+
 - `SyncStatus`
 - `EmailQueue`
 - `ActivityLog`
@@ -322,9 +360,11 @@
 ---
 
 ### Phase 7: Polish & Testing (Week 12) ✨
+
 **Goal**: Production Ready
 
 **Tasks**:
+
 - [ ] Performance optimization
 - [ ] SEO optimization
 - [ ] Error handling
@@ -334,6 +374,7 @@
 - [ ] Deployment setup
 
 **Key Focus**:
+
 - Speed optimization
 - Accessibility
 - Mobile responsiveness
@@ -345,12 +386,14 @@
 ## 📦 ESSENTIAL PACKAGES
 
 ### Core
+
 ```bash
 npm install next react react-dom
 npm install -D typescript @types/react @types/node
 ```
 
 ### Styling
+
 ```bash
 npm install tailwindcss autoprefixer postcss
 npm install clsx tailwind-merge
@@ -358,39 +401,46 @@ npm install lucide-react
 ```
 
 ### Data Fetching
+
 ```bash
 npm install swr
 npm install @tanstack/react-query
 ```
 
 ### Forms
+
 ```bash
 npm install react-hook-form
 npm install zod @hookform/resolvers
 ```
 
 ### Charts
+
 ```bash
 npm install recharts
 npm install chart.js react-chartjs-2
 ```
 
 ### Date/Time
+
 ```bash
 npm install date-fns
 ```
 
 ### Rich Text Editor
+
 ```bash
 npm install @tiptap/react @tiptap/starter-kit
 ```
 
 ### File Upload
+
 ```bash
 npm install react-dropzone
 ```
 
 ### Notifications
+
 ```bash
 npm install react-hot-toast
 ```
@@ -400,6 +450,7 @@ npm install react-hot-toast
 ## 🔑 KEY API ENDPOINTS BY PAGE
 
 ### Homepage
+
 ```
 GET /api/cms/banners
 GET /api/products/featured
@@ -409,6 +460,7 @@ GET /api/categories
 ```
 
 ### Product Detail
+
 ```
 GET /api/products/:slug
 GET /api/products/:id/variants
@@ -418,6 +470,7 @@ POST /api/products/:id/views
 ```
 
 ### Cart
+
 ```
 GET /api/cart
 POST /api/cart/items
@@ -427,6 +480,7 @@ POST /api/vouchers/apply
 ```
 
 ### Checkout
+
 ```
 POST /api/checkout/validate
 POST /api/checkout/shipping
@@ -435,6 +489,7 @@ POST /api/payment/create
 ```
 
 ### Admin Dashboard
+
 ```
 GET /api/admin/dashboard/stats
 GET /api/admin/dashboard/recent-activity
@@ -443,6 +498,7 @@ GET /api/admin/dashboard/performance
 ```
 
 ### Admin Products
+
 ```
 GET /api/admin/products
 GET /api/admin/products/:id
@@ -451,6 +507,7 @@ PUT /api/admin/products/:id/seo
 ```
 
 ### Admin Orders
+
 ```
 GET /api/admin/orders
 GET /api/admin/orders/:orderNumber
@@ -465,6 +522,7 @@ POST /api/admin/orders/:orderNumber/refund
 ### Recommended Components to Build
 
 **Basic UI**
+
 - Button (primary, secondary, outline, danger)
 - Input (text, number, email, password)
 - Textarea
@@ -477,6 +535,7 @@ POST /api/admin/orders/:orderNumber/refund
 - Spinner
 
 **Layout**
+
 - Card
 - Modal
 - Drawer
@@ -486,6 +545,7 @@ POST /api/admin/orders/:orderNumber/refund
 - Pagination
 
 **Data Display**
+
 - Table
 - List
 - Grid
@@ -493,18 +553,21 @@ POST /api/admin/orders/:orderNumber/refund
 - Skeleton Loader
 
 **Forms**
+
 - Form Field
 - Form Error
 - Form Label
 - Multi-step Form
 
 **Feedback**
+
 - Alert
 - Toast
 - Progress Bar
 - Loading Overlay
 
 **Charts**
+
 - Line Chart
 - Bar Chart
 - Pie Chart
@@ -519,14 +582,14 @@ POST /api/admin/orders/:orderNumber/refund
 module.exports = {
   theme: {
     screens: {
-      'sm': '640px',   // Mobile
-      'md': '768px',   // Tablet
-      'lg': '1024px',  // Laptop
-      'xl': '1280px',  // Desktop
-      '2xl': '1536px', // Large Desktop
+      sm: "640px", // Mobile
+      md: "768px", // Tablet
+      lg: "1024px", // Laptop
+      xl: "1280px", // Desktop
+      "2xl": "1536px", // Large Desktop
     },
   },
-}
+};
 ```
 
 ---
@@ -534,10 +597,12 @@ module.exports = {
 ## 🔒 AUTH STRATEGY
 
 ### User Roles
+
 - **Customer**: Access to public pages + user dashboard
 - **Admin**: Access to all pages including admin panel
 
 ### Protected Routes
+
 ```typescript
 // Public: No auth required
 / /products /categories /search
@@ -550,6 +615,7 @@ module.exports = {
 ```
 
 ### Token Storage
+
 - **Development**: localStorage
 - **Production**: httpOnly cookies
 
@@ -558,6 +624,7 @@ module.exports = {
 ## 🚀 PERFORMANCE OPTIMIZATION
 
 ### ISR (Incremental Static Regeneration)
+
 ```typescript
 // Product pages - revalidate every 60 seconds
 export const revalidate = 60;
@@ -570,18 +637,21 @@ export const revalidate = 300;
 ```
 
 ### SSR (Server-Side Rendering)
+
 - User dashboard pages
 - Cart
 - Checkout
 - Admin pages
 
 ### Static Generation
+
 - About page
 - Contact page
 - Terms & conditions
 - Privacy policy
 
 ### Client-Side Fetching
+
 - Real-time cart updates
 - Live search suggestions
 - Notifications
@@ -591,12 +661,14 @@ export const revalidate = 300;
 ## 📊 STATE MANAGEMENT
 
 ### Server State (SWR/React Query)
+
 - Product data
 - Order history
 - User profile
 - Admin data
 
 ### Client State (React Context/Zustand)
+
 - Cart
 - Auth
 - Theme
@@ -607,6 +679,7 @@ export const revalidate = 300;
 ## ✅ PRE-LAUNCH CHECKLIST
 
 ### Performance
+
 - [ ] Optimize images (WebP, lazy loading)
 - [ ] Code splitting
 - [ ] Bundle size optimization
@@ -614,6 +687,7 @@ export const revalidate = 300;
 - [ ] CDN setup
 
 ### SEO
+
 - [ ] Meta tags
 - [ ] OpenGraph tags
 - [ ] Sitemap
@@ -621,6 +695,7 @@ export const revalidate = 300;
 - [ ] Structured data
 
 ### Security
+
 - [ ] HTTPS
 - [ ] CSRF protection
 - [ ] XSS prevention
@@ -628,6 +703,7 @@ export const revalidate = 300;
 - [ ] Rate limiting
 
 ### Accessibility
+
 - [ ] Keyboard navigation
 - [ ] Screen reader support
 - [ ] Color contrast
@@ -635,6 +711,7 @@ export const revalidate = 300;
 - [ ] Focus management
 
 ### Testing
+
 - [ ] Unit tests
 - [ ] Integration tests
 - [ ] E2E tests
@@ -642,6 +719,7 @@ export const revalidate = 300;
 - [ ] Security testing
 
 ### Analytics
+
 - [ ] Google Analytics
 - [ ] Error tracking (Sentry)
 - [ ] Performance monitoring
@@ -652,12 +730,14 @@ export const revalidate = 300;
 ## 🎯 SUCCESS METRICS
 
 ### User Metrics
+
 - Page load time < 3s
 - Time to interactive < 5s
 - Cart abandonment rate < 70%
 - Checkout completion rate > 30%
 
 ### Admin Metrics
+
 - Order processing time < 2min
 - Stock sync success rate > 95%
 - Report generation time < 10s

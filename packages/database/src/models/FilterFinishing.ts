@@ -1,56 +1,62 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+} from "sequelize";
 
-import { sequelize } from '../config/database';
+import { sequelize } from "../config/database";
 
 export interface FilterFinishingAttributes {
-    id: number;
-    name: string;
-    display_order: number;
-    is_active: boolean;
-    created_at: Date;
+  id: number;
+  name: string;
+  display_order: number;
+  is_active: boolean;
+  created_at: Date;
 }
 
 export class FilterFinishing extends Model<
-    InferAttributes<FilterFinishing>,
-    InferCreationAttributes<FilterFinishing>
+  InferAttributes<FilterFinishing>,
+  InferCreationAttributes<FilterFinishing>
 > {
-    declare id: CreationOptional<number>;
-    declare name: string;
-    declare display_order: CreationOptional<number>;
-    declare is_active: CreationOptional<boolean>;
-    declare created_at: CreationOptional<Date>;
+  declare id: CreationOptional<number>;
+  declare name: string;
+  declare display_order: CreationOptional<number>;
+  declare is_active: CreationOptional<boolean>;
+  declare created_at: CreationOptional<Date>;
 }
 
 FilterFinishing.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        name: {
-            type: DataTypes.STRING(100),
-            allowNull: false,
-        },
-        display_order: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        is_active: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: true,
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW,
-        },
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    {
-        sequelize,
-        tableName: 'filter_finishings',
-        timestamps: false,
-    }
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    display_order: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    tableName: "filter_finishings",
+    timestamps: false,
+  },
 );

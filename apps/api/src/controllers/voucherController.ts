@@ -1,104 +1,132 @@
+import { BadRequestError, NotFoundError } from "@repo/shared/errors";
+import { Request, Response, NextFunction } from "express";
 
-import { Request, Response, NextFunction } from 'express';
-import { BadRequestError, NotFoundError } from '@repo/shared/errors';
+import * as cartService from "../services/cartService";
+import * as voucherService from "../services/voucherService";
+import { AuthenticatedRequest } from "../types/express";
 
-import * as cartService from '../services/cartService';
-import * as voucherService from '../services/voucherService';
-import { AuthenticatedRequest } from '../types/express';
+export async function applyVoucher(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userId = (req as AuthenticatedRequest).user?.userId;
+    const sessionId = req.headers["x-session-id"] as string;
+    const { code } = req.body as { code: string };
 
-export async function applyVoucher(req: Request, res: Response, next: NextFunction) {
-    try {
-        const userId = (req as AuthenticatedRequest).user?.userId;
-        const sessionId = req.headers['x-session-id'] as string;
-        const { code } = req.body as { code: string };
-
-        if (!code) {
-            throw new BadRequestError('Voucher code is required');
-        }
-
-        // Get Cart ID first
-        const cart = await cartService.getCart(userId, sessionId);
-        if (!cart) {
-            throw new NotFoundError('Cart');
-        }
-
-        const updatedCart = await voucherService.applyVoucher(cart.id, code);
-
-        res.json({
-            success: true,
-            data: updatedCart,
-        });
-    } catch (error) {
-        next(error);
+    if (!code) {
+      throw new BadRequestError("Voucher code is required");
     }
+
+    // Get Cart ID first
+    const cart = await cartService.getCart(userId, sessionId);
+    if (!cart) {
+      throw new NotFoundError("Cart");
+    }
+
+    const updatedCart = await voucherService.applyVoucher(cart.id, code);
+
+    res.json({
+      success: true,
+      data: updatedCart,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 
-export async function removeVoucher(req: Request, res: Response, next: NextFunction) {
-    try {
-        const userId = (req as AuthenticatedRequest).user?.userId;
-        const sessionId = req.headers['x-session-id'] as string;
+export async function removeVoucher(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const userId = (req as AuthenticatedRequest).user?.userId;
+    const sessionId = req.headers["x-session-id"] as string;
 
-        const cart = await cartService.getCart(userId, sessionId);
-        if (!cart) {
-            throw new NotFoundError('Cart');
-        }
-
-        const updatedCart = await voucherService.removeVoucher(cart.id);
-
-        res.json({
-            success: true,
-            data: updatedCart,
-        });
-    } catch (error) {
-        next(error);
+    const cart = await cartService.getCart(userId, sessionId);
+    if (!cart) {
+      throw new NotFoundError("Cart");
     }
+
+    const updatedCart = await voucherService.removeVoucher(cart.id);
+
+    res.json({
+      success: true,
+      data: updatedCart,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
-export async function getAvailableVouchers(_req: Request, res: Response, next: NextFunction) {
-    try {
-        const vouchers = await voucherService.getAvailableVouchers();
-        res.json({
-            success: true,
-            data: vouchers,
-        });
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function getVoucherByCode(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { code } = req.params;
-        const voucher = await voucherService.getVoucherByCode(code);
-        res.json({
-            success: true,
-            data: voucher,
-        });
-    } catch (error) {
-        next(error);
-    }
+export async function getAvailableVouchers(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const vouchers = await voucherService.getAvailableVouchers();
+    res.json({
+      success: true,
+      data: vouchers,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 
-export async function validateVoucher(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { code, cart_total } = req.body;
-        if (!code) {
-            throw new BadRequestError('Voucher code is required');
-        }
+export async function getVoucherByCode(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { code } = req.params;
+    const voucher = await voucherService.getVoucherByCode(code);
+    res.json({
+      success: true,
+      data: voucher,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
-        const voucher = await voucherService.validateVoucher(code, Number(cart_total || 0));
-
-        // Calculate potential discount
-        const discountAmount = (voucher as any).calculateDiscount(Number(cart_total || 0));
-
-        res.json({
-            success: true,
-            data: {
-                voucher,
-                discount_amount: discountAmount,
-                total_after_discount: Math.max(0, Number(cart_total || 0) - discountAmount)
-            },
-        });
-    } catch (error) {
-        next(error);
+export async function validateVoucher(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { code, cart_total } = req.body;
+    if (!code) {
+      throw new BadRequestError("Voucher code is required");
     }
+
+    const voucher = await voucherService.validateVoucher(
+      code,
+      Number(cart_total || 0),
+    );
+
+    // Calculate potential discount
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const discountAmount = (voucher as any).calculateDiscount(
+      Number(cart_total || 0),
+    );
+
+    res.json({
+      success: true,
+      data: {
+        voucher,
+        discount_amount: discountAmount,
+        total_after_discount: Math.max(
+          0,
+          Number(cart_total || 0) - discountAmount,
+        ),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 }

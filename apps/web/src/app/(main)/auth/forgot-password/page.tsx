@@ -1,13 +1,13 @@
-import { Suspense } from 'react';
+import { Suspense } from "react";
 
-import { ForgotPasswordForm } from '@/components/features/auth/ForgotPasswordForm';
+import { ForgotPasswordForm } from "@/components/features/auth/ForgotPasswordForm";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function ForgotPasswordPage() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <ForgotPasswordForm />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForgotPasswordForm />
+    </Suspense>
+  );
 }

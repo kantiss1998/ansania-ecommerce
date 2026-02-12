@@ -1,7 +1,7 @@
-import { SettingsContent } from '@/components/features/user/SettingsContent';
+import { SettingsContent } from "@/components/features/user/SettingsContent";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function SettingsPage() {
-    return <SettingsContent />;
+  return <SettingsContent />;
 }

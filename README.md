@@ -47,17 +47,17 @@ ansania-ecommerce/
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| **Frontend** | Next.js (TypeScript, App Router) | 15+ |
-| **Backend** | Express.js (TypeScript) | Latest |
-| **Database** | MariaDB | Latest |
-| **Monorepo** | Turborepo | Latest |
-| **ORM** | Sequelize | Latest |
-| **Validation** | Zod | Latest |
-| **Payment** | Doku | Latest |
-| **Shipping** | JNT Express API | Latest |
-| **ERP** | Odoo.com | REST API / XML-RPC |
+| Layer          | Technology                       | Version            |
+| -------------- | -------------------------------- | ------------------ |
+| **Frontend**   | Next.js (TypeScript, App Router) | 15+                |
+| **Backend**    | Express.js (TypeScript)          | Latest             |
+| **Database**   | MariaDB                          | Latest             |
+| **Monorepo**   | Turborepo                        | Latest             |
+| **ORM**        | Sequelize                        | Latest             |
+| **Validation** | Zod                              | Latest             |
+| **Payment**    | Doku                             | Latest             |
+| **Shipping**   | JNT Express API                  | Latest             |
+| **ERP**        | Odoo.com                         | REST API / XML-RPC |
 
 ---
 
@@ -75,12 +75,14 @@ Before you begin, ensure you have the following installed:
 ## ⚡ Quick Start
 
 ### 1. Clone the repository
+
 ```bash
 git clone <repository-url>
 cd ansania-ecommerce
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
 # or
@@ -88,6 +90,7 @@ pnpm install
 ```
 
 ### 3. Setup environment variables
+
 ```bash
 # Copy example files
 cp .env.example .env
@@ -97,6 +100,7 @@ nano .env
 ```
 
 ### 4. Setup database
+
 ```bash
 # Create database
 mysql -u root -p -e "CREATE DATABASE ansania_ecommerce CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
@@ -109,6 +113,7 @@ npm run db:seed
 ```
 
 ### 5. Start development servers
+
 ```bash
 # Start both apps (web + api)
 npm run dev
@@ -123,6 +128,7 @@ npm run dev:api   # Backend only (http://localhost:5000)
 ## 📦 Available Scripts
 
 ### Development
+
 ```bash
 npm run dev          # Start all apps in development mode
 npm run dev:web      # Start Next.js frontend only
@@ -132,6 +138,7 @@ npm run start        # Start production servers
 ```
 
 ### Database
+
 ```bash
 npm run db:migrate        # Run pending migrations
 npm run db:migrate:undo   # Rollback last migration
@@ -140,6 +147,7 @@ npm run db:reset          # Reset database (drop + migrate + seed)
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint         # Run ESLint on all packages
 npm run lint:fix     # Auto-fix linting issues
@@ -148,6 +156,7 @@ npm run typecheck    # Run TypeScript type checking
 ```
 
 ### Testing
+
 ```bash
 npm run test         # Run all tests
 npm run test:watch   # Run tests in watch mode
@@ -210,6 +219,7 @@ See [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md) for detailed environment setu
 ## 🏗️ Architecture Overview
 
 ### Frontend (Next.js 15+)
+
 - **App Router** with Server Components by default
 - **Client Components** only for interactivity
 - **React Query** for server state management
@@ -217,12 +227,14 @@ See [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md) for detailed environment setu
 - **Zod** + React Hook Form for form validation
 
 ### Backend (Express.js)
+
 - **Layered Architecture**: Routes → Controllers → Services → Data Access
 - **Middleware**: Authentication, Validation, Error Handling
 - **Integrations**: Isolated modules for Odoo, Doku, JNT APIs
 - **Type-safe**: Full TypeScript with strict mode
 
 ### Database (MariaDB)
+
 - **Sequelize ORM** for model definitions
 - **Migrations** for version control
 - **Cached Data** from Odoo (products, stock, categories)
@@ -233,16 +245,19 @@ See [DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md) for detailed environment setu
 ## 🔄 Data Flow
 
 ### Product Display Flow
+
 ```
 Odoo → Sync Job (every 30 min) → MariaDB → API → Next.js SSR → User
 ```
 
 ### Order Creation Flow
+
 ```
 User → Cart → Checkout → API → Doku Payment → Webhook → API → Odoo Sales Order
 ```
 
 ### Stock Management
+
 ```
 Odoo Warehouse → Sync Job → MariaDB → Reserved in Cart → Deducted on Payment Success
 ```
@@ -271,6 +286,7 @@ npm run test:coverage
 For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md) (coming soon).
 
 Quick production build:
+
 ```bash
 npm run build
 npm run start
@@ -306,6 +322,7 @@ Proprietary - All rights reserved
 ## 🆘 Support
 
 For issues and questions:
+
 - Create an issue in the repository
 - Contact: [support email]
 - Documentation: See `/docs` folder

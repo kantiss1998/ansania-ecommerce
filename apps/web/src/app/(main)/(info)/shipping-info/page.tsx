@@ -1,26 +1,26 @@
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 
-import { CmsContent } from '@/components/features/cms/CmsContent';
-import { cmsClient } from '@/lib/cms';
+import { CmsContent } from "@/components/features/cms/CmsContent";
+import { cmsClient } from "@/lib/cms";
 
-const PAGE_SLUG = 'shipping-info';
-export const dynamic = 'force-dynamic';
+const PAGE_SLUG = "shipping-info";
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
-    const page = await cmsClient.getPage(PAGE_SLUG);
-    if (!page) return { title: 'Page Not Found' };
+  const page = await cmsClient.getPage(PAGE_SLUG);
+  if (!page) return { title: "Page Not Found" };
 
-    return {
-        title: `${page.title} - Ansania`,
-    };
+  return {
+    title: `${page.title} - Ansania`,
+  };
 }
 
 export default async function ShippingPage() {
-    const page = await cmsClient.getPage(PAGE_SLUG);
+  const page = await cmsClient.getPage(PAGE_SLUG);
 
-    if (!page) {
-        notFound();
-    }
+  if (!page) {
+    notFound();
+  }
 
-    return <CmsContent page={page} />;
+  return <CmsContent page={page} />;
 }

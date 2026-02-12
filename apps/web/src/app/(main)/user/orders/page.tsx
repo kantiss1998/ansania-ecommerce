@@ -1,8 +1,7 @@
+import UserOrdersClient from "./client";
 
-import UserOrdersClient from './client';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function UserOrdersPage() {
-    return <UserOrdersClient />;
+  return <UserOrdersClient />;
 }

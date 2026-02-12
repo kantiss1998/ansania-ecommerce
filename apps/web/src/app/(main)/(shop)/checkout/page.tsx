@@ -1,8 +1,7 @@
+import CheckoutClient from "./client";
 
-import CheckoutClient from './client';
-
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function CheckoutPage() {
-    return <CheckoutClient />;
+  return <CheckoutClient />;
 }

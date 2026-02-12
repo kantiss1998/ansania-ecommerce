@@ -1,202 +1,202 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 import {
-    Model,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    CreationOptional,
-    NonAttribute,
-    Association,
-} from 'sequelize';
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  NonAttribute,
+  Association,
+} from "sequelize";
 
-import { sequelize } from '../config/database';
+import { sequelize } from "../config/database";
 
 // Use type-only imports to avoid circular dependencies
-import type { ActivityLog } from './ActivityLog';
-import type { Address } from './Address';
-import type { Cart } from './Cart';
-import type { Notification } from './Notification';
-import type { Order } from './Order';
-import type { PasswordResetToken } from './PasswordResetToken';
-import type { ProductView } from './ProductView';
-import type { Review } from './Review';
-import type { SearchHistory } from './SearchHistory';
-import type { UserSession } from './UserSession';
-import type { Wishlist } from './Wishlist';
+import type { ActivityLog } from "./ActivityLog";
+import type { Address } from "./Address";
+import type { Cart } from "./Cart";
+import type { Notification } from "./Notification";
+import type { Order } from "./Order";
+import type { PasswordResetToken } from "./PasswordResetToken";
+import type { ProductView } from "./ProductView";
+import type { Review } from "./Review";
+import type { SearchHistory } from "./SearchHistory";
+import type { UserSession } from "./UserSession";
+import type { Wishlist } from "./Wishlist";
 
 // Define User attributes interface
 export interface UserAttributes {
-    id: number;
-    email: string;
-    role: string;
-    phone: string | null;
-    password: string;
-    full_name: string | null;
-    odoo_user_id: number | null;
-    odoo_partner_id: number | null;
-    email_verified: boolean;
-    email_verified_at: Date | null;
-    created_at: Date;
-    updated_at: Date;
+  id: number;
+  email: string;
+  role: string;
+  phone: string | null;
+  password: string;
+  full_name: string | null;
+  odoo_user_id: number | null;
+  odoo_partner_id: number | null;
+  email_verified: boolean;
+  email_verified_at: Date | null;
+  created_at: Date;
+  updated_at: Date;
 }
 
 // User Model
 export class User extends Model<
-    InferAttributes<User>,
-    InferCreationAttributes<User>
+  InferAttributes<User>,
+  InferCreationAttributes<User>
 > {
-    // Primary key
-    declare id: CreationOptional<number>;
+  // Primary key
+  declare id: CreationOptional<number>;
 
-    // User credentials
-    declare email: string;
-    declare role: CreationOptional<string>;
-    declare phone: CreationOptional<string | null>;
-    declare password: string;
-    declare full_name: CreationOptional<string | null>;
+  // User credentials
+  declare email: string;
+  declare role: CreationOptional<string>;
+  declare phone: CreationOptional<string | null>;
+  declare password: string;
+  declare full_name: CreationOptional<string | null>;
 
-    // Odoo integration
-    declare odoo_user_id: CreationOptional<number | null>;
-    declare odoo_partner_id: CreationOptional<number | null>;
+  // Odoo integration
+  declare odoo_user_id: CreationOptional<number | null>;
+  declare odoo_partner_id: CreationOptional<number | null>;
 
-    // Email verification
-    declare email_verified: CreationOptional<boolean>;
-    declare email_verified_at: CreationOptional<Date | null>;
+  // Email verification
+  declare email_verified: CreationOptional<boolean>;
+  declare email_verified_at: CreationOptional<Date | null>;
 
-    // Timestamps
-    declare created_at: CreationOptional<Date>;
-    declare updated_at: CreationOptional<Date>;
+  // Timestamps
+  declare created_at: CreationOptional<Date>;
+  declare updated_at: CreationOptional<Date>;
 
-    // Associations
-    declare addresses?: NonAttribute<Address[]>;
-    declare orders?: NonAttribute<Order[]>;
-    declare cart?: NonAttribute<Cart>;
-    declare reviews?: NonAttribute<Review[]>;
-    declare wishlist?: NonAttribute<Wishlist[]>;
-    // New associations
-    declare sessions?: NonAttribute<UserSession[]>;
-    declare passwordResetTokens?: NonAttribute<PasswordResetToken[]>;
-    declare notifications?: NonAttribute<Notification[]>;
-    declare activityLogs?: NonAttribute<ActivityLog[]>;
-    declare searchHistory?: NonAttribute<SearchHistory[]>;
-    declare views?: NonAttribute<ProductView[]>;
+  // Associations
+  declare addresses?: NonAttribute<Address[]>;
+  declare orders?: NonAttribute<Order[]>;
+  declare cart?: NonAttribute<Cart>;
+  declare reviews?: NonAttribute<Review[]>;
+  declare wishlist?: NonAttribute<Wishlist[]>;
+  // New associations
+  declare sessions?: NonAttribute<UserSession[]>;
+  declare passwordResetTokens?: NonAttribute<PasswordResetToken[]>;
+  declare notifications?: NonAttribute<Notification[]>;
+  declare activityLogs?: NonAttribute<ActivityLog[]>;
+  declare searchHistory?: NonAttribute<SearchHistory[]>;
+  declare views?: NonAttribute<ProductView[]>;
 
-    // Association declarations
-    declare static associations: {
-        addresses: Association<User, Address>;
-        orders: Association<User, Order>;
-        cart: Association<User, Cart>;
-        reviews: Association<User, Review>;
-        wishlist: Association<User, Wishlist>;
-        sessions: Association<User, UserSession>;
-        passwordResetTokens: Association<User, PasswordResetToken>;
-        notifications: Association<User, Notification>;
-        activityLogs: Association<User, ActivityLog>;
-        searchHistory: Association<User, SearchHistory>;
-        views: Association<User, ProductView>;
-    };
+  // Association declarations
+  declare static associations: {
+    addresses: Association<User, Address>;
+    orders: Association<User, Order>;
+    cart: Association<User, Cart>;
+    reviews: Association<User, Review>;
+    wishlist: Association<User, Wishlist>;
+    sessions: Association<User, UserSession>;
+    passwordResetTokens: Association<User, PasswordResetToken>;
+    notifications: Association<User, Notification>;
+    activityLogs: Association<User, ActivityLog>;
+    searchHistory: Association<User, SearchHistory>;
+    views: Association<User, ProductView>;
+  };
 
-    // Instance methods
-    async comparePassword(candidatePassword: string): Promise<boolean> {
-        return bcrypt.compare(candidatePassword, this.password);
-    }
+  // Instance methods
+  async comparePassword(candidatePassword: string): Promise<boolean> {
+    return bcrypt.compare(candidatePassword, this.password);
+  }
 
-    toJSON(): Omit<UserAttributes, 'password'> {
-        const values = { ...this.get() } as Record<string, unknown>;
-        delete values.password;
-        return values as unknown as Omit<UserAttributes, 'password'>;
-    }
+  toJSON(): Omit<UserAttributes, "password"> {
+    const values = { ...this.get() } as Record<string, unknown>;
+    delete values.password;
+    return values as unknown as Omit<UserAttributes, "password">;
+  }
 }
 
 // Initialize User model
 User.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-        },
-        email: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
-            unique: true,
-            validate: {
-                isEmail: true,
-            },
-        },
-        role: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
-            defaultValue: 'customer',
-        },
-        phone: {
-            type: DataTypes.STRING(20),
-            allowNull: true,
-            unique: true,
-        },
-        password: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
-        },
-        full_name: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
-        },
-        odoo_user_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            comment: 'Reference to Odoo user ID',
-        },
-        odoo_partner_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            comment: 'Reference to Odoo partner (contact) ID',
-        },
-        email_verified: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        },
-        email_verified_at: {
-            type: DataTypes.DATE,
-            allowNull: true,
-        },
-        created_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW,
-        },
-        updated_at: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW,
-        },
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    {
-        sequelize,
-        tableName: 'users',
-        timestamps: true,
-        underscored: true,
-        indexes: [
-            { fields: ['email'], unique: true },
-            { fields: ['phone'], unique: true },
-            { fields: ['odoo_user_id'] },
-        ],
-        hooks: {
-            beforeCreate: async (user) => {
-                if (user.password) {
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(user.password, salt);
-                }
-            },
-            beforeUpdate: async (user) => {
-                if (user.changed('password') && user.password) {
-                    const salt = await bcrypt.genSalt(10);
-                    user.password = await bcrypt.hash(user.password, salt);
-                }
-            },
-        },
-    }
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true,
+      },
+    },
+    role: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: "customer",
+    },
+    phone: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    full_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    odoo_user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: "Reference to Odoo user ID",
+    },
+    odoo_partner_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: "Reference to Odoo partner (contact) ID",
+    },
+    email_verified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    email_verified_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    tableName: "users",
+    timestamps: true,
+    underscored: true,
+    indexes: [
+      { fields: ["email"], unique: true },
+      { fields: ["phone"], unique: true },
+      { fields: ["odoo_user_id"] },
+    ],
+    hooks: {
+      beforeCreate: async (user) => {
+        if (user.password) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+      beforeUpdate: async (user) => {
+        if (user.changed("password") && user.password) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+    },
+  },
 );
 
 export default User;

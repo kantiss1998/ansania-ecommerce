@@ -1,90 +1,94 @@
-
-import { Voucher, Cart, CartItem } from '@repo/database';
-import { AppError, NotFoundError } from '@repo/shared/errors';
-import { Op } from 'sequelize';
+import { Voucher, Cart, CartItem } from "@repo/database";
+import { AppError, NotFoundError } from "@repo/shared/errors";
+import { Op } from "sequelize";
 
 export async function validateVoucher(code: string, cartTotal: number) {
-    const voucher = await Voucher.findOne({
-        where: {
-            code,
-            is_active: true,
-            start_date: { [Op.lte]: new Date() },
-            end_date: { [Op.gte]: new Date() }
-        }
-    });
+  const voucher = await Voucher.findOne({
+    where: {
+      code,
+      is_active: true,
+      start_date: { [Op.lte]: new Date() },
+      end_date: { [Op.gte]: new Date() },
+    },
+  });
 
-    if (!voucher) {
-        throw new NotFoundError('Voucher validation failed: Invalid or expired code');
-    }
+  if (!voucher) {
+    throw new NotFoundError(
+      "Voucher validation failed: Invalid or expired code",
+    );
+  }
 
-    // Assuming instance methods exist on the model but not in the type definition available here
-    if (!(voucher as any).isValid(cartTotal)) {
-        throw new AppError('Voucher conditions not met (min purchase or usage limit)', 400);
-    }
+  // Assuming instance methods exist on the model
+  if (!voucher.isValid(cartTotal)) {
+    throw new AppError(
+      "Voucher conditions not met (min purchase or usage limit)",
+      400,
+    );
+  }
 
-    return voucher;
+  return voucher;
 }
 
 export async function getAvailableVouchers() {
-    return Voucher.findAll({
-        where: {
-            is_active: true,
-            start_date: { [Op.lte]: new Date() },
-            end_date: { [Op.gte]: new Date() }
-        },
-        order: [['created_at', 'DESC']]
-    });
+  return Voucher.findAll({
+    where: {
+      is_active: true,
+      start_date: { [Op.lte]: new Date() },
+      end_date: { [Op.gte]: new Date() },
+    },
+    order: [["created_at", "DESC"]],
+  });
 }
 
 export async function getVoucherByCode(code: string) {
-    const voucher = await Voucher.findOne({
-        where: { code }
-    });
+  const voucher = await Voucher.findOne({
+    where: { code },
+  });
 
-    if (!voucher) {
-        throw new NotFoundError('Voucher not found');
-    }
+  if (!voucher) {
+    throw new NotFoundError("Voucher not found");
+  }
 
-    return voucher;
+  return voucher;
 }
 
 export async function applyVoucher(cartId: number, code: string) {
-    const cart = await Cart.findByPk(cartId, {
-        include: [{ model: CartItem, as: 'items' }] // Need items for total calculation just in case
-    });
+  const cart = await Cart.findByPk(cartId, {
+    include: [{ model: CartItem, as: "items" }], // Need items for total calculation just in case
+  });
 
-    if (!cart) throw new NotFoundError('Cart');
+  if (!cart) throw new NotFoundError("Cart");
 
-    // Remove existing voucher first? Or easy replace.
+  // Remove existing voucher first? Or easy replace.
 
-    // Calculate current subtotal from items if not trusting cart.subtotal
-    // Assuming cart.subtotal is up to date (cartService updates it on item change)
-    const subtotal = Number(cart.subtotal);
+  // Calculate current subtotal from items if not trusting cart.subtotal
+  // Assuming cart.subtotal is up to date (cartService updates it on item change)
+  const subtotal = Number(cart.subtotal);
 
-    const voucher = await validateVoucher(code, subtotal);
+  const voucher = await validateVoucher(code, subtotal);
 
-    // Calculate discount
-    const discountAmount = (voucher as any).calculateDiscount(subtotal);
+  // Calculate discount
+  const discountAmount = voucher.calculateDiscount(subtotal);
 
-    // Update Cart
-    await cart.update({
-        voucher_id: voucher.id,
-        discount_amount: discountAmount,
-        total: Math.max(0, subtotal - discountAmount)
-    });
+  // Update Cart
+  await cart.update({
+    voucher_id: voucher.id,
+    discount_amount: discountAmount,
+    total: Math.max(0, subtotal - discountAmount),
+  });
 
-    return cart; // Or return voucher details?
+  return cart; // Or return voucher details?
 }
 
 export async function removeVoucher(cartId: number) {
-    const cart = await Cart.findByPk(cartId);
-    if (!cart) throw new NotFoundError('Cart');
+  const cart = await Cart.findByPk(cartId);
+  if (!cart) throw new NotFoundError("Cart");
 
-    await cart.update({
-        voucher_id: null,
-        discount_amount: 0,
-        total: cart.subtotal // Reset total to subtotal
-    });
+  await cart.update({
+    voucher_id: null,
+    discount_amount: 0,
+    total: cart.subtotal, // Reset total to subtotal
+  });
 
-    return cart;
+  return cart;
 }

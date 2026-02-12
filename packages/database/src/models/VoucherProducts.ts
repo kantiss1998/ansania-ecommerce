@@ -1,39 +1,45 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, ForeignKey } from 'sequelize';
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  ForeignKey,
+} from "sequelize";
 
-import { sequelize } from '../config/database';
+import { sequelize } from "../config/database";
 
-import { Product } from './Product';
-import { Voucher } from './Voucher';
+import { Product } from "./Product";
+import { Voucher } from "./Voucher";
 
 export interface VoucherProductsAttributes {
-    voucher_id: number;
-    product_id: number;
+  voucher_id: number;
+  product_id: number;
 }
 
 export class VoucherProducts extends Model<
-    InferAttributes<VoucherProducts>,
-    InferCreationAttributes<VoucherProducts>
+  InferAttributes<VoucherProducts>,
+  InferCreationAttributes<VoucherProducts>
 > {
-    declare voucher_id: ForeignKey<Voucher['id']>;
-    declare product_id: ForeignKey<Product['id']>;
+  declare voucher_id: ForeignKey<Voucher["id"]>;
+  declare product_id: ForeignKey<Product["id"]>;
 }
 
 VoucherProducts.init(
-    {
-        voucher_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-        },
-        product_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey: true,
-        },
+  {
+    voucher_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
     },
-    {
-        sequelize,
-        tableName: 'voucher_products',
-        timestamps: false,
-    }
+    product_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+    },
+  },
+  {
+    sequelize,
+    tableName: "voucher_products",
+    timestamps: false,
+  },
 );

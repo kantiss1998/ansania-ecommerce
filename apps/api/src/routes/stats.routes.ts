@@ -1,7 +1,6 @@
+import { Router } from "express";
 
-import { Router } from 'express';
-
-import * as statsController from '../controllers/statsController';
+import * as statsController from "../controllers/statsController";
 
 const router = Router();
 
@@ -11,9 +10,9 @@ const router = Router();
 // Let's rely on standard endpoints being public or auth based on design?
 // Tracking is usually public.
 
-router.post('/search', statsController.recordSearch);
-router.post('/view/:productId', statsController.recordProductView);
-router.get('/top-searches', statsController.getTopSearches);
-router.get('/trending-products', statsController.getMostViewedProducts);
+router.post("/search", statsController.recordSearch);
+router.post("/view/:productId", statsController.recordProductView);
+router.get("/top-searches", statsController.getTopSearches);
+router.get("/trending-products", statsController.getMostViewedProducts);
 
 export default router;

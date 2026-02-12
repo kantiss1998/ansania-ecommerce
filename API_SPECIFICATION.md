@@ -1,4 +1,5 @@
 # API Specification
+
 **Ansania E-Commerce Platform - REST API Documentation**
 
 **Version:** 1.0  
@@ -33,11 +34,13 @@
 Most endpoints require authentication using JWT tokens.
 
 **Header Format:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Token Lifecycle:**
+
 - **Access Token:** 1 hour expiry
 - **Refresh Token:** 7 days expiry
 
@@ -46,6 +49,7 @@ Authorization: Bearer <token>
 ## Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -59,6 +63,7 @@ Authorization: Bearer <token>
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -74,6 +79,7 @@ Authorization: Bearer <token>
 ```
 
 ### Paginated Response
+
 ```json
 {
   "success": true,
@@ -93,16 +99,16 @@ Authorization: Bearer <token>
 
 ## Error Codes
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `VALIDATION_ERROR` | 400 | Request validation failed |
-| `UNAUTHORIZED` | 401 | Authentication required or invalid token |
-| `FORBIDDEN` | 403 | Insufficient permissions |
-| `NOT_FOUND` | 404 | Resource not found |
-| `CONFLICT` | 409 | Resource already exists |
-| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
-| `INTERNAL_ERROR` | 500 | Server error |
-| `SERVICE_UNAVAILABLE` | 503 | External service unavailable (Odoo, Doku, JNT) |
+| Code                  | HTTP Status | Description                                    |
+| --------------------- | ----------- | ---------------------------------------------- |
+| `VALIDATION_ERROR`    | 400         | Request validation failed                      |
+| `UNAUTHORIZED`        | 401         | Authentication required or invalid token       |
+| `FORBIDDEN`           | 403         | Insufficient permissions                       |
+| `NOT_FOUND`           | 404         | Resource not found                             |
+| `CONFLICT`            | 409         | Resource already exists                        |
+| `RATE_LIMIT_EXCEEDED` | 429         | Too many requests                              |
+| `INTERNAL_ERROR`      | 500         | Server error                                   |
+| `SERVICE_UNAVAILABLE` | 503         | External service unavailable (Odoo, Doku, JNT) |
 
 ---
 
@@ -112,6 +118,7 @@ Authorization: Bearer <token>
 - **Authenticated:** 1000 requests per 15 minutes
 
 **Headers:**
+
 ```
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
@@ -125,11 +132,13 @@ X-RateLimit-Reset: 1675564800
 ## Auth Endpoints
 
 ### POST /auth/register
+
 Register a new user account.
 
 **Authentication:** None required
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -140,6 +149,7 @@ Register a new user account.
 ```
 
 **Response:** `201 Created`
+
 ```json
 {
   "success": true,
@@ -160,11 +170,13 @@ Register a new user account.
 ---
 
 ### POST /auth/login
+
 Login with email/phone and password.
 
 **Authentication:** None required
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -174,6 +186,7 @@ Login with email/phone and password.
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -194,11 +207,13 @@ Login with email/phone and password.
 ---
 
 ### POST /auth/refresh
+
 Refresh access token using refresh token.
 
 **Authentication:** None required
 
 **Request Body:**
+
 ```json
 {
   "refresh_token": "eyJhbGciOiJIUzI1NiIs..."
@@ -206,6 +221,7 @@ Refresh access token using refresh token.
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -219,11 +235,13 @@ Refresh access token using refresh token.
 ---
 
 ### POST /auth/forgot-password
+
 Request password reset email.
 
 **Authentication:** None required
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com"
@@ -231,6 +249,7 @@ Request password reset email.
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -243,11 +262,13 @@ Request password reset email.
 ---
 
 ### POST /auth/reset-password
+
 Reset password using token from email.
 
 **Authentication:** None required
 
 **Request Body:**
+
 ```json
 {
   "token": "reset_token_from_email",
@@ -262,11 +283,13 @@ Reset password using token from email.
 ## User Endpoints
 
 ### GET /user/profile
+
 Get current user profile.
 
 **Authentication:** Required
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -284,11 +307,13 @@ Get current user profile.
 ---
 
 ### PUT /user/profile
+
 Update user profile.
 
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "full_name": "John Doe Updated",
@@ -301,11 +326,13 @@ Update user profile.
 ---
 
 ### GET /user/addresses
+
 Get all user addresses.
 
 **Authentication:** Required
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -330,11 +357,13 @@ Get all user addresses.
 ---
 
 ### POST /user/addresses
+
 Add new address.
 
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "label": "Office",
@@ -355,11 +384,13 @@ Add new address.
 ---
 
 ### PUT /user/addresses/:id
+
 Update address.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `id` (integer) - Address ID
 
 **Request Body:** Same as POST /user/addresses
@@ -369,11 +400,13 @@ Update address.
 ---
 
 ### DELETE /user/addresses/:id
+
 Delete address.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `id` (integer) - Address ID
 
 **Response:** `204 No Content`
@@ -381,11 +414,13 @@ Delete address.
 ---
 
 ### PUT /user/addresses/:id/set-default
+
 Set address as default.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `id` (integer) - Address ID
 
 **Response:** `200 OK`
@@ -395,11 +430,13 @@ Set address as default.
 ## Product Endpoints
 
 ### GET /products
+
 Get product list with filters and pagination.
 
 **Authentication:** Optional
 
 **Query Parameters:**
+
 - `page` (integer, default: 1) - Page number
 - `limit` (integer, default: 20, max: 100) - Items per page
 - `sort` (string) - Sort by: `newest`, `price_asc`, `price_desc`, `popular`, `rating`
@@ -414,11 +451,13 @@ Get product list with filters and pagination.
 - `in_stock` (boolean) - Only show in-stock items
 
 **Example:**
+
 ```
 GET /products?page=1&limit=20&category=furniture&price_min=100000&in_stock=true
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -431,9 +470,7 @@ GET /products?page=1&limit=20&category=furniture&price_min=100000&in_stock=true
         "short_description": "Premium oak dining table",
         "selling_price": 3500000,
         "compare_price": 4000000,
-        "images": [
-          "https://cdn.example.com/images/table1.jpg"
-        ],
+        "images": ["https://cdn.example.com/images/table1.jpg"],
         "rating": 4.5,
         "total_reviews": 120,
         "is_featured": true,
@@ -453,14 +490,17 @@ GET /products?page=1&limit=20&category=furniture&price_min=100000&in_stock=true
 ---
 
 ### GET /products/:slug
+
 Get product detail by slug.
 
 **Authentication:** Optional
 
 **URL Parameters:**
+
 - `slug` (string) - Product slug
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -516,19 +556,23 @@ Get product detail by slug.
 ---
 
 ### GET /products/:id/reviews
+
 Get product reviews.
 
 **Authentication:** Optional
 
 **URL Parameters:**
+
 - `id` (integer) - Product ID
 
 **Query Parameters:**
+
 - `page` (integer, default: 1)
 - `limit` (integer, default: 10)
 - `sort` (string) - `recent`, `highest`, `lowest`, `helpful`
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -572,11 +616,13 @@ Get product reviews.
 ## Cart Endpoints
 
 ### GET /cart
+
 Get current cart (session for guest, user cart if authenticated).
 
 **Authentication:** Optional
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -617,11 +663,13 @@ Get current cart (session for guest, user cart if authenticated).
 ---
 
 ### POST /cart/items
+
 Add item to cart.
 
 **Authentication:** Optional
 
 **Request Body:**
+
 ```json
 {
   "product_variant_id": 101,
@@ -634,14 +682,17 @@ Add item to cart.
 ---
 
 ### PUT /cart/items/:id
+
 Update cart item quantity.
 
 **Authentication:** Optional
 
 **URL Parameters:**
+
 - `id` (integer) - Cart item ID
 
 **Request Body:**
+
 ```json
 {
   "quantity": 3
@@ -653,11 +704,13 @@ Update cart item quantity.
 ---
 
 ### DELETE /cart/items/:id
+
 Remove item from cart.
 
 **Authentication:** Optional
 
 **URL Parameters:**
+
 - `id` (integer) - Cart item ID
 
 **Response:** `204 No Content`
@@ -665,11 +718,13 @@ Remove item from cart.
 ---
 
 ### POST /cart/apply-voucher
+
 Apply voucher code to cart.
 
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "code": "WELCOME10"
@@ -677,6 +732,7 @@ Apply voucher code to cart.
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -695,6 +751,7 @@ Apply voucher code to cart.
 ---
 
 ### DELETE /cart/remove-voucher
+
 Remove applied voucher.
 
 **Authentication:** Required
@@ -706,11 +763,13 @@ Remove applied voucher.
 ## Checkout Endpoints
 
 ### POST /checkout/validate
+
 Validate cart before checkout.
 
 **Authentication:** Required
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -722,6 +781,7 @@ Validate cart before checkout.
 ```
 
 **Or with issues:**
+
 ```json
 {
   "success": true,
@@ -741,11 +801,13 @@ Validate cart before checkout.
 ---
 
 ### POST /checkout/calculate-shipping
+
 Calculate shipping cost.
 
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "shipping_address_id": 1,
@@ -754,6 +816,7 @@ Calculate shipping cost.
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -779,11 +842,13 @@ Calculate shipping cost.
 ---
 
 ### POST /checkout/create-order
+
 Create order and initiate payment.
 
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "shipping_address_id": 1,
@@ -796,6 +861,7 @@ Create order and initiate payment.
 ```
 
 **Response:** `201 Created`
+
 ```json
 {
   "success": true,
@@ -818,11 +884,13 @@ Create order and initiate payment.
 ---
 
 ### POST /checkout/payment-webhook
+
 Doku payment webhook handler (called by Doku).
 
 **Authentication:** Signature verification
 
 **Request Body:**
+
 ```json
 {
   "transaction_id": "TRX-123456",
@@ -840,17 +908,20 @@ Doku payment webhook handler (called by Doku).
 ## Order Endpoints
 
 ### GET /orders
+
 Get user order history.
 
 **Authentication:** Required
 
 **Query Parameters:**
+
 - `page` (integer, default: 1)
 - `limit` (integer, default: 10)
 - `status` (string) - Filter by status: `pending_payment`, `paid`, `processing`, `shipped`, `delivered`, `cancelled`
 - `sort` (string) - `newest`, `oldest`
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -879,14 +950,17 @@ Get user order history.
 ---
 
 ### GET /orders/:order_number
+
 Get order detail.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `order_number` (string) - Order number
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -937,14 +1011,17 @@ Get order detail.
 ---
 
 ### PUT /orders/:order_number/cancel
+
 Cancel order.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `order_number` (string) - Order number
 
 **Request Body:**
+
 ```json
 {
   "reason": "Changed my mind"
@@ -956,11 +1033,13 @@ Cancel order.
 ---
 
 ### GET /orders/:order_number/invoice
+
 Download invoice PDF.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `order_number` (string) - Order number
 
 **Response:** `200 OK` (PDF file)
@@ -970,24 +1049,24 @@ Download invoice PDF.
 ## Review Endpoints
 
 ### POST /products/:id/reviews
+
 Create product review (verified purchase only).
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `id` (integer) - Product ID
 
 **Request Body:**
+
 ```json
 {
   "order_id": 1,
   "rating": 5,
   "title": "Excellent product!",
   "comment": "Very satisfied with the quality...",
-  "images": [
-    "base64_image_data_1",
-    "base64_image_data_2"
-  ]
+  "images": ["base64_image_data_1", "base64_image_data_2"]
 }
 ```
 
@@ -998,11 +1077,13 @@ Create product review (verified purchase only).
 ## Wishlist Endpoints
 
 ### GET /wishlist
+
 Get user wishlist.
 
 **Authentication:** Required
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -1034,11 +1115,13 @@ Get user wishlist.
 ---
 
 ### POST /wishlist
+
 Add item to wishlist.
 
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "product_id": 1,
@@ -1051,11 +1134,13 @@ Add item to wishlist.
 ---
 
 ### DELETE /wishlist/:id
+
 Remove item from wishlist.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `id` (integer) - Wishlist item ID
 
 **Response:** `204 No Content`
@@ -1063,14 +1148,17 @@ Remove item from wishlist.
 ---
 
 ### POST /wishlist/:id/move-to-cart
+
 Move wishlist item to cart.
 
 **Authentication:** Required
 
 **URL Parameters:**
+
 - `id` (integer) - Wishlist item ID
 
 **Request Body:**
+
 ```json
 {
   "quantity": 1
@@ -1084,11 +1172,13 @@ Move wishlist item to cart.
 ## Voucher Endpoints
 
 ### GET /vouchers/available
+
 Get available vouchers for current user.
 
 **Authentication:** Required
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -1114,11 +1204,13 @@ Get available vouchers for current user.
 ---
 
 ### POST /vouchers/validate
+
 Validate voucher code.
 
 **Authentication:** Required
 
 **Request Body:**
+
 ```json
 {
   "code": "WELCOME10",
@@ -1127,6 +1219,7 @@ Validate voucher code.
 ```
 
 **Response:** `200 OK`
+
 ```json
 {
   "success": true,
@@ -1143,6 +1236,7 @@ Validate voucher code.
 ```
 
 **Or invalid:**
+
 ```json
 {
   "success": false,
@@ -1163,12 +1257,15 @@ Import this API spec into Postman for easy testing:
 ## Webhooks
 
 ### Doku Payment Webhook
+
 - **URL:** `POST /api/checkout/payment-webhook`
 - **Authentication:** HMAC signature verification
 - **Events:** `payment.success`, `payment.failed`, `payment.expired`
 
 ### Odoo Sync Webhooks (Optional)
+
 Configure Odoo to send webhooks on:
+
 - Product updates
 - Stock changes
 - Order status updates
@@ -1180,14 +1277,17 @@ Configure Odoo to send webhooks on:
 Use these test credentials in development:
 
 **Test User:**
+
 - Email: `test@example.com`
 - Password: `TestPass123!`
 
 **Test Voucher Codes:**
+
 - `WELCOME10` - 10% discount
 - `FREESHIP` - Free shipping
 
 **Test Payment (Doku Sandbox):**
+
 - Virtual Account will generate test account numbers
 
 ---

@@ -22,11 +22,13 @@ Before running migrations, kamu perlu:
 ### Quick Database Setup
 
 **MariaDB/MySQL:**
+
 ```sql
 CREATE DATABASE ansania_ecommerce CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 **Atau via command line:**
+
 ```bash
 mysql -u root -p -e "CREATE DATABASE ansania_ecommerce CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 ```
@@ -54,6 +56,7 @@ npm run build --workspace=@repo/database
 ### 3. Run Migrations
 
 Create all 39 tables:
+
 ```bash
 npm run db:migrate --workspace=@repo/database
 ```
@@ -61,26 +64,28 @@ npm run db:migrate --workspace=@repo/database
 ### 4. Run Seeders (Optional)
 
 Populate database dengan demo data:
+
 ```bash
 npm run db:seed --workspace=@repo/database
 ```
 
 ## 📚 Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Compile TypeScript to JavaScript |
-| `npm run dev` | Watch mode untuk development |
-| `npm run db:migrate` | Run all pending migrations |
-| `npm run db:migrate:undo` | Undo last migration |
-| `npm run db:migrate:undo:all` | Undo all migrations |
-| `npm run db:seed` | Run all seeders |
-| `npm run db:seed:undo` | Undo all seeders |
-| `npm run db:reset` | Reset database (undo all, migrate, seed) |
+| Command                       | Description                              |
+| ----------------------------- | ---------------------------------------- |
+| `npm run build`               | Compile TypeScript to JavaScript         |
+| `npm run dev`                 | Watch mode untuk development             |
+| `npm run db:migrate`          | Run all pending migrations               |
+| `npm run db:migrate:undo`     | Undo last migration                      |
+| `npm run db:migrate:undo:all` | Undo all migrations                      |
+| `npm run db:seed`             | Run all seeders                          |
+| `npm run db:seed:undo`        | Undo all seeders                         |
+| `npm run db:reset`            | Reset database (undo all, migrate, seed) |
 
 ## 🗂️ Database Tables (39)
 
 ### Core Tables (17)
+
 - `users` - User accounts
 - `addresses` - User shipping addresses
 - `categories` - Product categories (hierarchical)
@@ -100,28 +105,34 @@ npm run db:seed --workspace=@repo/database
 - `wishlist` - User wishlists
 
 ### Authentication (2)
+
 - `user_sessions` - JWT/session tokens
 - `password_reset_tokens` - Password reset tokens
 
 ### Stock & Inventory (1)
+
 - `product_stock` - Stock levels (Odoo sync)
 
 ### Junction Tables (3)
+
 - `product_categories` - Product ↔ Category
 - `voucher_products` - Voucher ↔ Product
 - `voucher_categories` - Voucher ↔ Category
 
 ### Filters (3)
+
 - `filter_colors` - Color filter options
 - `filter_finishings` - Finishing filter options
 - `filter_sizes` - Size filter options
 
 ### CMS (3)
+
 - `cms_pages` - Static pages (About, Terms, etc.)
 - `cms_banners` - Homepage carousels
 - `cms_settings` - Site configuration
 
 ### Utility & Logging (6)
+
 - `shipping_costs_cache` - Cached shipping rates
 - `product_ratings_summary` - Aggregated reviews
 - `sync_logs` - Odoo sync monitoring
@@ -130,6 +141,7 @@ npm run db:seed --workspace=@repo/database
 - `email_queue` - Async email processing
 
 ### Flash Sales & Analytics (4)
+
 - `flash_sales` - Flash sale campaigns
 - `flash_sale_products` - Flash sale items
 - `search_history` - Search analytics
@@ -164,7 +176,7 @@ The seeders create realistic demo data:
 ## 📖 Usage Example
 
 ```typescript
-import { sequelize, User, Product, Order } from '@repo/database';
+import { sequelize, User, Product, Order } from "@repo/database";
 
 // Test connection
 await sequelize.authenticate();
@@ -174,7 +186,7 @@ const user = await User.findByPk(1);
 
 // Find products with variants
 const products = await Product.findAll({
-  include: ['variants', 'images']
+  include: ["variants", "images"],
 });
 
 // Create order
@@ -188,6 +200,7 @@ const order = await Order.create({
 ## 🔄 Odoo Integration
 
 Tables ready for Odoo sync:
+
 - `users` → `odoo_customer_id`
 - `products` → `odoo_product_id`
 - `orders` → `odoo_order_id`
@@ -204,15 +217,19 @@ Tables ready for Odoo sync:
 ## 🐛 Troubleshooting
 
 ### "Unknown file extension .ts"
+
 → Run `npm run build` dulu sebelum migrations
 
 ### "ER_BAD_DB_ERROR: Unknown database"
+
 → Create database dulu: `CREATE DATABASE ansania_ecommerce;`
 
 ### "Access denied for user"
+
 → Check credentials di `.env` file
 
 ### "Connection refused"
+
 → Make sure MariaDB/MySQL service is running
 
 ## 📝 License

@@ -1,32 +1,32 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname } from 'next/navigation';
-import { ReactNode } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { ReactNode } from "react";
 
 interface PageTransitionProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 const pageVariants = {
-    initial: {
-        opacity: 0,
-        y: 20,
-    },
-    animate: {
-        opacity: 1,
-        y: 0,
-    },
-    exit: {
-        opacity: 0,
-        y: -20,
-    },
+  initial: {
+    opacity: 0,
+    y: 20,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+  },
 };
 
 const pageTransition = {
-    type: 'tween' as const,
-    ease: 'easeInOut' as const,
-    duration: 0.4,
+  type: "tween" as const,
+  ease: "easeInOut" as const,
+  duration: 0.4,
 };
 
 /**
@@ -34,20 +34,20 @@ const pageTransition = {
  * Wraps page content with smooth enter/exit animations
  */
 export function PageTransition({ children }: PageTransitionProps) {
-    const pathname = usePathname();
+  const pathname = usePathname();
 
-    return (
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={pathname}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                variants={pageVariants}
-                transition={pageTransition}
-            >
-                {children}
-            </motion.div>
-        </AnimatePresence>
-    );
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={pathname}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
+        transition={pageTransition}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
 }

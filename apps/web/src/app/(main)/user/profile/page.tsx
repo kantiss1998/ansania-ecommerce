@@ -1,7 +1,7 @@
-import { ProfileContent } from '@/components/features/user/ProfileContent';
+import { ProfileContent } from "@/components/features/user/ProfileContent";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function ProfilePage() {
-    return <ProfileContent />;
+  return <ProfileContent />;
 }

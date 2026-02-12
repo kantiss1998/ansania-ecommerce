@@ -3,336 +3,378 @@
  * Defines all Sequelize models and their associations
  */
 
-import { sequelize } from '../config/database';
+import { sequelize } from "../config/database";
 
 // Import all models
-import { ActivityLog } from './ActivityLog';
-import { Address } from './Address';
-import { Cart } from './Cart';
-import { CartItem } from './CartItem';
-import { Category } from './Category';
-import { CmsBanner } from './CmsBanner';
-import { CmsPage } from './CmsPage';
-import { CmsSetting } from './CmsSetting';
-import { EmailQueue } from './EmailQueue';
-import { FilterColor } from './FilterColor';
-import { FilterFinishing } from './FilterFinishing';
-import { FilterSize } from './FilterSize';
-import { FlashSale } from './FlashSale';
-import { FlashSaleProduct } from './FlashSaleProduct';
-import { Notification } from './Notification';
-import { Order } from './Order';
-import { OrderItem } from './OrderItem';
-import { PasswordResetToken } from './PasswordResetToken';
-import { Payment } from './Payment';
-import { Product } from './Product';
-import { ProductCategories } from './ProductCategories';
-import { ProductImage } from './ProductImage';
-import { ProductRatingsSummary } from './ProductRatingsSummary';
-import { ProductStock } from './ProductStock';
-import { ProductVariant } from './ProductVariant';
-import { ProductView } from './ProductView';
-import { Review } from './Review';
-import { ReviewImage } from './ReviewImage';
-import { SearchHistory } from './SearchHistory';
-import { Shipping } from './Shipping';
-import { ShippingCostsCache } from './ShippingCostsCache';
-import { SyncLog } from './SyncLog';
-import { User } from './User';
-import { UserSession } from './UserSession';
-import { Voucher } from './Voucher';
-import { VoucherCategories } from './VoucherCategories';
-import { VoucherProducts } from './VoucherProducts';
-import { VoucherUsage } from './VoucherUsage';
-import { Wishlist } from './Wishlist';
+import { ActivityLog } from "./ActivityLog";
+import { Address } from "./Address";
+import { Cart } from "./Cart";
+import { CartItem } from "./CartItem";
+import { Category } from "./Category";
+import { CmsBanner } from "./CmsBanner";
+import { CmsPage } from "./CmsPage";
+import { CmsSetting } from "./CmsSetting";
+import { EmailQueue } from "./EmailQueue";
+import { FilterColor } from "./FilterColor";
+import { FilterFinishing } from "./FilterFinishing";
+import { FilterSize } from "./FilterSize";
+import { FlashSale } from "./FlashSale";
+import { FlashSaleProduct } from "./FlashSaleProduct";
+import { Notification } from "./Notification";
+import { Order } from "./Order";
+import { OrderItem } from "./OrderItem";
+import { PasswordResetToken } from "./PasswordResetToken";
+import { Payment } from "./Payment";
+import { Product } from "./Product";
+import { ProductCategories } from "./ProductCategories";
+import { ProductImage } from "./ProductImage";
+import { ProductRatingsSummary } from "./ProductRatingsSummary";
+import { ProductStock } from "./ProductStock";
+import { ProductVariant } from "./ProductVariant";
+import { ProductView } from "./ProductView";
+import { Review } from "./Review";
+import { ReviewImage } from "./ReviewImage";
+import { SearchHistory } from "./SearchHistory";
+import { Shipping } from "./Shipping";
+import { ShippingCostsCache } from "./ShippingCostsCache";
+import { SyncLog } from "./SyncLog";
+import { User } from "./User";
+import { UserSession } from "./UserSession";
+import { Voucher } from "./Voucher";
+import { VoucherCategories } from "./VoucherCategories";
+import { VoucherProducts } from "./VoucherProducts";
+import { VoucherUsage } from "./VoucherUsage";
+import { Wishlist } from "./Wishlist";
 
 // ==========================================
 // DEFINE ALL MODEL ASSOCIATIONS
 // ==========================================
 
 // User Associations
-User.hasMany(Address, { foreignKey: 'user_id', as: 'addresses' });
-User.hasOne(Cart, { foreignKey: 'user_id', as: 'cart' });
-User.hasMany(Order, { foreignKey: 'user_id', as: 'orders' });
-User.hasMany(Review, { foreignKey: 'user_id', as: 'reviews' });
-User.hasMany(Wishlist, { foreignKey: 'user_id', as: 'wishlist' });
-User.hasMany(VoucherUsage, { foreignKey: 'user_id', as: 'voucherUsages' });
+User.hasMany(Address, { foreignKey: "user_id", as: "addresses" });
+User.hasOne(Cart, { foreignKey: "user_id", as: "cart" });
+User.hasMany(Order, { foreignKey: "user_id", as: "orders" });
+User.hasMany(Review, { foreignKey: "user_id", as: "reviews" });
+User.hasMany(Wishlist, { foreignKey: "user_id", as: "wishlist" });
+User.hasMany(VoucherUsage, { foreignKey: "user_id", as: "voucherUsages" });
 
 // Address Associations
-Address.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+Address.belongsTo(User, { foreignKey: "user_id", as: "user" });
 
 // Category Associations (Self-referencing)
-Category.belongsTo(Category, { foreignKey: 'parent_id', as: 'parent' });
-Category.hasMany(Category, { foreignKey: 'parent_id', as: 'children' });
-Category.hasMany(Product, { foreignKey: 'category_id', as: 'products' });
+Category.belongsTo(Category, { foreignKey: "parent_id", as: "parent" });
+Category.hasMany(Category, { foreignKey: "parent_id", as: "children" });
+Category.hasMany(Product, { foreignKey: "category_id", as: "products" });
 
 // Product Associations
-Product.belongsTo(Category, { foreignKey: 'category_id', as: 'category' });
-Product.hasMany(ProductVariant, { foreignKey: 'product_id', as: 'variants' });
-Product.hasMany(ProductImage, { foreignKey: 'product_id', as: 'images' });
-Product.hasMany(Review, { foreignKey: 'product_id', as: 'reviews' });
-Product.hasMany(Wishlist, { foreignKey: 'product_id', as: 'wishlist' });
+Product.belongsTo(Category, { foreignKey: "category_id", as: "category" });
+Product.hasMany(ProductVariant, { foreignKey: "product_id", as: "variants" });
+Product.hasMany(ProductImage, { foreignKey: "product_id", as: "images" });
+Product.hasMany(Review, { foreignKey: "product_id", as: "reviews" });
+Product.hasMany(Wishlist, { foreignKey: "product_id", as: "wishlist" });
 
 // ProductVariant Associations
-ProductVariant.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
-ProductVariant.hasMany(CartItem, { foreignKey: 'product_variant_id', as: 'cartItems' });
-ProductVariant.hasMany(Wishlist, { foreignKey: 'product_variant_id', as: 'wishlist' });
+ProductVariant.belongsTo(Product, { foreignKey: "product_id", as: "product" });
+ProductVariant.hasMany(CartItem, {
+  foreignKey: "product_variant_id",
+  as: "cartItems",
+});
+ProductVariant.hasMany(Wishlist, {
+  foreignKey: "product_variant_id",
+  as: "wishlist",
+});
 
 // ProductImage Associations
-ProductImage.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
+ProductImage.belongsTo(Product, { foreignKey: "product_id", as: "product" });
 
 // Cart Associations
-Cart.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-Cart.hasMany(CartItem, { foreignKey: 'cart_id', as: 'items' });
-Cart.belongsTo(Voucher, { foreignKey: 'voucher_id', as: 'voucher' });
+Cart.belongsTo(User, { foreignKey: "user_id", as: "user" });
+Cart.hasMany(CartItem, { foreignKey: "cart_id", as: "items" });
+Cart.belongsTo(Voucher, { foreignKey: "voucher_id", as: "voucher" });
 
 // CartItem Associations
-CartItem.belongsTo(Cart, { foreignKey: 'cart_id', as: 'cart' });
-CartItem.belongsTo(ProductVariant, { foreignKey: 'product_variant_id', as: 'productVariant' });
+CartItem.belongsTo(Cart, { foreignKey: "cart_id", as: "cart" });
+CartItem.belongsTo(ProductVariant, {
+  foreignKey: "product_variant_id",
+  as: "productVariant",
+});
 
 // Order Associations
-Order.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-Order.hasMany(OrderItem, { foreignKey: 'order_id', as: 'items' });
-Order.hasOne(Payment, { foreignKey: 'order_id', as: 'payment' });
-Order.hasOne(Shipping, { foreignKey: 'order_id', as: 'shipping' });
-Order.hasMany(Review, { foreignKey: 'order_id', as: 'reviews' });
-Order.hasMany(VoucherUsage, { foreignKey: 'order_id', as: 'voucherUsages' });
+Order.belongsTo(User, { foreignKey: "user_id", as: "user" });
+Order.hasMany(OrderItem, { foreignKey: "order_id", as: "items" });
+Order.hasOne(Payment, { foreignKey: "order_id", as: "payment" });
+Order.hasOne(Shipping, { foreignKey: "order_id", as: "shipping" });
+Order.hasMany(Review, { foreignKey: "order_id", as: "reviews" });
+Order.hasMany(VoucherUsage, { foreignKey: "order_id", as: "voucherUsages" });
 
 // OrderItem Associations
 // OrderItem Associations
-OrderItem.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
-OrderItem.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
-OrderItem.belongsTo(ProductVariant, { foreignKey: 'product_variant_id', as: 'productVariant' });
+OrderItem.belongsTo(Order, { foreignKey: "order_id", as: "order" });
+OrderItem.belongsTo(Product, { foreignKey: "product_id", as: "product" });
+OrderItem.belongsTo(ProductVariant, {
+  foreignKey: "product_variant_id",
+  as: "productVariant",
+});
 
 // Payment Associations
-Payment.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
+Payment.belongsTo(Order, { foreignKey: "order_id", as: "order" });
 
 // Shipping Associations
-Shipping.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
+Shipping.belongsTo(Order, { foreignKey: "order_id", as: "order" });
 
 // Voucher Associations
-Voucher.hasMany(Cart, { foreignKey: 'voucher_id', as: 'carts' });
-Voucher.hasMany(VoucherUsage, { foreignKey: 'voucher_id', as: 'usages' });
+Voucher.hasMany(Cart, { foreignKey: "voucher_id", as: "carts" });
+Voucher.hasMany(VoucherUsage, { foreignKey: "voucher_id", as: "usages" });
 
 // VoucherUsage Associations
-VoucherUsage.belongsTo(Voucher, { foreignKey: 'voucher_id', as: 'voucher' });
-VoucherUsage.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-VoucherUsage.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
+VoucherUsage.belongsTo(Voucher, { foreignKey: "voucher_id", as: "voucher" });
+VoucherUsage.belongsTo(User, { foreignKey: "user_id", as: "user" });
+VoucherUsage.belongsTo(Order, { foreignKey: "order_id", as: "order" });
 
 // Review Associations
-Review.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
-Review.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-Review.belongsTo(Order, { foreignKey: 'order_id', as: 'order' });
-Review.hasMany(ReviewImage, { foreignKey: 'review_id', as: 'images' });
+Review.belongsTo(Product, { foreignKey: "product_id", as: "product" });
+Review.belongsTo(User, { foreignKey: "user_id", as: "user" });
+Review.belongsTo(Order, { foreignKey: "order_id", as: "order" });
+Review.hasMany(ReviewImage, { foreignKey: "review_id", as: "images" });
 
 // ReviewImage Associations
-ReviewImage.belongsTo(Review, { foreignKey: 'review_id', as: 'review' });
+ReviewImage.belongsTo(Review, { foreignKey: "review_id", as: "review" });
 
 // Wishlist Associations
-Wishlist.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-Wishlist.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
-Wishlist.belongsTo(ProductVariant, { foreignKey: 'product_variant_id', as: 'productVariant' });
+Wishlist.belongsTo(User, { foreignKey: "user_id", as: "user" });
+Wishlist.belongsTo(Product, { foreignKey: "product_id", as: "product" });
+Wishlist.belongsTo(ProductVariant, {
+  foreignKey: "product_variant_id",
+  as: "productVariant",
+});
 
 // ==========================================
 // NEW MODEL ASSOCIATIONS
 // ==========================================
 
 // UserSession Associations
-UserSession.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-User.hasMany(UserSession, { foreignKey: 'user_id', as: 'sessions' });
+UserSession.belongsTo(User, { foreignKey: "user_id", as: "user" });
+User.hasMany(UserSession, { foreignKey: "user_id", as: "sessions" });
 
 // PasswordResetToken Associations
-PasswordResetToken.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-User.hasMany(PasswordResetToken, { foreignKey: 'user_id', as: 'passwordResetTokens' });
+PasswordResetToken.belongsTo(User, { foreignKey: "user_id", as: "user" });
+User.hasMany(PasswordResetToken, {
+  foreignKey: "user_id",
+  as: "passwordResetTokens",
+});
 
 // ProductStock Associations
-ProductStock.belongsTo(ProductVariant, { foreignKey: 'product_variant_id', as: 'productVariant' });
-ProductVariant.hasOne(ProductStock, { foreignKey: 'product_variant_id', as: 'inventory' });
+ProductStock.belongsTo(ProductVariant, {
+  foreignKey: "product_variant_id",
+  as: "productVariant",
+});
+ProductVariant.hasOne(ProductStock, {
+  foreignKey: "product_variant_id",
+  as: "inventory",
+});
 
 // Many-to-Many: Product <-> Category via ProductCategories
 Product.belongsToMany(Category, {
-    through: ProductCategories,
-    foreignKey: 'product_id',
-    otherKey: 'category_id',
-    as: 'categories'
+  through: ProductCategories,
+  foreignKey: "product_id",
+  otherKey: "category_id",
+  as: "categories",
 });
 Category.belongsToMany(Product, {
-    through: ProductCategories,
-    foreignKey: 'category_id',
-    otherKey: 'product_id',
-    as: 'categorizedProducts'
+  through: ProductCategories,
+  foreignKey: "category_id",
+  otherKey: "product_id",
+  as: "categorizedProducts",
 });
 
 // Many-to-Many: Voucher <-> Product via VoucherProducts
 Voucher.belongsToMany(Product, {
-    through: VoucherProducts,
-    foreignKey: 'voucher_id',
-    otherKey: 'product_id',
-    as: 'applicableProducts'
+  through: VoucherProducts,
+  foreignKey: "voucher_id",
+  otherKey: "product_id",
+  as: "applicableProducts",
 });
 Product.belongsToMany(Voucher, {
-    through: VoucherProducts,
-    foreignKey: 'product_id',
-    otherKey: 'voucher_id',
-    as: 'vouchers'
+  through: VoucherProducts,
+  foreignKey: "product_id",
+  otherKey: "voucher_id",
+  as: "vouchers",
 });
 
 // Many-to-Many: Voucher <-> Category via VoucherCategories
 Voucher.belongsToMany(Category, {
-    through: VoucherCategories,
-    foreignKey: 'voucher_id',
-    otherKey: 'category_id',
-    as: 'applicableCategories'
+  through: VoucherCategories,
+  foreignKey: "voucher_id",
+  otherKey: "category_id",
+  as: "applicableCategories",
 });
 Category.belongsToMany(Voucher, {
-    through: VoucherCategories,
-    foreignKey: 'category_id',
-    otherKey: 'voucher_id',
-    as: 'categoryVouchers'
+  through: VoucherCategories,
+  foreignKey: "category_id",
+  otherKey: "voucher_id",
+  as: "categoryVouchers",
 });
 
 // ProductRatingsSummary Associations
-ProductRatingsSummary.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
-Product.hasOne(ProductRatingsSummary, { foreignKey: 'product_id', as: 'ratingsSummary' });
+ProductRatingsSummary.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+Product.hasOne(ProductRatingsSummary, {
+  foreignKey: "product_id",
+  as: "ratingsSummary",
+});
 
 // Notification Associations
-Notification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-User.hasMany(Notification, { foreignKey: 'user_id', as: 'notifications' });
+Notification.belongsTo(User, { foreignKey: "user_id", as: "user" });
+User.hasMany(Notification, { foreignKey: "user_id", as: "notifications" });
 
 // ActivityLog Associations
-ActivityLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-User.hasMany(ActivityLog, { foreignKey: 'user_id', as: 'activityLogs' });
+ActivityLog.belongsTo(User, { foreignKey: "user_id", as: "user" });
+User.hasMany(ActivityLog, { foreignKey: "user_id", as: "activityLogs" });
 
 // FlashSale Associations
-FlashSale.hasMany(FlashSaleProduct, { foreignKey: 'flash_sale_id', as: 'products' });
+FlashSale.hasMany(FlashSaleProduct, {
+  foreignKey: "flash_sale_id",
+  as: "products",
+});
 
 // FlashSaleProduct Associations
-FlashSaleProduct.belongsTo(FlashSale, { foreignKey: 'flash_sale_id', as: 'flashSale' });
-FlashSaleProduct.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
-FlashSaleProduct.belongsTo(ProductVariant, { foreignKey: 'product_variant_id', as: 'productVariant' });
+FlashSaleProduct.belongsTo(FlashSale, {
+  foreignKey: "flash_sale_id",
+  as: "flashSale",
+});
+FlashSaleProduct.belongsTo(Product, {
+  foreignKey: "product_id",
+  as: "product",
+});
+FlashSaleProduct.belongsTo(ProductVariant, {
+  foreignKey: "product_variant_id",
+  as: "productVariant",
+});
 
 // SearchHistory Associations
-SearchHistory.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-User.hasMany(SearchHistory, { foreignKey: 'user_id', as: 'searchHistory' });
+SearchHistory.belongsTo(User, { foreignKey: "user_id", as: "user" });
+User.hasMany(SearchHistory, { foreignKey: "user_id", as: "searchHistory" });
 
 // ProductView Associations
-ProductView.belongsTo(Product, { foreignKey: 'product_id', as: 'product' });
-ProductView.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-Product.hasMany(ProductView, { foreignKey: 'product_id', as: 'views' });
+ProductView.belongsTo(Product, { foreignKey: "product_id", as: "product" });
+ProductView.belongsTo(User, { foreignKey: "user_id", as: "user" });
+Product.hasMany(ProductView, { foreignKey: "product_id", as: "views" });
 
 // ==========================================
 // EXPORT ALL MODELS
 // ==========================================
 
 export {
-    // Database connection
-    sequelize,
+  // Database connection
+  sequelize,
 
-    // Core models
-    User,
-    Address,
-    Category,
-    Product,
-    ProductVariant,
-    ProductImage,
+  // Core models
+  User,
+  Address,
+  Category,
+  Product,
+  ProductVariant,
+  ProductImage,
 
-    // Cart models
-    Cart,
-    CartItem,
+  // Cart models
+  Cart,
+  CartItem,
 
-    // Order models
-    Order,
-    OrderItem,
-    Payment,
-    Shipping,
+  // Order models
+  Order,
+  OrderItem,
+  Payment,
+  Shipping,
 
-    // Supporting models
-    Voucher,
-    VoucherUsage,
-    Review,
-    ReviewImage,
-    Wishlist,
+  // Supporting models
+  Voucher,
+  VoucherUsage,
+  Review,
+  ReviewImage,
+  Wishlist,
 
-    // Authentication models
-    UserSession,
-    PasswordResetToken,
+  // Authentication models
+  UserSession,
+  PasswordResetToken,
 
-    // Stock & Inventory
-    ProductStock,
+  // Stock & Inventory
+  ProductStock,
 
-    // Junction tables
-    ProductCategories,
-    VoucherProducts,
-    VoucherCategories,
+  // Junction tables
+  ProductCategories,
+  VoucherProducts,
+  VoucherCategories,
 
-    // Filter models
-    FilterColor,
-    FilterFinishing,
-    FilterSize,
+  // Filter models
+  FilterColor,
+  FilterFinishing,
+  FilterSize,
 
-    // CMS models
-    CmsPage,
-    CmsBanner,
-    CmsSetting,
+  // CMS models
+  CmsPage,
+  CmsBanner,
+  CmsSetting,
 
-    // Utility models
-    ShippingCostsCache,
-    ProductRatingsSummary,
-    SyncLog,
-    Notification,
-    ActivityLog,
-    EmailQueue,
+  // Utility models
+  ShippingCostsCache,
+  ProductRatingsSummary,
+  SyncLog,
+  Notification,
+  ActivityLog,
+  EmailQueue,
 
-    // Flash Sales & Analytics
-    FlashSale,
-    FlashSaleProduct,
-    SearchHistory,
-    ProductView,
+  // Flash Sales & Analytics
+  FlashSale,
+  FlashSaleProduct,
+  SearchHistory,
+  ProductView,
 };
 
 // Export model instances for database initialization
 export const models = {
-    User,
-    Address,
-    Category,
-    Product,
-    ProductVariant,
-    ProductImage,
-    Cart,
-    CartItem,
-    Order,
-    OrderItem,
-    Payment,
-    Shipping,
-    Voucher,
-    VoucherUsage,
-    Review,
-    ReviewImage,
-    Wishlist,
+  User,
+  Address,
+  Category,
+  Product,
+  ProductVariant,
+  ProductImage,
+  Cart,
+  CartItem,
+  Order,
+  OrderItem,
+  Payment,
+  Shipping,
+  Voucher,
+  VoucherUsage,
+  Review,
+  ReviewImage,
+  Wishlist,
 
-    // New models
-    UserSession,
-    PasswordResetToken,
-    ProductStock,
-    ProductCategories,
-    VoucherProducts,
-    VoucherCategories,
-    FilterColor,
-    FilterFinishing,
-    FilterSize,
-    CmsPage,
-    CmsBanner,
-    CmsSetting,
-    ShippingCostsCache,
-    ProductRatingsSummary,
-    SyncLog,
-    Notification,
-    ActivityLog,
-    EmailQueue,
-    FlashSale,
-    FlashSaleProduct,
-    SearchHistory,
-    ProductView,
+  // New models
+  UserSession,
+  PasswordResetToken,
+  ProductStock,
+  ProductCategories,
+  VoucherProducts,
+  VoucherCategories,
+  FilterColor,
+  FilterFinishing,
+  FilterSize,
+  CmsPage,
+  CmsBanner,
+  CmsSetting,
+  ShippingCostsCache,
+  ProductRatingsSummary,
+  SyncLog,
+  Notification,
+  ActivityLog,
+  EmailQueue,
+  FlashSale,
+  FlashSaleProduct,
+  SearchHistory,
+  ProductView,
 };
 
 export default models;

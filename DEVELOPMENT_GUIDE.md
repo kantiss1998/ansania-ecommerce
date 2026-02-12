@@ -1,4 +1,5 @@
 # Development Guide
+
 **Ansania E-Commerce Platform - Complete Setup Guide**
 
 This guide will walk you through setting up your local development environment step-by-step.
@@ -25,6 +26,7 @@ This guide will walk you through setting up your local development environment s
 Install the following before proceeding:
 
 #### 1. Node.js (v18 or higher)
+
 ```bash
 # Check if installed
 node --version  # Should be 18.x or higher
@@ -36,6 +38,7 @@ nvm use 18
 ```
 
 #### 2. npm or pnpm
+
 ```bash
 # npm comes with Node.js, check version
 npm --version  # Should be 8.x or higher
@@ -46,6 +49,7 @@ pnpm --version
 ```
 
 #### 3. MariaDB (v10.6 or higher)
+
 ```bash
 # Check if installed
 mysql --version
@@ -64,6 +68,7 @@ sudo apt-get install mariadb-server
 ```
 
 #### 4. Git
+
 ```bash
 # Check if installed
 git --version
@@ -108,6 +113,7 @@ pnpm install
 ```
 
 **Expected output:**
+
 ```
 ✓ Installed packages
 ✓ Built workspace dependencies
@@ -329,6 +335,7 @@ npm run dev
 ```
 
 Visit:
+
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:5000
 - **API Health:** http://localhost:5000/health
@@ -445,6 +452,7 @@ git push origin feature/your-feature-name
 ```
 
 **Commit Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation only
@@ -492,6 +500,7 @@ mysql -u ansania_user -p -h localhost ansania_ecommerce
 ```
 
 **Common causes:**
+
 - Wrong credentials in `.env`
 - MariaDB service not running
 - Database doesn't exist
@@ -543,6 +552,7 @@ npm run dev:web
    - Copy credentials to `.env`
 
 2. **Test Connection:**
+
    ```bash
    # From API directory
    cd apps/api

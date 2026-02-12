@@ -1,24 +1,24 @@
 {
-    "extends": "./tsconfig.base.json",
-    "compilerOptions": {
-        "baseUrl": "."
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/api"
     },
-    "files": [],
-    "references": [
-        {
-            "path": "./apps/api"
-        },
-        {
-            "path": "./apps/web"
-        },
-        {
-            "path": "./packages/database"
-        },
-        {
-            "path": "./packages/shared"
-        },
-        {
-            "path": "./packages/ui"
-        }
-    ]
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./packages/database"
+    },
+    {
+      "path": "./packages/shared"
+    },
+    {
+      "path": "./packages/ui"
+    }
+  ]
 }

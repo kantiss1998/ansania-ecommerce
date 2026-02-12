@@ -5,7 +5,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ## 📱 Halaman Utama & Publik
 
 ### 1. Homepage (/)
+
 **Konten:**
+
 - Hero Banner (dari CMS)
 - Flash Sale Section (dari flashSale_routes)
 - Featured Products
@@ -15,6 +17,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Newsletter Subscription
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/banners` - Banner utama
 - `GET /api/flash-sales/active` - Flash sale aktif
 - `GET /api/products` - Produk featured
@@ -23,7 +26,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 2. Product Listing Page (/products)
+
 **Konten:**
+
 - Product Grid/List View
 - Filter Sidebar:
   - Category
@@ -38,6 +43,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Search Results Count
 
 **Data yang dibutuhkan:**
+
 - `GET /api/products?category=&minPrice=&maxPrice=&color=&size=&sort=`
 - `GET /api/attributes/colors`
 - `GET /api/attributes/sizes`
@@ -46,7 +52,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 3. Product Detail Page (/products/:slug)
+
 **Konten:**
+
 - Product Image Gallery
 - Product Title & SKU
 - Price & Discount Info
@@ -69,11 +77,13 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Recently Viewed Products
 
 **Data yang dibutuhkan:**
+
 - `GET /api/products/:slug`
 - `GET /api/reviews/:productId`
 - `POST /api/stats/view/:productId` - Track view
 
 **Actions:**
+
 - `POST /api/cart/items` - Add to cart
 - `POST /api/wishlist` - Add to wishlist
 - `POST /api/reviews` - Submit review (authenticated)
@@ -81,7 +91,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 4. Search Results Page (/search?q=)
+
 **Konten:**
+
 - Search Query Display
 - Search Results Grid
 - Filter Options (sama seperti Product Listing)
@@ -91,6 +103,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Popular Searches
 
 **Data yang dibutuhkan:**
+
 - `GET /api/products?search=query`
 - `GET /api/stats/top-searches`
 - `POST /api/stats/search` - Record search
@@ -98,7 +111,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 5. Flash Sale Page (/flash-sale/:id)
+
 **Konten:**
+
 - Flash Sale Header dengan Countdown Timer
 - Flash Sale Products Grid
 - Discount Percentage
@@ -107,6 +122,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Terms & Conditions
 
 **Data yang dibutuhkan:**
+
 - `GET /api/flash-sales/:id`
 - `GET /api/flash-sales/active`
 
@@ -115,7 +131,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ## 🔐 Authentication Pages
 
 ### 6. Login Page (/login)
+
 **Konten:**
+
 - Email Input
 - Password Input
 - Remember Me Checkbox
@@ -125,12 +143,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Social Login Options (opsional)
 
 **Actions:**
+
 - `POST /api/auth/login`
 
 ---
 
 ### 7. Register Page (/register)
+
 **Konten:**
+
 - Full Name Input
 - Email Input
 - Phone Input
@@ -141,30 +162,37 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Login Link
 
 **Actions:**
+
 - `POST /api/auth/register`
 
 ---
 
 ### 8. Forgot Password Page (/forgot-password)
+
 **Konten:**
+
 - Email Input
 - Instructions Text
 - Submit Button
 - Back to Login Link
 
 **Actions:**
+
 - `POST /api/auth/forgot-password`
 
 ---
 
 ### 9. Reset Password Page (/reset-password?token=)
+
 **Konten:**
+
 - New Password Input
 - Confirm Password Input
 - Submit Button
 - Password Requirements Info
 
 **Actions:**
+
 - `POST /api/auth/reset-password`
 
 ---
@@ -172,7 +200,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ## 🛒 Shopping Flow Pages
 
 ### 10. Shopping Cart Page (/cart)
+
 **Konten:**
+
 - Cart Items List:
   - Product Image
   - Product Name
@@ -193,9 +223,11 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Empty Cart State
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cart`
 
 **Actions:**
+
 - `POST /api/cart/items` - Add item
 - `PUT /api/cart/items/:id` - Update quantity
 - `DELETE /api/cart/items/:id` - Remove item
@@ -205,7 +237,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 11. Checkout Page (/checkout)
+
 **Konten:**
+
 - Step Indicator (Shipping → Payment → Review)
 - Shipping Address Section:
   - Saved Addresses List
@@ -226,18 +260,22 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Place Order Button
 
 **Data yang dibutuhkan:**
+
 - `GET /api/addresses` - User addresses
 - `POST /api/checkout/shipping` - Calculate shipping rates
 - `GET /api/cart` - Cart items
 
 **Actions:**
+
 - `POST /api/checkout/order` - Create order
 - `POST /api/addresses` - Add new address
 
 ---
 
 ### 12. Payment Page (/payment/:orderNumber)
+
 **Konten:**
+
 - Order Information
 - Payment Instructions
 - Payment Methods (Doku integration)
@@ -246,12 +284,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Cancel Order Button
 
 **Data yang dibutuhkan:**
+
 - `GET /api/payment/status/:orderNumber`
 
 ---
 
 ### 13. Payment Success Page (/payment/success)
+
 **Konten:**
+
 - Success Icon/Animation
 - Order Number
 - Total Paid
@@ -263,7 +304,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 14. Payment Failed Page (/payment/failed)
+
 **Konten:**
+
 - Failed Icon
 - Error Message
 - Order Number
@@ -276,7 +319,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ## 👤 User Account Pages
 
 ### 15. Profile Page (/account/profile)
+
 **Konten:**
+
 - Profile Header with Avatar
 - Personal Information Form:
   - Full Name
@@ -291,15 +336,19 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
   - Member Since
 
 **Data yang dibutuhkan:**
+
 - `GET /api/profile`
 
 **Actions:**
+
 - `PUT /api/profile` - Update profile
 
 ---
 
 ### 16. Change Password Page (/account/security)
+
 **Konten:**
+
 - Current Password Input
 - New Password Input
 - Confirm New Password Input
@@ -307,12 +356,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Change Password Button
 
 **Actions:**
+
 - `PUT /api/profile/password`
 
 ---
 
 ### 17. Address Book Page (/account/addresses)
+
 **Konten:**
+
 - Address Cards List:
   - Full Name
   - Phone
@@ -324,9 +376,11 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Empty State
 
 **Data yang dibutuhkan:**
+
 - `GET /api/addresses`
 
 **Actions:**
+
 - `POST /api/addresses` - Create address
 - `PUT /api/addresses/:id` - Update address
 - `DELETE /api/addresses/:id` - Delete address
@@ -334,7 +388,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 18. Order History Page (/account/orders)
+
 **Konten:**
+
 - Order Filter:
   - All Orders
   - Pending Payment
@@ -353,13 +409,16 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Empty State per Status
 
 **Data yang dibutuhkan:**
+
 - Endpoint belum ada di routes (perlu ditambahkan)
 - Suggested: `GET /api/orders?status=&page=`
 
 ---
 
 ### 19. Order Detail Page (/account/orders/:orderNumber)
+
 **Konten:**
+
 - Order Header:
   - Order Number
   - Order Date
@@ -381,12 +440,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Contact Support Button
 
 **Data yang dibutuhkan:**
+
 - Suggested: `GET /api/orders/:orderNumber`
 
 ---
 
 ### 20. Wishlist Page (/account/wishlist)
+
 **Konten:**
+
 - Wishlist Items Grid:
   - Product Image
   - Product Name
@@ -398,9 +460,11 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Share Wishlist Button
 
 **Data yang dibutuhkan:**
+
 - `GET /api/wishlist`
 
 **Actions:**
+
 - `POST /api/wishlist` - Add to wishlist
 - `DELETE /api/wishlist/:id` - Remove from wishlist
 - `POST /api/cart/items` - Move to cart
@@ -408,7 +472,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 21. Notifications Page (/account/notifications)
+
 **Konten:**
+
 - Notification List:
   - Icon/Type
   - Title
@@ -420,16 +486,20 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Empty State
 
 **Data yang dibutuhkan:**
+
 - `GET /api/notifications`
 
 **Actions:**
+
 - `PATCH /api/notifications/:id/read` - Mark as read
 - `PATCH /api/notifications/read-all` - Mark all as read
 
 ---
 
 ### 22. Reviews & Ratings Page (/account/reviews)
+
 **Konten:**
+
 - My Reviews List:
   - Product Info
   - Rating Given
@@ -440,6 +510,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Empty State
 
 **Data yang dibutuhkan:**
+
 - Suggested: `GET /api/reviews/my-reviews`
 
 ---
@@ -447,7 +518,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ## 📄 Static & Information Pages
 
 ### 23. About Us Page (/about)
+
 **Konten:**
+
 - Company Story
 - Vision & Mission
 - Team Members
@@ -456,12 +529,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Office Locations
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/pages/about`
 
 ---
 
 ### 24. Contact Us Page (/contact)
+
 **Konten:**
+
 - Contact Form:
   - Name
   - Email
@@ -476,12 +552,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Google Maps Embed
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/settings` - Contact info
 
 ---
 
 ### 25. FAQ Page (/faq)
+
 **Konten:**
+
 - Search Bar
 - Category Tabs:
   - General
@@ -496,12 +575,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Still Have Questions Section
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/pages/faq`
 
 ---
 
 ### 26. Terms & Conditions Page (/terms)
+
 **Konten:**
+
 - Last Updated Date
 - Table of Contents
 - Terms Sections:
@@ -516,12 +598,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
   - Governing Law
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/pages/terms`
 
 ---
 
 ### 27. Privacy Policy Page (/privacy)
+
 **Konten:**
+
 - Last Updated Date
 - Table of Contents
 - Privacy Sections:
@@ -534,12 +619,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
   - Contact Information
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/pages/privacy`
 
 ---
 
 ### 28. Shipping & Delivery Page (/shipping)
+
 **Konten:**
+
 - Shipping Methods
 - Delivery Times by Region
 - Shipping Costs
@@ -548,12 +636,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Shipping FAQs
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/pages/shipping`
 
 ---
 
 ### 29. Returns & Refunds Page (/returns)
+
 **Konten:**
+
 - Return Policy Overview
 - Return Eligibility
 - Return Process Steps
@@ -562,12 +653,15 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Return Form/Request Button
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/pages/returns`
 
 ---
 
 ### 30. Size Guide Page (/size-guide)
+
 **Konten:**
+
 - Size Chart by Category
 - Measurement Guide
 - How to Measure Instructions
@@ -575,6 +669,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Size Conversion Table
 
 **Data yang dibutuhkan:**
+
 - `GET /api/cms/pages/size-guide`
 
 ---
@@ -582,7 +677,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ## 🔧 Utility Pages
 
 ### 31. 404 Not Found Page (/404)
+
 **Konten:**
+
 - 404 Illustration
 - Error Message
 - Search Bar
@@ -592,7 +689,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 32. 500 Server Error Page (/500)
+
 **Konten:**
+
 - Error Illustration
 - Friendly Error Message
 - Retry Button
@@ -602,7 +701,9 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ---
 
 ### 33. Maintenance Page (/maintenance)
+
 **Konten:**
+
 - Maintenance Illustration
 - Maintenance Message
 - Expected Return Time
@@ -616,6 +717,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 ### Total Pages: 33+
 
 **Breakdown by Category:**
+
 - **Halaman Utama & Publik:** 5 halaman
 - **Authentication:** 4 halaman
 - **Shopping Flow:** 4 halaman
@@ -624,6 +726,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - **Utility:** 3 halaman
 
 ### Additional Components Needed:
+
 - Header with Navigation
 - Footer with Links
 - Search Bar Component
@@ -637,6 +740,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 - Modal Dialogs
 
 ### Missing API Endpoints (Perlu ditambahkan):
+
 1. `GET /api/orders` - Get user orders
 2. `GET /api/orders/:orderNumber` - Get order detail
 3. `GET /api/reviews/my-reviews` - Get user reviews
@@ -644,6 +748,7 @@ Berdasarkan analisis API routes, berikut adalah daftar lengkap halaman yang dapa
 5. `GET /api/cms/pages/:slug` - Sudah ada, perlu dimanfaatkan
 
 ### Recommended Additional Pages:
+
 1. **Blog/News Page** - Untuk content marketing
 2. **Careers Page** - Untuk recruitment
 3. **Store Locator** - Jika ada physical store

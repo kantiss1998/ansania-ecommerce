@@ -1,4 +1,5 @@
 # Coding Standards & Engineering Guidelines
+
 **Ansania E-Commerce Platform with Odoo Integration**
 
 This document defines the strict engineering standards, architectural patterns, and code quality requirements for the **ansania-ecommerce** monorepo. All AI-generated code and human contributions must adhere to these guidelines.
@@ -7,26 +8,27 @@ This document defines the strict engineering standards, architectural patterns, 
 
 ## 1. Core Principles
 
-* **Clean Code:** Code must be self-documenting, intent-revealing, and formatted consistently.
-* **DRY (Don't Repeat Yourself):** Logic duplicated more than twice must be abstracted into a shared utility or component.
-* **SOLID:**
-    * *SRP:* Modules/Classes/Functions have one reason to change.
-    * *OCP:* Open for extension, closed for modification.
-    * *LSP:* Subtypes must be substitutable for their base types.
-    * *ISP:* Clients shouldn't depend on interfaces they don't use.
-    * *DIP:* Depend on abstractions, not concretions.
-* **KISS (Keep It Simple, Stupid):** Prefer simple, understandable solutions over complex, clever ones.
-* **YAGNI (You Ain't Gonna Need It):** Implement only what is currently required. No speculative engineering.
-* **Separation of Concerns:** Strict boundaries between UI, Business Logic, and Data Access.
-* **Single Source of Truth:** Data configurations and types exist in exactly one place (typically `packages/shared` or `packages/database`).
-* **Convention over Configuration:** Follow existing directory structures and naming patterns before creating new ones.
-* **API-First Design:** Backend exposes well-documented RESTful APIs that frontend consumes.
+- **Clean Code:** Code must be self-documenting, intent-revealing, and formatted consistently.
+- **DRY (Don't Repeat Yourself):** Logic duplicated more than twice must be abstracted into a shared utility or component.
+- **SOLID:**
+  - _SRP:_ Modules/Classes/Functions have one reason to change.
+  - _OCP:_ Open for extension, closed for modification.
+  - _LSP:_ Subtypes must be substitutable for their base types.
+  - _ISP:_ Clients shouldn't depend on interfaces they don't use.
+  - _DIP:_ Depend on abstractions, not concretions.
+- **KISS (Keep It Simple, Stupid):** Prefer simple, understandable solutions over complex, clever ones.
+- **YAGNI (You Ain't Gonna Need It):** Implement only what is currently required. No speculative engineering.
+- **Separation of Concerns:** Strict boundaries between UI, Business Logic, and Data Access.
+- **Single Source of Truth:** Data configurations and types exist in exactly one place (typically `packages/shared` or `packages/database`).
+- **Convention over Configuration:** Follow existing directory structures and naming patterns before creating new ones.
+- **API-First Design:** Backend exposes well-documented RESTful APIs that frontend consumes.
 
 ---
 
 ## 2. Monorepo Architecture
 
 ### Tech Stack
+
 ```
 Frontend:  Next.js 15+ (TypeScript, App Router)
 Backend:   Express.js (TypeScript)
@@ -38,6 +40,7 @@ ERP:       Odoo.com (REST API / XML-RPC)
 ```
 
 ### Structure
+
 ```
 ansania-ecommerce/
 ├── apps/
@@ -89,20 +92,23 @@ ansania-ecommerce/
 ```
 
 ### Boundaries & Rules
-* **No Circular Dependencies:** A package must never import from a package that depends on it.
-* **No Direct Cross-App Imports:** `apps/web` cannot import code from `apps/api`. Communication happens via HTTP/REST API only.
-* **Dependency Inversion:** High-level policy (Use Cases) should not depend on low-level detail (Database Drivers).
-* **Framework Agnostic:** Shared logic in `packages/shared` must not depend on React or Express internals.
-* **Integration Layer Isolation:** All external API integrations (Odoo, Doku, JNT) must be isolated in `apps/api/src/integrations/`.
+
+- **No Circular Dependencies:** A package must never import from a package that depends on it.
+- **No Direct Cross-App Imports:** `apps/web` cannot import code from `apps/api`. Communication happens via HTTP/REST API only.
+- **Dependency Inversion:** High-level policy (Use Cases) should not depend on low-level detail (Database Drivers).
+- **Framework Agnostic:** Shared logic in `packages/shared` must not depend on React or Express internals.
+- **Integration Layer Isolation:** All external API integrations (Odoo, Doku, JNT) must be isolated in `apps/api/src/integrations/`.
 
 ---
 
 ## 3. Code Quality Requirements
 
 ### Type Safety
-* **Strict Mode:** `strict: true` is enforced in all `tsconfig.json` files.
-* **No `any`:** Explicitly define types. Use `unknown` if types are truly dynamic, with proper type narrowing.
-* **DTOs (Data Transfer Objects):** Use strict interfaces/types for data transfer between layers.
+
+- **Strict Mode:** `strict: true` is enforced in all `tsconfig.json` files.
+- **No `any`:** Explicitly define types. Use `unknown` if types are truly dynamic, with proper type narrowing.
+- **DTOs (Data Transfer Objects):** Use strict interfaces/types for data transfer between layers.
+
   ```typescript
   // ✅ Good - Explicit types
   interface CreateOrderDTO {
@@ -116,7 +122,9 @@ ansania-ecommerce/
   ```
 
 ### Maintainability
-* **No Magic Values:** Strings and numbers with special meaning must be defined as constants.
+
+- **No Magic Values:** Strings and numbers with special meaning must be defined as constants.
+
   ```typescript
   // ✅ Good
   const ORDER_STATUS = {
@@ -128,18 +136,20 @@ ansania-ecommerce/
   // ❌ Bad
   if (order.status === 'pending_payment') { ... }
   ```
-* **Tree-shakeable:** Export individual functions/components rather than default exports for libraries.
-* **Explicit Exports:** Use named exports (`export { Foo }`) over default exports for better IDE support.
+
+- **Tree-shakeable:** Export individual functions/components rather than default exports for libraries.
+- **Explicit Exports:** Use named exports (`export { Foo }`) over default exports for better IDE support.
 
 ### Readability
-* **Naming Conventions:**
-    * *Variables/Functions:* `camelCase` (e.g., `calculateShippingCost`, `isUserActive`)
-    * *React Components:* `PascalCase` (e.g., `ProductCard`, `CheckoutForm`)
-    * *Files:* `camelCase.ts` for logic, `PascalCase.tsx` for React components.
-    * *Constants:* `SCREAMING_SNAKE_CASE` (e.g., `MAX_CART_ITEMS`, `API_BASE_URL`)
-    * *Interfaces/Types:* `PascalCase` (e.g., `User`, `OrderItem`, `ApiResponse`)
-* **Predictable Folder Structure:** Group by feature/domain where possible.
-* **Function Length:** Keep functions under 50 lines. Extract complex logic into smaller functions.
+
+- **Naming Conventions:**
+  - _Variables/Functions:_ `camelCase` (e.g., `calculateShippingCost`, `isUserActive`)
+  - _React Components:_ `PascalCase` (e.g., `ProductCard`, `CheckoutForm`)
+  - _Files:_ `camelCase.ts` for logic, `PascalCase.tsx` for React components.
+  - _Constants:_ `SCREAMING_SNAKE_CASE` (e.g., `MAX_CART_ITEMS`, `API_BASE_URL`)
+  - _Interfaces/Types:_ `PascalCase` (e.g., `User`, `OrderItem`, `ApiResponse`)
+- **Predictable Folder Structure:** Group by feature/domain where possible.
+- **Function Length:** Keep functions under 50 lines. Extract complex logic into smaller functions.
 
 ---
 
@@ -148,45 +158,48 @@ ansania-ecommerce/
 ### Layered Architecture
 
 #### Layer 1: Routes (`src/routes`)
+
 ```typescript
 // src/routes/products.ts
-import { Router } from 'express';
-import { validateRequest } from '@/middleware/validation';
-import { productSchemas } from '@repo/shared/schemas';
-import * as productController from '@/controllers/productController';
+import { Router } from "express";
+import { validateRequest } from "@/middleware/validation";
+import { productSchemas } from "@repo/shared/schemas";
+import * as productController from "@/controllers/productController";
 
 const router = Router();
 
 router.get(
-  '/products',
+  "/products",
   validateRequest(productSchemas.listProducts),
-  productController.listProducts
+  productController.listProducts,
 );
 
 export default router;
 ```
 
 **Responsibilities:**
+
 - Define endpoint paths
 - Apply middleware (auth, validation)
 - Route to appropriate controller
 - **NO business logic**
 
 #### Layer 2: Controllers (`src/controllers`)
+
 ```typescript
 // src/controllers/productController.ts
-import { Request, Response, NextFunction } from 'express';
-import * as productService from '@/services/productService';
-import { ApiResponse } from '@repo/shared/types';
+import { Request, Response, NextFunction } from "express";
+import * as productService from "@/services/productService";
+import { ApiResponse } from "@repo/shared/types";
 
 export async function listProducts(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const { page, limit, category } = req.query;
-    
+
     const result = await productService.getProducts({
       page: Number(page) || 1,
       limit: Number(limit) || 20,
@@ -206,6 +219,7 @@ export async function listProducts(
 ```
 
 **Responsibilities:**
+
 - Parse HTTP requests
 - Call appropriate service methods
 - Format HTTP responses
@@ -213,18 +227,19 @@ export async function listProducts(
 - **NO business logic**
 
 #### Layer 3: Services (`src/services`)
+
 ```typescript
 // src/services/productService.ts
-import { Product } from '@repo/database/models';
-import { ProductListQuery } from '@repo/shared/types';
-import { syncProductsFromOdoo } from '@/integrations/odoo/productSync';
+import { Product } from "@repo/database/models";
+import { ProductListQuery } from "@repo/shared/types";
+import { syncProductsFromOdoo } from "@/integrations/odoo/productSync";
 
 export async function getProducts(query: ProductListQuery) {
   const { page, limit, category } = query;
-  
+
   // Business logic here
   const offset = (page - 1) * limit;
-  
+
   const products = await Product.findAll({
     where: {
       is_visible: true,
@@ -232,7 +247,7 @@ export async function getProducts(query: ProductListQuery) {
     },
     limit,
     offset,
-    order: [['created_at', 'DESC']],
+    order: [["created_at", "DESC"]],
   });
 
   const total = await Product.count({
@@ -257,6 +272,7 @@ export async function syncProductsWithOdoo() {
 ```
 
 **Responsibilities:**
+
 - Contain ALL business logic
 - Call data access layer (models/repositories)
 - Orchestrate external API calls (Odoo, Doku, JNT)
@@ -264,10 +280,11 @@ export async function syncProductsWithOdoo() {
 - **NO HTTP concerns (req/res)**
 
 #### Layer 4: Integrations (`src/integrations`)
+
 ```typescript
 // src/integrations/odoo/client.ts
-import axios from 'axios';
-import { OdooConfig } from '@repo/shared/types';
+import axios from "axios";
+import { OdooConfig } from "@repo/shared/types";
 
 export class OdooClient {
   private baseUrl: string;
@@ -299,16 +316,18 @@ export async function syncProductsFromOdoo() {
 ```
 
 **Responsibilities:**
+
 - Isolated external API integrations
 - Handle API-specific authentication
 - Transform external data to internal models
 - Retry logic, rate limiting
 
 #### Layer 5: Data Access (`packages/database`)
+
 ```typescript
 // packages/database/models/Product.ts
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../connection';
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../connection";
 
 export class Product extends Model {
   declare id: number;
@@ -320,26 +339,30 @@ export class Product extends Model {
   declare is_visible: boolean;
 }
 
-Product.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+Product.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    odoo_product_id: {
+      type: DataTypes.INTEGER,
+      unique: true,
+      allowNull: false,
+    },
+    // ... other fields
   },
-  odoo_product_id: {
-    type: DataTypes.INTEGER,
-    unique: true,
-    allowNull: false,
+  {
+    sequelize,
+    tableName: "products",
+    timestamps: true,
   },
-  // ... other fields
-}, {
-  sequelize,
-  tableName: 'products',
-  timestamps: true,
-});
+);
 ```
 
 **Responsibilities:**
+
 - Define database models
 - Database queries
 - Data validation at DB level
@@ -352,6 +375,7 @@ Product.init({
 ### Next.js App Router Patterns
 
 #### Server Components (Default)
+
 ```typescript
 // app/products/page.tsx
 import { ProductGrid } from '@/components/ProductGrid';
@@ -378,12 +402,14 @@ export default async function ProductsPage({
 ```
 
 **Use Server Components for:**
+
 - Data fetching
 - SEO-critical content
 - Heavy computations
 - Direct database access (if needed)
 
 #### Client Components
+
 ```typescript
 // components/AddToCartButton.tsx
 'use client';
@@ -410,18 +436,21 @@ export function AddToCartButton({ productId }: { productId: number }) {
 ```
 
 **Use Client Components strictly for:**
+
 - Event handlers (`onClick`, `onChange`)
 - Hooks (`useState`, `useEffect`)
 - Browser APIs
 - Third-party libraries requiring browser context
 
 ### State Management Strategy
-* **URL State:** For filters, pagination, search (use `searchParams`)
-* **Server State:** Use React Query or SWR for API data caching
-* **Global UI State:** Use Context or Zustand (auth, cart, theme)
-* **Form State:** React Hook Form + Zod validation
+
+- **URL State:** For filters, pagination, search (use `searchParams`)
+- **Server State:** Use React Query or SWR for API data caching
+- **Global UI State:** Use Context or Zustand (auth, cart, theme)
+- **Form State:** React Hook Form + Zod validation
 
 ### Component Organization
+
 ```
 apps/web/src/components/
 ├── ui/              # Atomic, reusable components (Button, Input)
@@ -437,9 +466,10 @@ apps/web/src/components/
 ## 6. Data Validation Strategy
 
 ### Shared Schemas (Zod)
+
 ```typescript
 // packages/shared/src/schemas/product.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 export const productSchemas = {
   listProducts: z.object({
@@ -462,10 +492,11 @@ export type CreateProductDTO = z.infer<typeof productSchemas.createProduct>;
 ```
 
 ### Backend Validation Middleware
+
 ```typescript
 // apps/api/src/middleware/validation.ts
-import { Request, Response, NextFunction } from 'express';
-import { ZodSchema } from 'zod';
+import { Request, Response, NextFunction } from "express";
+import { ZodSchema } from "zod";
 
 export function validateRequest(schema: ZodSchema) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -475,13 +506,13 @@ export function validateRequest(schema: ZodSchema) {
         ...req.query,
         ...req.params,
       });
-      
+
       req.body = validated;
       next();
     } catch (error) {
       res.status(400).json({
         success: false,
-        error: 'Validation failed',
+        error: "Validation failed",
         details: error.errors,
       });
     }
@@ -490,6 +521,7 @@ export function validateRequest(schema: ZodSchema) {
 ```
 
 ### Frontend Validation
+
 ```typescript
 // apps/web/src/components/CheckoutForm.tsx
 'use client';
@@ -520,13 +552,14 @@ export function CheckoutForm() {
 ## 7. Error Handling
 
 ### Custom Error Classes
+
 ```typescript
 // packages/shared/src/errors/AppError.ts
 export class AppError extends Error {
   constructor(
     public message: string,
     public statusCode: number = 500,
-    public code?: string
+    public code?: string,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -536,34 +569,35 @@ export class AppError extends Error {
 
 export class ValidationError extends AppError {
   constructor(message: string) {
-    super(message, 400, 'VALIDATION_ERROR');
+    super(message, 400, "VALIDATION_ERROR");
   }
 }
 
 export class NotFoundError extends AppError {
   constructor(resource: string) {
-    super(`${resource} not found`, 404, 'NOT_FOUND');
+    super(`${resource} not found`, 404, "NOT_FOUND");
   }
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message = 'Unauthorized') {
-    super(message, 401, 'UNAUTHORIZED');
+  constructor(message = "Unauthorized") {
+    super(message, 401, "UNAUTHORIZED");
   }
 }
 ```
 
 ### Backend Error Handler
+
 ```typescript
 // apps/api/src/middleware/errorHandler.ts
-import { Request, Response, NextFunction } from 'express';
-import { AppError } from '@repo/shared/errors';
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "@repo/shared/errors";
 
 export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
@@ -574,10 +608,10 @@ export function errorHandler(
   }
 
   // Unknown errors
-  console.error('Unhandled error:', err);
+  console.error("Unhandled error:", err);
   res.status(500).json({
     success: false,
-    error: 'Internal server error',
+    error: "Internal server error",
   });
 }
 ```
@@ -587,6 +621,7 @@ export function errorHandler(
 ## 8. Environment Variables
 
 ### Structure
+
 ```
 # .env.example
 # Database
@@ -621,9 +656,10 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 ```
 
 ### Type-safe Config
+
 ```typescript
 // packages/shared/src/config/env.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_HOST: z.string(),
@@ -642,19 +678,20 @@ export const env = envSchema.parse(process.env);
 ## 9. Testing Standards
 
 ### Unit Tests
+
 ```typescript
 // apps/api/src/services/__tests__/productService.test.ts
-import { getProducts } from '../productService';
-import { Product } from '@repo/database/models';
+import { getProducts } from "../productService";
+import { Product } from "@repo/database/models";
 
-jest.mock('@repo/database/models');
+jest.mock("@repo/database/models");
 
-describe('productService', () => {
-  describe('getProducts', () => {
-    it('should return products with pagination', async () => {
+describe("productService", () => {
+  describe("getProducts", () => {
+    it("should return products with pagination", async () => {
       const mockProducts = [
-        { id: 1, name: 'Product 1' },
-        { id: 2, name: 'Product 2' },
+        { id: 1, name: "Product 1" },
+        { id: 2, name: "Product 2" },
       ];
 
       (Product.findAll as jest.Mock).mockResolvedValue(mockProducts);
@@ -670,15 +707,16 @@ describe('productService', () => {
 ```
 
 ### Integration Tests
+
 ```typescript
 // apps/api/src/routes/__tests__/products.integration.test.ts
-import request from 'supertest';
-import app from '../../app';
+import request from "supertest";
+import app from "../../app";
 
-describe('GET /api/products', () => {
-  it('should return 200 and products list', async () => {
+describe("GET /api/products", () => {
+  it("should return 200 and products list", async () => {
     const response = await request(app)
-      .get('/api/products')
+      .get("/api/products")
       .query({ page: 1, limit: 10 });
 
     expect(response.status).toBe(200);
@@ -693,12 +731,14 @@ describe('GET /api/products', () => {
 ## 10. Output Rules for AI Code Generation
 
 ### Pre-Generation Checklist
+
 1. ✅ **Check existing code:** Look for similar functionality in `packages/shared`, `packages/database`
 2. ✅ **Use existing types:** Reuse TypeScript interfaces and Zod schemas if they exist
 3. ✅ **Follow layer boundaries:** Don't put business logic in controllers or UI logic in services
 4. ✅ **Use path aliases:** Import from `@/` or `@repo/` instead of relative paths
 
 ### Code Quality Checklist
+
 1. ✅ **Type Safety:** No `any`, explicit return types for functions
 2. ✅ **Error Handling:** Use custom error classes, proper try-catch
 3. ✅ **Validation:** Use Zod schemas for all external inputs
@@ -707,7 +747,9 @@ describe('GET /api/products', () => {
 6. ✅ **Naming:** Follow conventions (camelCase, PascalCase, SCREAMING_SNAKE_CASE)
 
 ### Anti-Patterns to Avoid
+
 ❌ **Don't:**
+
 - Put business logic in controllers or React components
 - Use default exports in shared packages
 - Access `req.body` directly without validation
@@ -716,6 +758,7 @@ describe('GET /api/products', () => {
 - Use `any` type instead of proper typing
 
 ✅ **Do:**
+
 - Keep functions small and focused (SRP)
 - Extract reusable logic to `packages/shared`
 - Use dependency injection for testability
@@ -727,6 +770,7 @@ describe('GET /api/products', () => {
 ## 11. Git Commit Standards
 
 ### Commit Message Format
+
 ```
 <type>(<scope>): <subject>
 
@@ -736,6 +780,7 @@ describe('GET /api/products', () => {
 ```
 
 ### Types
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -746,6 +791,7 @@ describe('GET /api/products', () => {
 - `chore`: Build process or auxiliary tool changes
 
 ### Examples
+
 ```
 feat(api): add Doku payment integration
 
@@ -759,8 +805,8 @@ Closes #123
 ```
 fix(web): correct shipping cost calculation
 
-The JNT Express API was returning incorrect rates due to 
-missing weight parameter. Added proper weight calculation 
+The JNT Express API was returning incorrect rates due to
+missing weight parameter. Added proper weight calculation
 based on cart items.
 
 Fixes #456

@@ -1,9 +1,8 @@
+import { Router } from "express";
 
-import { Router } from 'express';
-
-import * as orderController from '../controllers/orderController';
-import * as reviewController from '../controllers/reviewController';
-import { authenticate } from '../middleware/auth';
+import * as orderController from "../controllers/orderController";
+import * as reviewController from "../controllers/reviewController";
+import { authenticate } from "../middleware/auth";
 
 const router = Router();
 
@@ -11,16 +10,15 @@ const router = Router();
 router.use(authenticate);
 
 // Get all orders for the authenticated user
-router.get('/', orderController.getOrders);
+router.get("/", orderController.getOrders);
 
 // Get specific order detail
-router.get('/:orderNumber', orderController.getOrderDetail);
+router.get("/:orderNumber", orderController.getOrderDetail);
 
 // Cancel an order
-router.post('/:orderNumber/cancel', orderController.cancelOrder);
+router.post("/:orderNumber/cancel", orderController.cancelOrder);
 
 // Leave a review for an order
-router.post('/:orderNumber/review', reviewController.createReviewFromOrder);
+router.post("/:orderNumber/review", reviewController.createReviewFromOrder);
 
 export default router;
-
