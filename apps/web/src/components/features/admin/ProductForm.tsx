@@ -3,7 +3,7 @@
 import { Category } from "@repo/shared";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -22,19 +22,21 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
   const { success, error: showError } = useToast();
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<Partial<Product>>(
     initialData || {
       name: "",
       slug: "",
       description: "",
-      base_price: 0,
-      discount_price: 0,
+      selling_price: 0,
+      compare_price: 0,
       category: categories[0]
         ? {
-            id: categories[0].id,
-            name: categories[0].name,
-            slug: categories[0].slug,
-          }
+          id: categories[0].id,
+          name: categories[0].name,
+          slug: categories[0].slug,
+        }
         : undefined,
       is_featured: false,
       is_new: true,
@@ -65,6 +67,39 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!isEdit || !initialData?.id) {
+      showError("Please save the product first before uploading images.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const imageUrl = await adminProductService.uploadProductImage(
+        initialData.id,
+        file,
+      );
+      setFormData((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), imageUrl],
+      }));
+      success("Image uploaded successfully!");
+    } catch (error) {
+      console.error("Image upload error:", error);
+      showError(
+        error instanceof Error ? error.message : "Failed to upload image.",
+      );
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Clear the input to allow re-uploading the same file
+      }
     }
   };
 
@@ -109,11 +144,10 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-left rounded-lg text-sm font-medium transition-all ${
-                activeTab === tab
-                  ? "bg-primary-50 text-primary-700 shadow-sm"
-                  : "text-gray-500 hover:bg-gray-100"
-              }`}
+              className={`px-4 py-2 text-left rounded-lg text-sm font-medium transition-all ${activeTab === tab
+                ? "bg-primary-50 text-primary-700 shadow-sm"
+                : "text-gray-500 hover:bg-gray-100"
+                }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -178,11 +212,11 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                   <input
                     type="number"
                     className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
-                    value={formData.base_price}
+                    value={formData.selling_price ?? formData.base_price ?? 0}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        base_price: Number(e.target.value),
+                        selling_price: Number(e.target.value),
                       })
                     }
                     required
@@ -195,11 +229,11 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                   <input
                     type="number"
                     className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
-                    value={formData.discount_price || 0}
+                    value={formData.compare_price ?? formData.discount_price ?? 0}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        discount_price: Number(e.target.value),
+                        compare_price: Number(e.target.value),
                       })
                     }
                   />
@@ -260,14 +294,14 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                 Media Produk
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {formData.images?.map((img, idx) => (
+                {formData.images?.filter(img => !!img).map((img, idx) => (
                   <div
                     key={idx}
                     className="relative aspect-square rounded-lg border border-gray-200 overflow-hidden bg-gray-50 group"
                   >
                     <div className="relative w-full h-full">
                       <Image
-                        src={img.image_url}
+                        src={img}
                         alt={`Product image ${idx + 1}`}
                         fill
                         className="object-cover"
@@ -288,13 +322,33 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                 ))}
                 <button
                   type="button"
-                  className="aspect-square rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 hover:border-primary-500 hover:text-primary-500 transition-all"
+                  disabled={!isEdit || isUploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center transition-all ${!isEdit
+                    ? "bg-gray-50 border-gray-100 cursor-not-allowed text-gray-300"
+                    : "border-gray-200 text-gray-400 hover:border-primary-500 hover:text-primary-500"
+                    }`}
                 >
-                  <span className="text-2xl">+</span>
-                  <span className="text-[10px] font-medium uppercase tracking-wider">
-                    Add Image
-                  </span>
+                  {isUploading ? (
+                    <span className="text-[10px] font-medium animate-pulse">
+                      Uploading...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-2xl">+</span>
+                      <span className="text-[10px] font-medium uppercase tracking-wider">
+                        {isEdit ? "Add Image" : "Save Product first"}
+                      </span>
+                    </>
+                  )}
                 </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
               </div>
             </div>
           )}

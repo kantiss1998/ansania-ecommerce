@@ -30,7 +30,7 @@ export default async function CategoriesPage() {
             >
               <div className="relative flex-1 overflow-hidden">
                 <Image
-                  src={category.image || "/placeholder-category.svg"}
+                  src={category.image_url || category.image || "/placeholder-category.svg"}
                   alt={category.name}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"

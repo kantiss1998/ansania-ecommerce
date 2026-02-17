@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
 
+import path from "path";
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, "../../../..", ".env") });
 
 // Database configuration
 const config = {

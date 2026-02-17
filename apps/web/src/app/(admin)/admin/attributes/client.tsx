@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { getAccessToken } from "@/lib/auth";
+import apiClient from "@/lib/api";
 
 interface AdminAttributesProps {
   attributes: Attribute[];
@@ -40,20 +40,12 @@ export default function AdminAttributesClient({
 
     try {
       setIsLoading(true);
-      const token = getAccessToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/attributes/colors/${colorId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ hex_code: newHex }),
-        },
+      const response = await apiClient.put(
+        `/admin/attributes/colors/${colorId}`,
+        { hex_code: newHex },
       );
 
-      if (response.ok) {
+      if (response.status === 200) {
         // Update local state
         setAttributes((prev) =>
           prev.map((attr) => {
@@ -84,6 +76,7 @@ export default function AdminAttributesClient({
       }
     } catch (error) {
       console.error("Update hex error:", error);
+      alert("Gagal mengupdate hex code.");
     } finally {
       setIsLoading(false);
     }
@@ -104,26 +97,19 @@ export default function AdminAttributesClient({
 
     try {
       setIsLoading(true);
-      const token = getAccessToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/attributes/${endpoint}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ name: newValue, ...extraData }),
-        },
+      const response = await apiClient.post(
+        `/admin/attributes/${endpoint}`,
+        { name: newValue, ...extraData },
       );
 
-      if (response.ok) {
+      if (response.status === 201 || response.status === 200) {
         window.location.reload();
       } else {
         alert("Gagal menambahkan nilai.");
       }
     } catch (error) {
       console.error("Add attribute value error:", error);
+      alert("Gagal menambahkan nilai.");
     } finally {
       setIsLoading(false);
     }
@@ -135,22 +121,14 @@ export default function AdminAttributesClient({
 
     try {
       setIsLoading(true);
-      const token = getAccessToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/attributes/${endpoint}/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await apiClient.delete(`/admin/attributes/${endpoint}/${id}`);
 
-      if (response.ok) {
+      if (response.status === 200) {
         window.location.reload();
       }
     } catch (error) {
       console.error("Delete attribute error:", error);
+      alert("Gagal menghapus atribut.");
     } finally {
       setIsLoading(false);
     }
@@ -174,11 +152,10 @@ export default function AdminAttributesClient({
             <button
               key={attr.id}
               onClick={() => setActiveAttr(attr)}
-              className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-all ${
-                activeAttr?.id === attr.id
-                  ? "bg-primary-600 text-white shadow-md"
-                  : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-              }`}
+              className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between transition-all ${activeAttr?.id === attr.id
+                ? "bg-primary-600 text-white shadow-md"
+                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
             >
               <span className="font-semibold">{attr.name}</span>
               <Badge

@@ -1,5 +1,6 @@
 import { AppError } from "@repo/shared/errors";
 import { Request, Response, NextFunction } from "express";
+import { MulterError } from "multer";
 
 export function errorHandler(
   err: Error,
@@ -12,6 +13,19 @@ export function errorHandler(
       success: false,
       error: err.message,
       code: err.code,
+    });
+  }
+
+  // Handle Multer Errors
+  if (err instanceof MulterError) {
+    let message = "File upload error";
+    if (err.code === "LIMIT_FILE_SIZE") {
+      message = "File too large. Maximum size is 10MB.";
+    }
+    return res.status(400).json({
+      success: false,
+      error: message,
+      code: `UPLOAD_${err.code}`,
     });
   }
 

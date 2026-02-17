@@ -87,7 +87,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           } else if (product.is_featured) {
             tag = "Best Seller";
             tagColor = "bg-gradient-to-r from-yellow-500 to-orange-500";
-          } else if (product.discount_price) {
+          } else if (product.compare_price && product.compare_price > (product.selling_price || 0)) {
             tag = "Promo";
             tagColor = "bg-gradient-to-r from-red-500 to-pink-500";
           }
@@ -121,7 +121,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                   <Image
                     src={
                       product.thumbnail_url ||
-                      product.images?.[0]?.image_url ||
+                      product.images?.[0] ||
                       "/placeholder.jpg"
                     }
                     alt={product.name}
@@ -168,13 +168,13 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     <div className="flex items-baseline gap-2">
                       <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent font-heading tracking-tight">
                         {formatCurrency(
-                          product.discount_price || product.base_price,
+                          Number(product.selling_price) || Number(product.base_price) || 0,
                         )}
                       </span>
                     </div>
-                    {product.discount_price && (
+                    {product.compare_price && (
                       <span className="text-sm text-gray-400 line-through decoration-gray-300">
-                        {formatCurrency(product.base_price)}
+                        {formatCurrency(product.compare_price)}
                       </span>
                     )}
                   </div>

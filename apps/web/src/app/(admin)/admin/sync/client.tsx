@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { getAccessToken } from "@/lib/auth";
+import apiClient from "@/lib/api";
 
 interface AdminSyncProps {
   status: SyncStatus;
@@ -22,22 +22,16 @@ export default function AdminSyncClient({
   const handleTriggerSync = async (type: string) => {
     try {
       setIsSyncing((prev) => ({ ...prev, [type]: true }));
-      const token = getAccessToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/sync/${type}`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await apiClient.post(`/admin/sync/${type}`);
 
-      if (response.ok) {
+      if (response.status === 200) {
         alert(`Sinkronisasi ${type} telah dijadwalkan.`);
       } else {
         alert("Gagal memicu sinkronisasi.");
       }
     } catch (error) {
       console.error("Trigger sync error:", error);
+      alert("Terjadi kesalahan saat sinkronisasi.");
     } finally {
       setIsSyncing((prev) => ({ ...prev, [type]: false }));
     }
@@ -48,20 +42,25 @@ export default function AdminSyncClient({
       key: "products",
       label: "Produk & Terjemahan",
       icon: "🛍️",
-      data: status.products,
+      data: status?.products || { last_sync: new Date().toISOString(), status: "idle" },
     },
-    { key: "stock", label: "Stok Persediaan", icon: "📦", data: status.stock },
+    {
+      key: "stock",
+      label: "Stok Persediaan",
+      icon: "📦",
+      data: status?.stock || { last_sync: new Date().toISOString(), status: "idle" }
+    },
     {
       key: "categories",
       label: "Kategori & Struktur",
       icon: "📂",
-      data: status.categories,
+      data: status?.categories || { last_sync: new Date().toISOString(), status: "idle" },
     },
     {
       key: "orders",
       label: "Status Pesanan (Pusher)",
       icon: "🚚",
-      data: status.orders,
+      data: status?.orders || { last_sync: new Date().toISOString(), status: "idle" },
     },
   ];
 
@@ -155,16 +154,16 @@ export default function AdminSyncClient({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {recentLogs.map((log) => (
+              {Array.isArray(recentLogs) && recentLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-gray-50/50">
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                     {new Date(log.created_at).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900">
-                    {log.entity_type} {log.entity_id && `(#${log.entity_id})`}
+                    {log.entity_type || (log as any).sync_type} {(log.entity_id || (log as any).sync_direction) && `(#${log.entity_id || (log as any).sync_direction})`}
                   </td>
                   <td className="px-6 py-4 capitalize text-gray-600">
-                    {log.action}
+                    {log.action || (log as any).sync_direction}
                   </td>
                   <td className="px-6 py-4">
                     <Badge
@@ -174,11 +173,11 @@ export default function AdminSyncClient({
                     </Badge>
                   </td>
                   <td className="px-6 py-4 text-xs text-gray-500 max-w-xs truncate">
-                    {log.message}
+                    {log.message || (log as any).error_message || `${(log as any).records_processed || 0} processed`}
                   </td>
                 </tr>
               ))}
-              {recentLogs.length === 0 && (
+              {(!recentLogs || recentLogs.length === 0) && (
                 <tr>
                   <td
                     colSpan={5}

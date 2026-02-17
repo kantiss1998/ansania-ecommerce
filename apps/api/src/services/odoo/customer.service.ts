@@ -1,4 +1,4 @@
-import { User, Address } from "@repo/database";
+import { User, Address, SyncLog } from "@repo/database";
 import { USER_ROLES } from "@repo/shared/constants";
 import {
   NotFoundError,
@@ -102,6 +102,7 @@ export class OdooCustomerService {
    */
   async syncCustomer(userId: number): Promise<number> {
     console.log(`[ODOO_SYNC] Syncing customer to Odoo: User ID ${userId}`);
+    const startTime = Date.now();
 
     try {
       const user = await User.findByPk(userId);
@@ -117,32 +118,59 @@ export class OdooCustomerService {
         return user.odoo_partner_id;
       }
 
+      let odooPartnerId: number;
+
       if (odooClient.isMockMode()) {
-        const mockOdooId = Math.floor(Math.random() * 100000);
-        await user.update({ odoo_partner_id: mockOdooId });
-        console.log(`[ODOO_SYNC] Mock partner created with ID: ${mockOdooId}`);
-        return mockOdooId;
+        odooPartnerId = Math.floor(Math.random() * 100000);
+        await user.update({ odoo_partner_id: odooPartnerId });
+        console.log(`[ODOO_SYNC] Mock partner created with ID: ${odooPartnerId}`);
+      } else {
+        // Create partner in Odoo
+        const partnerData = {
+          name: user.full_name,
+          email: user.email,
+          phone: user.phone ? formatPhone(user.phone) : "",
+          customer_rank: 1,
+          is_company: false,
+          comment: `Registered via e-commerce on ${user.created_at.toISOString()}`,
+        };
+
+        odooPartnerId = await odooClient.create("res.partner", partnerData);
+        await user.update({ odoo_partner_id: odooPartnerId });
       }
 
-      // Create partner in Odoo
-      const partnerData = {
-        name: user.full_name,
-        email: user.email,
-        phone: user.phone ? formatPhone(user.phone) : "",
-        customer_rank: 1,
-        is_company: false,
-        comment: `Registered via e-commerce on ${user.created_at.toISOString()}`,
-      };
-
-      const odooPartnerId = await odooClient.create("res.partner", partnerData);
-      await user.update({ odoo_partner_id: odooPartnerId });
-
+      const duration = Date.now() - startTime;
       console.log(
         `[ODOO_SYNC] Customer synced to Odoo - Partner ID: ${odooPartnerId}`,
       );
+
+      // Create success log
+      await SyncLog.create({
+        sync_type: "customers",
+        sync_direction: "to_odoo",
+        status: "success",
+        records_processed: 1,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: null,
+      });
+
       return odooPartnerId;
     } catch (error) {
+      const duration = Date.now() - startTime;
       console.error("[ODOO_SYNC] Failed to sync customer:", error);
+
+      // Create failure log
+      await SyncLog.create({
+        sync_type: "customers",
+        sync_direction: "to_odoo",
+        status: "failed",
+        records_processed: 0,
+        records_failed: 1,
+        execution_time_ms: duration,
+        error_message: error instanceof Error ? error.message : String(error),
+      });
+
       if (error instanceof AppError) throw error;
       throw new ServiceUnavailableError("Odoo Sync Customer");
     }
@@ -210,9 +238,6 @@ export class OdooCustomerService {
 
     try {
       // Step 1: Fetch Customers from Odoo
-      // Filter: Customers (customer_rank > 0) OR having an email
-      // We want to avoid syncing vendors if possible, but strict filtering depends on Odoo usage.
-      // For now, let's focus on records with emails to avoid creating users without login ID.
       const domain = [["email", "!=", false]];
       const fields = [
         "id",
@@ -254,17 +279,42 @@ export class OdooCustomerService {
           errorsCount++;
         }
       }
+
+      const duration = Date.now() - startTime;
+      console.log(
+        `✅ Customer Sync Completed in ${duration / 1000}s. Synced: ${syncedCount}, Errors: ${errorsCount}`,
+      );
+
+      // Create success/partial log
+      await SyncLog.create({
+        sync_type: "customers",
+        sync_direction: "from_odoo",
+        status: errorsCount > 0 ? "partial" : "success",
+        records_processed: syncedCount,
+        records_failed: errorsCount,
+        execution_time_ms: duration,
+        error_message: errorsCount > 0 ? `Failed for ${errorsCount} customers` : null,
+      });
+
+      return { synced: syncedCount, errors: errorsCount };
     } catch (error) {
+      const duration = Date.now() - startTime;
       console.error("❌ Fatal error in syncCustomersFromOdoo:", error);
+
+      // Create failure log
+      await SyncLog.create({
+        sync_type: "customers",
+        sync_direction: "from_odoo",
+        status: "failed",
+        records_processed: 0,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: error instanceof Error ? error.message : String(error),
+      });
+
       if (error instanceof AppError) throw error;
       throw new ServiceUnavailableError("Odoo Sync Customers From Odoo");
     }
-
-    const duration = (Date.now() - startTime) / 1000;
-    console.log(
-      `✅ Customer Sync Completed in ${duration}s. Synced: ${syncedCount}, Errors: ${errorsCount}`,
-    );
-    return { synced: syncedCount, errors: errorsCount };
   }
 
   private async processPartner(partner: OdooPartner): Promise<void> {

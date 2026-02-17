@@ -2,9 +2,9 @@ import { Router } from "express";
 
 import * as adminProductController from "../../controllers/admin/productController";
 import { authenticate, authorizeAdmin } from "../../middleware/auth";
+import { upload } from "../../middleware/upload";
 
 const router = Router();
-
 router.use(authenticate, authorizeAdmin);
 
 // Product Browsing
@@ -20,7 +20,11 @@ router.put("/:id/description", adminProductController.updateDescription);
 
 // Image Management
 router.get("/:id/images", adminProductController.getImages);
-router.post("/:id/images", adminProductController.uploadImage);
+router.post(
+  "/:id/images",
+  upload.single("image"),
+  adminProductController.uploadImage,
+);
 router.delete("/:id/images/:imageId", adminProductController.deleteImage);
 router.patch(
   "/:id/images/:imageId/set-primary",

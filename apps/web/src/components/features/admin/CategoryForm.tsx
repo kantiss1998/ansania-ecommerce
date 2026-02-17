@@ -3,7 +3,7 @@
 import { Category } from "@repo/shared";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -22,11 +22,30 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
       name: "",
       slug: "",
       description: "",
-      image: "",
+      image_url: "",
     },
   );
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isEdit = !!initialData;
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !initialData?.id) return;
+
+    try {
+      setUploading(true);
+      const imageUrl = await adminCategoryService.uploadCategoryImage(initialData.id, file);
+      setFormData({ ...formData, image_url: imageUrl });
+      success("Gambar kategori berhasil diunggah.");
+    } catch (error) {
+      console.error("Upload error:", error);
+      showError(error instanceof Error ? error.message : "Gagal mengunggah gambar.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,11 +221,22 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
               <label className="text-sm font-semibold text-gray-700">
                 Gambar Kategori
               </label>
-              <div className="aspect-square w-full rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-4 text-center group hover:border-primary-500 transition-all cursor-pointer">
-                {formData.image ? (
+              <div
+                className={`aspect-square w-full rounded-lg border-2 border-dashed ${uploading ? 'animate-pulse bg-gray-50' : 'border-gray-200'} flex flex-col items-center justify-center p-4 text-center group hover:border-primary-500 transition-all cursor-pointer`}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploading || !isEdit}
+                />
+                {formData.image_url ? (
                   <div className="relative w-full h-full">
                     <Image
-                      src={formData.image}
+                      src={formData.image_url}
                       alt="Preview"
                       fill
                       className="object-cover rounded-md"
@@ -216,7 +246,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                       className="absolute top-1 right-1 bg-white/80 rounded-full p-1 shadow hover:bg-error-50 z-10"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setFormData({ ...formData, image: "" });
+                        setFormData({ ...formData, image_url: "" });
                       }}
                     >
                       ✕
@@ -225,10 +255,10 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                 ) : (
                   <>
                     <span className="text-2xl text-gray-300 group-hover:text-primary-500">
-                      +
+                      {uploading ? "..." : "+"}
                     </span>
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-primary-500">
-                      Upload Image
+                      {uploading ? "Uploading..." : isEdit ? "Upload Image" : "Simpan dulu untuk upload"}
                     </span>
                   </>
                 )}
@@ -237,9 +267,9 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                 type="text"
                 className="w-full text-xs rounded border-gray-200 p-2 mt-2"
                 placeholder="Atau tempel URL gambar..."
-                value={formData.image}
+                value={formData.image_url || ""}
                 onChange={(e) =>
-                  setFormData({ ...formData, image: e.target.value })
+                  setFormData({ ...formData, image_url: e.target.value })
                 }
               />
             </div>

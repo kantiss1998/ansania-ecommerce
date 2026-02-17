@@ -14,10 +14,15 @@ export interface BannerData {
 
 export const adminCmsService = {
   // --- PAGES ---
-  async getAllPages(): Promise<CMSPage[]> {
+  async getAllPages(token?: string): Promise<CMSPage[]> {
     try {
-      const response =
-        await apiClient.get<ApiResponse<CMSPage[]>>("/admin/pages");
+      const config = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : {};
+      const response = await apiClient.get<ApiResponse<CMSPage[]>>(
+        "/admin/cms/pages",
+        config,
+      );
       return response.data.data || [];
     } catch (error) {
       console.error("Fetch pages error:", error);
@@ -25,10 +30,14 @@ export const adminCmsService = {
     }
   },
 
-  async getPage(id: number): Promise<CMSPage | null> {
+  async getPage(id: number, token?: string): Promise<CMSPage | null> {
     try {
+      const config = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : {};
       const response = await apiClient.get<ApiResponse<CMSPage>>(
-        `/admin/pages/${id}`,
+        `/admin/cms/pages/${id}`,
+        config,
       );
       return response.data.data || null;
     } catch (error) {
@@ -44,7 +53,7 @@ export const adminCmsService = {
     >,
   ): Promise<CMSPage> {
     const response = await apiClient.post<ApiResponse<CMSPage>>(
-      "/admin/pages",
+      "/admin/cms/pages",
       data,
     );
     return response.data.data!;
@@ -55,21 +64,26 @@ export const adminCmsService = {
     data: Partial<Omit<CMSPage, "id" | "updated_at" | "created_at">>,
   ): Promise<CMSPage> {
     const response = await apiClient.put<ApiResponse<CMSPage>>(
-      `/admin/pages/${id}`,
+      `/admin/cms/pages/${id}`,
       data,
     );
     return response.data.data!;
   },
 
   async deletePage(id: number): Promise<void> {
-    await apiClient.delete(`/admin/pages/${id}`);
+    await apiClient.delete(`/admin/cms/pages/${id}`);
   },
 
   // --- BANNERS ---
-  async getAllBanners(): Promise<Banner[]> {
+  async getAllBanners(token?: string): Promise<Banner[]> {
     try {
-      const response =
-        await apiClient.get<ApiResponse<Banner[]>>("/admin/banners");
+      const config = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : {};
+      const response = await apiClient.get<ApiResponse<Banner[]>>(
+        "/admin/cms/banners",
+        config,
+      );
       return response.data.data || [];
     } catch (error) {
       console.error("Fetch banners error:", error);
@@ -77,10 +91,14 @@ export const adminCmsService = {
     }
   },
 
-  async getBanner(id: number): Promise<Banner | null> {
+  async getBanner(id: number, token?: string): Promise<Banner | null> {
     try {
+      const config = token
+        ? { headers: { Authorization: `Bearer ${token}` } }
+        : {};
       const response = await apiClient.get<ApiResponse<Banner>>(
-        `/admin/banners/${id}`,
+        `/admin/cms/banners/${id}`,
+        config,
       );
       return response.data.data || null;
     } catch (error) {
@@ -91,7 +109,7 @@ export const adminCmsService = {
 
   async createBanner(data: BannerData): Promise<Banner> {
     const response = await apiClient.post<ApiResponse<Banner>>(
-      "/admin/banners",
+      "/admin/cms/banners",
       data,
     );
     return response.data.data!;
@@ -99,13 +117,13 @@ export const adminCmsService = {
 
   async updateBanner(id: number, data: Partial<BannerData>): Promise<Banner> {
     const response = await apiClient.put<ApiResponse<Banner>>(
-      `/admin/banners/${id}`,
+      `/admin/cms/banners/${id}`,
       data,
     );
     return response.data.data!;
   },
 
   async deleteBanner(id: number): Promise<void> {
-    await apiClient.delete(`/admin/banners/${id}`);
+    await apiClient.delete(`/admin/cms/banners/${id}`);
   },
 };

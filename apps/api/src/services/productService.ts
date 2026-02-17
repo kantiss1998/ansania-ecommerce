@@ -75,8 +75,8 @@ export function mapProduct(product: unknown): MappedProduct | null {
   const thumbnail_url =
     (
       data.images as
-        | Array<{ image_url: string; is_primary: boolean }>
-        | undefined
+      | Array<{ image_url: string; is_primary: boolean }>
+      | undefined
     )?.find((img) => img.is_primary)?.image_url ||
     (data.images as Array<{ image_url: string }> | undefined)?.[0]?.image_url ||
     null;
@@ -89,6 +89,8 @@ export function mapProduct(product: unknown): MappedProduct | null {
 
   return {
     ...data,
+    selling_price: Number(data.selling_price || 0),
+    compare_price: data.compare_price ? Number(data.compare_price) : null,
     base_price,
     discount_price,
     rating_average,

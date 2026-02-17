@@ -121,3 +121,35 @@ export async function updateCategorySeo(
     next(error);
   }
 }
+
+export async function uploadCategoryImage(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+      return;
+    }
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const imageUrl = `${baseUrl}/public/uploads/categories/${req.file.filename}`;
+
+    const category = await adminCategoryService.updateCategory(Number(id), {
+      image_url: imageUrl,
+    });
+
+    res.json({
+      success: true,
+      data: category,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

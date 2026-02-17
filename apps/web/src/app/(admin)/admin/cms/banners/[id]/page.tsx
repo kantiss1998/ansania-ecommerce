@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { BannerForm } from "@/components/features/admin/BannerForm";
@@ -9,7 +10,9 @@ export default async function BannerDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const banner = await adminCmsService.getBanner(parseInt(id));
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  const banner = await adminCmsService.getBanner(parseInt(id), token);
   if (!banner) notFound();
 
   return (

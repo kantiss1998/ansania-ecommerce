@@ -25,7 +25,7 @@ const apiClient: AxiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 30000, // 30 seconds
+  timeout: 600000, // 10 minutes (to accommodate long-running Odoo sync)
 });
 
 /**

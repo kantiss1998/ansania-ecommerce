@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
-import { getAccessToken } from "@/lib/auth";
+import apiClient from "@/lib/api";
 
 interface VoucherFormProps {
   initialData?: Voucher;
@@ -35,25 +35,15 @@ export function VoucherForm({ initialData }: VoucherFormProps) {
     e.preventDefault();
     try {
       setIsLoading(true);
-      const token = getAccessToken();
-      const method = isEdit ? "PUT" : "POST";
-      const endpoint = isEdit
-        ? `/api/admin/vouchers/${initialData.id}`
-        : "/api/admin/vouchers";
+      const url = isEdit
+        ? `/admin/vouchers/${initialData.id}`
+        : "/admin/vouchers";
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}${endpoint}`,
-        {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        },
-      );
+      const response = isEdit
+        ? await apiClient.put(url, formData)
+        : await apiClient.post(url, formData);
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         router.push("/admin/vouchers");
         router.refresh();
       } else {

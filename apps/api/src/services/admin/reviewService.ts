@@ -1,4 +1,4 @@
-import { Review, User, Product } from "@repo/database";
+import { Review, User, Product, ProductImage } from "@repo/database";
 import { REVIEW_STATUS } from "@repo/shared/constants";
 import { NotFoundError } from "@repo/shared/errors";
 import { Op } from "sequelize";
@@ -62,7 +62,15 @@ export async function listAllReviews(query: {
       {
         model: Product,
         as: "product",
-        attributes: ["name", "slug", "images", "main_image"],
+        attributes: ["name", "slug"],
+        include: [
+          {
+            model: ProductImage,
+            as: "images",
+            attributes: ["image_url", "is_primary"],
+            required: false,
+          },
+        ],
       },
     ],
     distinct: true,
@@ -70,7 +78,16 @@ export async function listAllReviews(query: {
 
   // Map to JSON and add status field
   const items: AdminReviewResult[] = rows.map((r) => {
-    const review = r.get({ plain: true }) as AdminReviewResult;
+    const review = r.get({ plain: true }) as any;
+
+    // Derive main image for frontend compatibility
+    if (review.product && Array.isArray(review.product.images)) {
+      const primaryImage =
+        review.product.images.find((img: any) => img.is_primary) ||
+        review.product.images[0];
+      review.product.image = primaryImage ? primaryImage.image_url : null;
+    }
+
     return {
       ...review,
       status: r.is_approved ? REVIEW_STATUS.APPROVED : REVIEW_STATUS.PENDING,

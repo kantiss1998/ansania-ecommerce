@@ -6,6 +6,7 @@ import {
   FilterColor,
   FilterSize,
   FilterFinishing,
+  SyncLog,
 } from "@repo/database";
 import { ODOO_CONFIG } from "@repo/shared/constants";
 import {
@@ -94,9 +95,9 @@ export class OdooProductService {
 
   // Main sync function
   async syncProducts() {
+    const startTime = Date.now();
     try {
       console.log("🚀 Starting product sync from Odoo...");
-      const startTime = Date.now();
 
       // Step 1: Get valid warehouse for stock syncing
       const warehouse = await this.getValidWarehouse();
@@ -123,29 +124,56 @@ export class OdooProductService {
       );
 
       const endTime = Date.now();
-      const duration = (endTime - startTime) / 1000;
+      const duration = endTime - startTime;
 
-      console.log(`✅ Product sync completed in ${duration} s`);
+      console.log(`✅ Product sync completed in ${duration / 1000} s`);
+
+      // Create log
+      await SyncLog.create({
+        sync_type: "products",
+        sync_direction: "from_odoo",
+        status: "success",
+        records_processed: (syncResult.processedProducts || 0) + (syncResult.processedVariants || 0),
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: null,
+      });
 
       return {
         success: true,
         message: "Product sync completed successfully",
         data: {
           ...syncResult,
-          duration: `${duration} s`,
+          duration: `${duration / 1000} s`,
           syncTime: new Date(),
         },
       };
     } catch (error) {
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+
       console.error(
         "❌ Product sync failed:",
         error instanceof Error ? error.message : String(error),
       );
+
+      // Create failure log
+      await SyncLog.create({
+        sync_type: "products",
+        sync_direction: "from_odoo",
+        status: "failed",
+        records_processed: 0,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: error instanceof Error ? error.message : String(error),
+      });
+
       throw new ServiceUnavailableError("Odoo Product Sync");
     }
   }
 
   async syncCategories() {
+    const startTime = Date.now();
     try {
       console.log("📂 Starting category sync from Odoo...");
       const categories = (await this.safeSearchRead(
@@ -197,6 +225,20 @@ export class OdooProductService {
         }
       }
 
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+
+      // Create success log
+      await SyncLog.create({
+        sync_type: "categories",
+        sync_direction: "from_odoo",
+        status: "success",
+        records_processed: createdCount + updatedCount,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: null,
+      });
+
       return {
         success: true,
         created: createdCount,
@@ -204,7 +246,21 @@ export class OdooProductService {
         total: categories.length,
       };
     } catch (error) {
+      const endTime = Date.now();
+      const duration = endTime - startTime;
       console.error("❌ Category sync failed:", error);
+
+      // Create failure log
+      await SyncLog.create({
+        sync_type: "categories",
+        sync_direction: "from_odoo",
+        status: "failed",
+        records_processed: 0,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: error instanceof Error ? error.message : String(error),
+      });
+
       throw error;
     }
   }
@@ -780,6 +836,7 @@ export class OdooProductService {
   // or just kept as utility. The controller calls syncStock.
   async syncStock() {
     console.log("[ODOO_SYNC] Starting Stock Sync (Legacy Support)...");
+    const startTime = Date.now();
     try {
       const warehouse = await this.getValidWarehouse();
       const warehouseId = warehouse?.id;
@@ -803,6 +860,7 @@ export class OdooProductService {
       const odooIds = variants.map((v) => v.odoo_product_id);
       const chunkSize = ODOO_CONFIG.CHUNK_SIZE;
       let syncedCount = 0;
+      let errorCount = 0;
 
       for (let i = 0; i < odooIds.length; i += chunkSize) {
         const chunk = odooIds.slice(i, i + chunkSize);
@@ -859,6 +917,7 @@ export class OdooProductService {
             `[ODOO_SYNC] Synced stock for chunk ${i} - ${i + chunk.length} `,
           );
         } catch (chunkError) {
+          errorCount += chunk.length;
           console.error(
             `[ODOO_SYNC] ❌ Failed to sync stock for chunk ${i} - ${i + chunk.length}: `,
             chunkError,
@@ -866,9 +925,37 @@ export class OdooProductService {
         }
       }
 
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+
+      // Create success/partial log
+      await SyncLog.create({
+        sync_type: "stock",
+        sync_direction: "from_odoo",
+        status: errorCount > 0 ? "partial" : "success",
+        records_processed: syncedCount,
+        records_failed: errorCount,
+        execution_time_ms: duration,
+        error_message: errorCount > 0 ? `Failed for ${errorCount} variants` : null,
+      });
+
       return { updated: syncedCount };
     } catch (error) {
+      const endTime = Date.now();
+      const duration = endTime - startTime;
       console.error("[ODOO_SYNC] Stock sync failed:", error);
+
+      // Create failure log
+      await SyncLog.create({
+        sync_type: "stock",
+        sync_direction: "from_odoo",
+        status: "failed",
+        records_processed: 0,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: error instanceof Error ? error.message : String(error),
+      });
+
       throw error;
     }
   }

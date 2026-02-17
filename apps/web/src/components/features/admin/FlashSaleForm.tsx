@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
-import { getAccessToken } from "@/lib/auth";
+import apiClient from "@/lib/api";
 
 interface FlashSaleFormProps {
   initialData?: FlashSale;
@@ -39,25 +39,15 @@ export function FlashSaleForm({ initialData }: FlashSaleFormProps) {
     e.preventDefault();
     try {
       setIsLoading(true);
-      const token = getAccessToken();
-      const method = isEdit ? "PUT" : "POST";
-      const endpoint = isEdit
-        ? `/api/admin/flash-sales/${initialData.id}`
-        : "/api/admin/flash-sales";
+      const url = isEdit
+        ? `/admin/flash-sales/${initialData.id}`
+        : "/admin/flash-sales";
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}${endpoint}`,
-        {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        },
-      );
+      const response = isEdit
+        ? await apiClient.put(url, formData)
+        : await apiClient.post(url, formData);
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         router.push("/admin/flash-sales");
         router.refresh();
       } else {

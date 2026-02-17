@@ -4,6 +4,7 @@ import {
   User,
   Address,
   ProductVariant,
+  SyncLog,
 } from "@repo/database";
 import {
   NotFoundError,
@@ -20,6 +21,7 @@ export class OdooOrderService {
    */
   async syncOrder(orderId: number): Promise<number> {
     console.log(`[ODOO_SYNC] Starting order sync for order ID: ${orderId}`);
+    const startTime = Date.now();
 
     try {
       const order = await Order.findByPk(orderId, {
@@ -45,60 +47,82 @@ export class OdooOrderService {
         return order.odoo_order_id;
       }
 
+      let odooOrderId: number;
+
       if (odooClient.isMockMode()) {
         console.log(
           "[ODOO_SYNC] Mock mode - simulating order creation in Odoo",
         );
-        const mockOdooId = Math.floor(Math.random() * 100000);
-        await order.update({ odoo_order_id: mockOdooId });
-        console.log(
-          `[ODOO_SYNC] Mock Odoo order created with ID: ${mockOdooId}`,
-        );
-        return mockOdooId;
+        odooOrderId = Math.floor(Math.random() * 100000);
+      } else {
+        // Prepare order line items
+        const orderLines = (order.items || []).map((item) => {
+          return [
+            0,
+            0,
+            {
+              product_id: item.productVariant?.odoo_product_id || null,
+              name: item.product_name,
+              product_uom_qty: item.quantity,
+              price_unit: Number(item.price),
+              tax_id: [[6, 0, []]], // No taxes for now
+            },
+          ];
+        });
+
+        // Prepare order data for Odoo
+        const odooOrderData = {
+          partner_id: order.user?.odoo_partner_id || null,
+          date_order: order.created_at.toISOString(),
+          client_order_ref: order.order_number,
+          state: "sale", // Confirmed sale order
+          order_line: orderLines,
+          // Note: Add custom fields if needed
+          note: order.customer_note || "",
+        };
+
+        // Create Sale Order in Odoo
+        odooOrderId = await odooClient.create("sale.order", odooOrderData);
       }
-
-      // Prepare order line items
-      const orderLines = (order.items || []).map((item) => {
-        return [
-          0,
-          0,
-          {
-            product_id: item.productVariant?.odoo_product_id || null,
-            name: item.product_name,
-            product_uom_qty: item.quantity,
-            price_unit: Number(item.price),
-            tax_id: [[6, 0, []]], // No taxes for now
-          },
-        ];
-      });
-
-      // Prepare order data for Odoo
-      const odooOrderData = {
-        partner_id: order.user?.odoo_partner_id || null,
-        date_order: order.created_at.toISOString(),
-        client_order_ref: order.order_number,
-        state: "sale", // Confirmed sale order
-        order_line: orderLines,
-        // Note: Add custom fields if needed
-        note: order.customer_note || "",
-      };
-
-      // Create Sale Order in Odoo
-      const odooOrderId = await odooClient.create("sale.order", odooOrderData);
 
       // Update local order with Odoo ID
       await order.update({ odoo_order_id: odooOrderId });
 
+      const duration = Date.now() - startTime;
       console.log(
         `[ODOO_SYNC] Order ${order.order_number} synced successfully to Odoo (ID: ${odooOrderId})`,
       );
 
+      // Create success log
+      await SyncLog.create({
+        sync_type: "orders",
+        sync_direction: "to_odoo",
+        status: "success",
+        records_processed: 1,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: null,
+      });
+
       return odooOrderId;
     } catch (error) {
+      const duration = Date.now() - startTime;
       console.error(
         `[ODOO_SYNC] Failed to sync order ${orderId} to Odoo:`,
         error,
       );
+
+      // Create failure log
+      await SyncLog.create({
+        sync_type: "orders",
+        sync_direction: "to_odoo",
+        status: "failed",
+        records_processed: 0,
+        records_failed: 1, // Single order failed
+        execution_time_ms: duration,
+        error_message: error instanceof Error ? error.message : String(error),
+      });
+
       if (error instanceof AppError) throw error;
       throw new ServiceUnavailableError("Odoo Order Sync");
     }
@@ -145,31 +169,24 @@ export class OdooOrderService {
     errors: number;
   }> {
     console.log("[ODOO_SYNC] syncing order status from Odoo...");
+    const startTime = Date.now();
 
     try {
       // Find orders that are synced to Odoo but not in final state locally
-      // This logic depends on what states are considered final in your system.
-      // Assuming we want to check all orders that have an Odoo ID.
       const orders = await Order.findAll({
         where: {
           odoo_order_id: { [Op.ne]: null },
-          // Add condition for non-final states if available e.g. status: { [Op.notIn]: ['completed', 'cancelled'] }
         },
       });
 
       console.log(`[ODOO_SYNC] Found ${orders.length} orders to check status.`);
 
-      const updatedCount = 0;
+      let updatedCount = 0;
       let errorCount = 0;
 
-      // In a real implementation, we would batch fetch status from Odoo
-      // For now, we'll placeholder this loop
       for (const order of orders) {
         try {
-          // Fetch status from Odoo
-          // const odooStatus = await odooClient.searchRead(...)
-          // Update local status if different
-          // await order.update({ status: mappedStatus })
+          // Placeholder for real logic
           // updatedCount++;
         } catch (err) {
           errorCount++;
@@ -180,13 +197,39 @@ export class OdooOrderService {
         }
       }
 
+      const duration = Date.now() - startTime;
+
+      // Create success/partial log
+      await SyncLog.create({
+        sync_type: "orders",
+        sync_direction: "from_odoo",
+        status: errorCount > 0 ? "partial" : "success",
+        records_processed: updatedCount,
+        records_failed: errorCount,
+        execution_time_ms: duration,
+        error_message: errorCount > 0 ? `Failed for ${errorCount} orders` : null,
+      });
+
       return {
         synced: orders.length,
         updated: updatedCount,
         errors: errorCount,
       };
     } catch (error) {
+      const duration = Date.now() - startTime;
       console.error("[ODOO_SYNC] Failed to sync order statuses:", error);
+
+      // Create failure log
+      await SyncLog.create({
+        sync_type: "orders",
+        sync_direction: "from_odoo",
+        status: "failed",
+        records_processed: 0,
+        records_failed: 0,
+        execution_time_ms: duration,
+        error_message: error instanceof Error ? error.message : String(error),
+      });
+
       throw new ServiceUnavailableError("Odoo Order Status Sync");
     }
   }

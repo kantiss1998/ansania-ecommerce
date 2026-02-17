@@ -17,7 +17,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/Table";
-import { getAccessToken } from "@/lib/auth";
+import apiClient from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 
 interface AdminOrderDetailClientProps {
@@ -39,20 +39,12 @@ export default function AdminOrderDetailClient({
   const updateStatus = async (status: string) => {
     try {
       setIsUpdating(true);
-      const token = getAccessToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/orders/${order.id}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status }),
-        },
+      const response = await apiClient.patch(
+        `/admin/orders/${order.id}/status`,
+        { status },
       );
 
-      if (response.ok) {
+      if (response.status === 200) {
         router.refresh();
       } else {
         alert("Gagal mengupdate status pesanan.");
@@ -73,29 +65,20 @@ export default function AdminOrderDetailClient({
 
     try {
       setIsProcessingRefund(true);
-      const token = getAccessToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/orders/${order.id}/refund`,
+      const response = await apiClient.post(
+        `/admin/orders/${order.id}/refund`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            amount: parseFloat(refundAmount),
-            reason: refundReason,
-          }),
+          amount: parseFloat(refundAmount),
+          reason: refundReason,
         },
       );
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         alert("Refund berhasil diproses");
         setShowRefundModal(false);
         router.refresh();
       } else {
-        const error = await response.json();
-        alert(error.message || "Gagal memproses refund");
+        alert("Gagal memproses refund");
       }
     } catch (error) {
       console.error("Refund error:", error);
@@ -190,14 +173,14 @@ export default function AdminOrderDetailClient({
           {(order.status === ORDER_STATUS.PAID ||
             order.status === ORDER_STATUS.PROCESSING ||
             order.status === ORDER_STATUS.DELIVERED) && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowRefundModal(true)}
-            >
-              💰 Process Refund
-            </Button>
-          )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowRefundModal(true)}
+              >
+                💰 Process Refund
+              </Button>
+            )}
         </div>
       </div>
 
@@ -318,8 +301,8 @@ export default function AdminOrderDetailClient({
                   <span>
                     {formatCurrency(
                       order.total_amount -
-                        order.shipping_cost +
-                        (order.voucher_discount || 0),
+                      order.shipping_cost +
+                      (order.voucher_discount || 0),
                     )}
                   </span>
                 </div>

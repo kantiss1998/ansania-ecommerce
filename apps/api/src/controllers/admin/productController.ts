@@ -152,12 +152,27 @@ export async function uploadImage(
 ) {
   try {
     const { id } = req.params;
-    const { url, is_primary } = req.body; // In real app, this would use multer
+    const { is_primary } = req.body;
+
+    if (!req.file) {
+      res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+      return;
+    }
+
+    // Construct the public URL
+    // In production, this might be a CDN URL
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const imageUrl = `${baseUrl}/public/uploads/products/${req.file.filename}`;
+
     const image = await adminProductService.addProductImage(
       Number(id),
-      url,
-      is_primary,
+      imageUrl,
+      is_primary === "true" || is_primary === true,
     );
+
     res.status(201).json({
       success: true,
       data: image,

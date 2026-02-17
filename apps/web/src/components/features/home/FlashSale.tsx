@@ -103,12 +103,12 @@ export function FlashSale({ products, endTime }: FlashSaleProps) {
           <div className="flex gap-6 min-w-max">
             {products.map((product) => {
               const discountPercentage =
-                product.base_price && product.discount_price
+                product.compare_price && product.selling_price
                   ? Math.round(
-                      ((product.base_price - product.discount_price) /
-                        product.base_price) *
-                        100,
-                    )
+                    ((product.compare_price - product.selling_price) /
+                      product.compare_price) *
+                    100,
+                  )
                   : 0;
 
               return (
@@ -147,12 +147,12 @@ export function FlashSale({ products, endTime }: FlashSaleProps) {
                         <div className="flex items-baseline gap-2">
                           <span className="font-bold text-primary text-lg">
                             {formatCurrency(
-                              product.discount_price || product.base_price,
+                              product.selling_price ?? product.base_price ?? 0,
                             )}
                           </span>
-                          {product.discount_price && (
+                          {product.compare_price && (
                             <span className="text-[10px] text-gray-400 line-through">
-                              {formatCurrency(product.base_price)}
+                              {formatCurrency(product.compare_price)}
                             </span>
                           )}
                         </div>

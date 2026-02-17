@@ -15,7 +15,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/Table";
-import { getAccessToken } from "@/lib/auth";
+import apiClient from "@/lib/api";
 
 interface AdminStockClientProps {
   initialData: PaginatedResponse<StockItem> | null;
@@ -55,18 +55,9 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
   const handleSync = async () => {
     try {
       setIsSyncing(true);
-      const token = getAccessToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/stock/sync`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await apiClient.post("/admin/stock/sync");
 
-      if (response.ok) {
+      if (response.status === 200) {
         alert("Sinkronisasi stok berhasil dimulai di background.");
         router.refresh();
       } else {

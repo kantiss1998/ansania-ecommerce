@@ -28,6 +28,8 @@ export interface Product {
   description: string;
   base_price: number;
   discount_price?: number;
+  selling_price?: number;
+  compare_price?: number;
   thumbnail_url?: string;
   stock_status: string;
   rating_average: number;
@@ -40,7 +42,7 @@ export interface Product {
     slug: string;
   };
   category_name?: string;
-  images?: { image_url: string; is_primary?: boolean }[];
+  images?: string[];
   variants?: ProductVariant[];
   reviews?: Review[];
   related_products?: Product[];

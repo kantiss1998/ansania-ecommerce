@@ -8,8 +8,11 @@ import { useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { useToast } from "@/components/ui/Toast";
 import { formatCurrency } from "@/lib/utils";
 import { Product } from "@/services/productService";
+import { wishlistService } from "@/services/wishlistService";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Product card component for grid display
@@ -20,14 +23,18 @@ export interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
-  const discountPercentage = product.discount_price
-    ? Math.round(
-        ((product.base_price - product.discount_price) / product.base_price) *
-          100,
+  const { isAuthenticated } = useAuthStore();
+  const { success, error: showError } = useToast();
+  const discountPercentage =
+    product.compare_price && product.selling_price
+      ? Math.round(
+        ((Number(product.compare_price) - Number(product.selling_price)) /
+          Number(product.compare_price)) *
+        100,
       )
-    : 0;
+      : 0;
 
-  const price = product.discount_price || product.base_price;
+  const price = Number(product.selling_price) || Number(product.base_price) || 0;
   const isOutOfStock = product.stock_status === STOCK_STATUS.OUT_OF_STOCK;
 
   return (
@@ -79,9 +86,20 @@ export function ProductCard({ product }: ProductCardProps) {
         <button
           className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-gray-600 shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-primary-600 hover:text-white hover:scale-110 active:scale-95"
           aria-label="Add to wishlist"
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
-            // Add wishlist logic here
+            e.stopPropagation();
+            if (!isAuthenticated) {
+              showError("Silakan login untuk menambahkan ke wishlist");
+              return;
+            }
+            try {
+              await wishlistService.addToWishlist(product.id);
+              success("Produk berhasil ditambahkan ke wishlist");
+            } catch (err) {
+              console.error(err);
+              showError(err instanceof Error ? err.message : "Gagal menambahkan ke wishlist");
+            }
           }}
         >
           <Heart className="h-5 w-5" />
@@ -143,9 +161,9 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent font-heading tracking-tight">
               {formatCurrency(price)}
             </span>
-            {product.discount_price && (
+            {discountPercentage > 0 && product.compare_price && (
               <span className="text-xs text-gray-400 line-through decoration-gray-300">
-                {formatCurrency(product.base_price)}
+                {formatCurrency(product.compare_price)}
               </span>
             )}
           </div>

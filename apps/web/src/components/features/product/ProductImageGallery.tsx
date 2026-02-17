@@ -12,15 +12,21 @@ export interface ProductImageGalleryProps {
 }
 
 export function ProductImageGallery({
-  images,
+  images: initialImages,
   productName,
 }: ProductImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(0);
 
-  if (images.length === 0) {
+  // Filter out empty images
+  const images = initialImages.filter(Boolean);
+
+  if (images.length === 0 || !images[selectedImage]) {
     return (
-      <div className="aspect-square w-full rounded-lg bg-gray-200 flex items-center justify-center">
-        <span className="text-gray-400">No image available</span>
+      <div className="aspect-square w-full rounded-lg bg-gray-200 flex flex-col items-center justify-center text-gray-400 gap-2">
+        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+          <span>🖼️</span>
+        </div>
+        <span className="text-sm font-medium">Gambar tidak tersedia</span>
       </div>
     );
   }
@@ -46,11 +52,10 @@ export function ProductImageGallery({
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
-              className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
-                selectedImage === index
+              className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${selectedImage === index
                   ? "border-primary-700"
                   : "border-gray-200 hover:border-gray-300"
-              }`}
+                }`}
             >
               <Image
                 src={image}

@@ -1,4 +1,4 @@
-import { Order, User } from "@repo/database";
+import { Order, User, SyncLog } from "@repo/database";
 import { BadRequestError } from "@repo/shared/errors";
 import { Request, Response, NextFunction } from "express";
 import { Op } from "sequelize";
@@ -167,6 +167,25 @@ export const getSyncStatus = async (
       where: { odoo_partner_id: { [Op.ne]: null } },
     });
 
+    // Get last sync details from logs
+    const getLastSync = async (syncType: "products" | "stock" | "orders" | "customers") => {
+      const log = await SyncLog.findOne({
+        where: { sync_type: syncType, status: "success" },
+        order: [["created_at", "DESC"]],
+      });
+      return {
+        last_sync: log ? log.created_at : new Date().toISOString(),
+        status: "idle" as const,
+      };
+    };
+
+    const [productsSync, stockSync, categoriesSync, ordersSync] = await Promise.all([
+      getLastSync("products"),
+      getLastSync("stock"),
+      getLastSync("products"), // Fallback for categories since it's not in ENUM
+      getLastSync("orders"),
+    ]);
+
     const config = odooClient.getConfig();
 
     res.json({
@@ -175,6 +194,10 @@ export const getSyncStatus = async (
         total_orders: totalOrders,
         synced_orders: syncedOrders,
         synced_customers: syncedCustomers,
+        products: productsSync,
+        stock: stockSync,
+        categories: categoriesSync,
+        orders: ordersSync,
         last_sync: new Date().toISOString(),
         mode: config.baseUrl !== "NOT_SET" ? "production" : "mock",
         connection: config,

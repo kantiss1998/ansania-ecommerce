@@ -116,9 +116,9 @@ export function WishlistContent() {
             <Link href={`/products/${item.product.slug}`}>
               <div className="relative aspect-square bg-gray-100">
                 {/* Use Image component */}
-                {item.product.thumbnail_url ? (
+                {(item.product.thumbnail_url || item.product.images?.[0]) ? (
                   <Image
-                    src={item.product.thumbnail_url}
+                    src={item.product.thumbnail_url || item.product.images?.[0]!}
                     alt={item.product.name}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -143,7 +143,7 @@ export function WishlistContent() {
                   {new Intl.NumberFormat("id-ID", {
                     style: "currency",
                     currency: "IDR",
-                  }).format(item.product.base_price)}
+                  }).format(Number(item.product.selling_price) || Number(item.product.base_price) || 0)}
                 </span>
               </div>
               <Button

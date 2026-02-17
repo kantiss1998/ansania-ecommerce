@@ -37,8 +37,8 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
       const method = action === "delete" ? "DELETE" : "PATCH";
       const endpoint =
         action === "delete"
-          ? `/api/admin/reviews/${id}`
-          : `/api/admin/reviews/${id}/${action}`;
+          ? `/admin/reviews/${id}`
+          : `/admin/reviews/${id}/${action}`;
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}${endpoint}`,

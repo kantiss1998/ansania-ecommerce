@@ -102,6 +102,7 @@ export interface Category {
   name: string;
   slug: string;
   image?: string;
+  image_url?: string;
   description?: string;
   meta_title?: string;
   meta_description?: string;

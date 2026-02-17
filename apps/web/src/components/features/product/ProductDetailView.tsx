@@ -25,6 +25,7 @@ import { useToast } from "@/components/ui/Toast";
 import { formatCurrency } from "@/lib/utils";
 import { Product } from "@/services/productService";
 import { wishlistService } from "@/services/wishlistService";
+import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
 
 interface ProductDetailViewProps {
@@ -32,8 +33,9 @@ interface ProductDetailViewProps {
 }
 
 export function ProductDetailView({ product }: ProductDetailViewProps) {
+  const { isAuthenticated } = useAuthStore();
   const { addItem } = useCartStore();
-  const { success } = useToast();
+  const { success, error: showError } = useToast();
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     product.variants?.[0] || null,
@@ -47,20 +49,31 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
     success(`${quantity}x ${product.name} ditambahkan ke keranjang!`);
   };
 
-  const discountPercentage = product.discount_price
-    ? Math.round(
-        ((product.base_price - product.discount_price) / product.base_price) *
-          100,
+  const discountPercentage =
+    product.compare_price && product.selling_price
+      ? Math.round(
+        ((Number(product.compare_price) - Number(product.selling_price)) /
+          Number(product.compare_price)) *
+        100,
       )
-    : 0;
+      : 0;
 
   const currentPrice =
-    selectedVariant?.price || product.discount_price || product.base_price;
+    selectedVariant?.price && Number(selectedVariant.price) > 0
+      ? Number(selectedVariant.price)
+      : (Number(product.selling_price) || Number(product.base_price) || 0);
 
   // Map images to string array for gallery component
-  const galleryImages = product.images?.map((img) => img.image_url) || [
-    product.thumbnail_url || "",
-  ];
+  const galleryImages = (product.images?.filter(Boolean) as string[]) || [];
+
+  // Fallback to thumbnail or placeholder
+  if (galleryImages.length === 0) {
+    if (product.thumbnail_url) {
+      galleryImages.push(product.thumbnail_url);
+    } else {
+      galleryImages.push("/placeholder-product.svg");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50/30 to-white">
@@ -158,10 +171,10 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                     <span className="text-5xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent tracking-tight font-heading">
                       {formatCurrency(currentPrice)}
                     </span>
-                    {discountPercentage > 0 && (
+                    {discountPercentage > 0 && product.compare_price && (
                       <div className="flex flex-col items-start">
                         <span className="text-lg text-gray-400 line-through decoration-2">
-                          {formatCurrency(product.base_price)}
+                          {formatCurrency(product.compare_price)}
                         </span>
                         <div className="relative overflow-hidden rounded-full px-2.5 py-1 shadow-md">
                           <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500" />
@@ -262,12 +275,16 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                   size="lg"
                   className="rounded-xl h-14 w-14 p-0 flex items-center justify-center border-gray-200 hover:border-error-200 hover:bg-error-50 hover:text-error-500 transition-all active:scale-95"
                   onClick={async () => {
+                    if (!isAuthenticated) {
+                      showError("Silakan login untuk menambahkan ke wishlist");
+                      return;
+                    }
                     try {
                       await wishlistService.addToWishlist(product.id);
                       success("Produk ditambahkan ke wishlist");
                     } catch (err) {
                       console.error(err);
-                      success("Produk ditambahkan ke wishlist");
+                      showError(err instanceof Error ? err.message : "Gagal menambahkan ke wishlist");
                     }
                   }}
                 >

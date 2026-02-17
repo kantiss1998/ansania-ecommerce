@@ -1,5 +1,22 @@
 {
   "css.lint.unknownAtRules": "ignore",
   "scss.lint.unknownAtRules": "ignore",
-  "less.lint.unknownAtRules": "ignore"
+  "less.lint.unknownAtRules": "ignore",
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "kantiss.com",
+      "port": 3306,
+      "driver": "MariaDB",
+      "name": "Ansania",
+      "database": "kanz8438_ansania",
+      "password": "!oq$xWWB^@0C",
+      "username": "kanz8438_log8924"
+    }
+  ]
 }

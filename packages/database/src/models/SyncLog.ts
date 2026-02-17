@@ -10,7 +10,7 @@ import { sequelize } from "../config/database";
 
 export interface SyncLogAttributes {
   id: number;
-  sync_type: "products" | "stock" | "orders" | "customers" | "addresses";
+  sync_type: "products" | "stock" | "orders" | "customers" | "addresses" | "categories" | "full_sync";
   sync_direction: "from_odoo" | "to_odoo";
   status: "success" | "failed" | "partial";
   records_processed: number;
@@ -30,7 +30,9 @@ export class SyncLog extends Model<
     | "stock"
     | "orders"
     | "customers"
-    | "addresses";
+    | "addresses"
+    | "categories"
+    | "full_sync";
   declare sync_direction: "from_odoo" | "to_odoo";
   declare status: "success" | "failed" | "partial";
   declare records_processed: CreationOptional<number>;
@@ -54,6 +56,8 @@ SyncLog.init(
         "orders",
         "customers",
         "addresses",
+        "categories",
+        "full_sync",
       ),
       allowNull: false,
     },
