@@ -52,10 +52,11 @@ export function ProductImageGallery({
             <button
               key={index}
               onClick={() => setSelectedImage(index)}
-              className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${selectedImage === index
+              className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                selectedImage === index
                   ? "border-primary-700"
                   : "border-gray-200 hover:border-gray-300"
-                }`}
+              }`}
             >
               <Image
                 src={image}

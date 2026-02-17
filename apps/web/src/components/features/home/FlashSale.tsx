@@ -105,10 +105,10 @@ export function FlashSale({ products, endTime }: FlashSaleProps) {
               const discountPercentage =
                 product.compare_price && product.selling_price
                   ? Math.round(
-                    ((product.compare_price - product.selling_price) /
-                      product.compare_price) *
-                    100,
-                  )
+                      ((product.compare_price - product.selling_price) /
+                        product.compare_price) *
+                        100,
+                    )
                   : 0;
 
               return (

@@ -49,7 +49,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (
         typeof icon === "function" ||
-        (typeof icon === "object" && icon !== null && "render" in (icon as unknown as Record<string, unknown>))
+        (typeof icon === "object" &&
+          icon !== null &&
+          "render" in (icon as unknown as Record<string, unknown>))
       ) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const IconComponent = icon as any;
@@ -85,7 +87,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 "focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500",
                 "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100",
                 error &&
-                "border-red-300 focus:border-red-500 focus:ring-red-100",
+                  "border-red-300 focus:border-red-500 focus:ring-red-100",
                 leftIcon && "pl-12",
                 rightIcon && "pr-12",
                 className,
@@ -167,7 +169,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500",
               "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100",
               error &&
-              "border-red-300 bg-red-50/30 focus:border-red-500 focus:ring-red-100",
+                "border-red-300 bg-red-50/30 focus:border-red-500 focus:ring-red-100",
               leftIcon && "pl-12",
               rightIcon && "pr-12",
               className,

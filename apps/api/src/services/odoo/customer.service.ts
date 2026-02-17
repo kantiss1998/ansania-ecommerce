@@ -123,7 +123,9 @@ export class OdooCustomerService {
       if (odooClient.isMockMode()) {
         odooPartnerId = Math.floor(Math.random() * 100000);
         await user.update({ odoo_partner_id: odooPartnerId });
-        console.log(`[ODOO_SYNC] Mock partner created with ID: ${odooPartnerId}`);
+        console.log(
+          `[ODOO_SYNC] Mock partner created with ID: ${odooPartnerId}`,
+        );
       } else {
         // Create partner in Odoo
         const partnerData = {
@@ -293,7 +295,8 @@ export class OdooCustomerService {
         records_processed: syncedCount,
         records_failed: errorsCount,
         execution_time_ms: duration,
-        error_message: errorsCount > 0 ? `Failed for ${errorsCount} customers` : null,
+        error_message:
+          errorsCount > 0 ? `Failed for ${errorsCount} customers` : null,
       });
 
       return { synced: syncedCount, errors: errorsCount };

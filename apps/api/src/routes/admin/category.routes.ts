@@ -10,7 +10,11 @@ router.use(authenticate, authorizeAdmin);
 
 router.get("/", adminCategoryController.getAllCategories);
 router.post("/reorder", adminCategoryController.reorderCategories);
-router.post("/:id/image", upload.single("image"), adminCategoryController.uploadCategoryImage);
+router.post(
+  "/:id/image",
+  upload.single("image"),
+  adminCategoryController.uploadCategoryImage,
+);
 router.get("/:id", adminCategoryController.getCategoryDetail);
 router.get("/:id/stats", adminCategoryController.getCategoryStats);
 router.put("/:id", adminCategoryController.updateCategory);

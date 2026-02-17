@@ -199,16 +199,16 @@ export function DashboardContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-4 py-2 mb-4">
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-5 py-2.5 shadow-sm border border-primary-100/50 mb-4">
           <Sparkles className="h-4 w-4 text-primary-600" />
           <span className="text-sm font-semibold text-primary-700">
             Dashboard
           </span>
         </div>
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
           Selamat Datang Kembali!
         </h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-3 text-lg text-gray-600">
           Kelola pesanan dan akun Anda dengan mudah
         </p>
       </motion.div>
@@ -221,7 +221,7 @@ export function DashboardContent() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg"
+            className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             {/* Decorative blur */}
             <div
@@ -258,9 +258,9 @@ export function DashboardContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="h-5 w-5 text-primary-600" />
-          <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             Aksi Cepat
           </h2>
         </div>
@@ -272,7 +272,7 @@ export function DashboardContent() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.6 + index * 0.1 }}
                 whileHover={{ scale: 1.02 }}
-                className="group relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg transition-all hover:shadow-xl cursor-pointer"
+                className="group relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-6 shadow-lg transition-all hover:shadow-xl cursor-pointer"
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-5 transition-opacity`}
@@ -302,10 +302,10 @@ export function DashboardContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-primary-600" />
-            <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Pesanan Terbaru
             </h2>
           </div>
@@ -317,7 +317,7 @@ export function DashboardContent() {
         </div>
 
         {recentOrders.length === 0 ? (
-          <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 p-12 text-center">
+          <div className="rounded-3xl border-2 border-dashed border-gray-200 bg-gray-50 p-12 text-center">
             <ShoppingBag className="mx-auto h-12 w-12 text-gray-400" />
             <p className="mt-4 text-sm font-medium text-gray-600">
               Belum ada pesanan
@@ -332,7 +332,7 @@ export function DashboardContent() {
             </Link>
           </div>
         ) : (
-          <div className="rounded-2xl border-2 border-gray-100 bg-white shadow-lg overflow-hidden">
+          <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100">

@@ -27,13 +27,13 @@ async function getSyncData() {
     const status = statusRes.ok
       ? (await statusRes.json()).data
       : {
-        products: { last_sync: new Date().toISOString(), status: "idle" },
-        stock: { last_sync: new Date().toISOString(), status: "idle" },
-        categories: { last_sync: new Date().toISOString(), status: "idle" },
-        orders: { last_sync: new Date().toISOString(), status: "idle" },
-      };
+          products: { last_sync: new Date().toISOString(), status: "idle" },
+          stock: { last_sync: new Date().toISOString(), status: "idle" },
+          categories: { last_sync: new Date().toISOString(), status: "idle" },
+          orders: { last_sync: new Date().toISOString(), status: "idle" },
+        };
     const logsData = logsRes.ok ? (await logsRes.json()).data : [];
-    const logs = Array.isArray(logsData) ? logsData : (logsData?.items || []);
+    const logs = Array.isArray(logsData) ? logsData : logsData?.items || [];
 
     return { status, logs };
   } catch (error) {

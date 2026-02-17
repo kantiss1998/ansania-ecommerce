@@ -48,17 +48,18 @@ export class OdooClient {
   /**
    * Refresh configuration from database settings
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async refreshFromSettings(settings: any[]) {
+  async refreshFromSettings(
+    settings: Array<{ setting_key: string; setting_value: string | null }>,
+  ) {
     const urlSetting = settings.find((s) => s.setting_key === "odoo_url");
     const dbSetting = settings.find((s) => s.setting_key === "odoo_db");
     const userSetting = settings.find((s) => s.setting_key === "odoo_username");
     const passSetting = settings.find((s) => s.setting_key === "odoo_password");
 
-    if (urlSetting) this.baseUrl = urlSetting.setting_value;
-    if (dbSetting) this.db = dbSetting.setting_value;
-    if (userSetting) this.username = userSetting.setting_value;
-    if (passSetting) this.password = passSetting.setting_value;
+    if (urlSetting) this.baseUrl = urlSetting.setting_value ?? "";
+    if (dbSetting) this.db = dbSetting.setting_value ?? "";
+    if (userSetting) this.username = userSetting.setting_value ?? "";
+    if (passSetting) this.password = passSetting.setting_value ?? "";
 
     this.useMock =
       !this.baseUrl || !this.db || !this.username || !this.password;
@@ -138,13 +139,12 @@ export class OdooClient {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async call(
+  async call<T = unknown>(
     model: string,
     method: string,
-    args: any[] = [],
-    kwargs: any = {},
-  ): Promise<any> {
+    args: Array<unknown> = [],
+    kwargs: Record<string, unknown> = {},
+  ): Promise<T> {
     if (!this.uid) {
       await this.authenticate();
     }
@@ -154,7 +154,7 @@ export class OdooClient {
         args,
         kwargs,
       });
-      return null;
+      return null as T;
     }
 
     try {
@@ -188,14 +188,13 @@ export class OdooClient {
         throw new Error(`API call failed: ${response.statusText}`);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const data = (await response.json()) as OdooResponse<any>;
+      const data = (await response.json()) as OdooResponse<T>;
 
       if (data.error) {
         throw new Error(`Odoo API Error: ${data.error.message}`);
       }
 
-      return data.result;
+      return data.result as T;
     } catch (error) {
       console.error(`[ODOO] Error calling ${model}.${method}:`, error);
       if (error instanceof AppError) throw error;
@@ -208,29 +207,36 @@ export class OdooClient {
   /**
    * Search and read records from Odoo
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async searchRead(
+  async searchRead<T = unknown>(
     model: string,
-    domain: any[] = [],
+    domain: Array<unknown> = [],
     fields: string[] = [],
-    options: any = {},
-  ): Promise<any[]> {
-    return this.call(model, "search_read", [domain], { fields, ...options });
+    options: Record<string, unknown> = {},
+  ): Promise<T[]> {
+    return this.call<T[]>(model, "search_read", [domain], {
+      fields,
+      ...options,
+    });
   }
 
   /**
    * Create a record in Odoo
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async create(model: string, values: any): Promise<number> {
+  async create(
+    model: string,
+    values: Record<string, unknown>,
+  ): Promise<number> {
     return this.call(model, "create", [values]);
   }
 
   /**
    * Update record(s) in Odoo
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async write(model: string, ids: number[], values: any): Promise<boolean> {
+  async write(
+    model: string,
+    ids: number[],
+    values: Record<string, unknown>,
+  ): Promise<boolean> {
     return this.call(model, "write", [ids, values]);
   }
 

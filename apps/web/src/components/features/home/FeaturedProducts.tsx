@@ -44,7 +44,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
         >
           <Sparkles className="h-4 w-4 text-primary-600" />
           <span className="text-sm font-semibold text-primary-700">
-            Pilihan Terbaik
+            Koleksi Favorit
           </span>
         </motion.div>
 
@@ -55,7 +55,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           transition={{ delay: 0.1 }}
           className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading mb-4"
         >
-          Produk Pilihan
+          Kerudung Pilihan
         </motion.h2>
 
         <motion.p
@@ -65,7 +65,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           transition={{ delay: 0.2 }}
           className="text-lg text-gray-600 max-w-2xl mx-auto"
         >
-          Terfavorit minggu ini untuk hunian impian Anda
+          Koleksi kerudung terpopuler dan paling banyak disukai minggu ini
         </motion.p>
       </div>
 
@@ -87,7 +87,10 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
           } else if (product.is_featured) {
             tag = "Best Seller";
             tagColor = "bg-gradient-to-r from-yellow-500 to-orange-500";
-          } else if (product.compare_price && product.compare_price > (product.selling_price || 0)) {
+          } else if (
+            product.compare_price &&
+            product.compare_price > (product.selling_price || 0)
+          ) {
             tag = "Promo";
             tagColor = "bg-gradient-to-r from-red-500 to-pink-500";
           }
@@ -168,7 +171,9 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                     <div className="flex items-baseline gap-2">
                       <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-primary-700 bg-clip-text text-transparent font-heading tracking-tight">
                         {formatCurrency(
-                          Number(product.selling_price) || Number(product.base_price) || 0,
+                          Number(product.selling_price) ||
+                            Number(product.base_price) ||
+                            0,
                         )}
                       </span>
                     </div>

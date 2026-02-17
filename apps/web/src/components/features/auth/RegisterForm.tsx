@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authSchemas } from "@repo/shared";
-import { Eye, EyeOff, UserPlus } from "lucide-react";
+import { Eye, EyeOff, UserPlus, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -68,17 +68,23 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto space-y-8">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-gray-900 font-heading">
-          Buat Akun Baru
+    <div className="w-full max-w-lg mx-auto space-y-6">
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-5 py-2.5 shadow-sm border border-primary-100/50">
+          <Sparkles className="h-4 w-4 text-primary-600" />
+          <span className="text-sm font-semibold text-primary-700">
+            Bergabung Bersama Kami
+          </span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+          Buat Akun Ansania
         </h1>
-        <p className="text-gray-500">
-          Daftar untuk mulai berbelanja di Ansania
+        <p className="text-base text-gray-600">
+          Daftar untuk mulai berbelanja produk hijab premium
         </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Input
             label="Nama Lengkap"
@@ -186,11 +192,11 @@ export function RegisterForm() {
 
             <Button
               type="submit"
-              variant="primary"
+              variant="gradient"
               size="lg"
               fullWidth
               isLoading={isLoading}
-              className="shadow-lg shadow-primary-500/30 hover:shadow-primary-500/40"
+              className="shadow-lg hover:shadow-xl"
             >
               <UserPlus className="mr-2 h-5 w-5" />
               Daftar Sekarang

@@ -316,11 +316,16 @@ export interface SyncStatus {
 
 export interface SyncLog {
   id: number;
-  entity_type: string;
+  entity_type?: string;
   entity_id?: string;
-  action: string;
-  status: "success" | "failed";
+  sync_type?: string;
+  sync_direction?: string;
+  action?: string;
+  status: "success" | "failed" | "partial";
   message?: string;
+  error_message?: string;
+  records_processed?: number;
+  records_failed?: number;
   created_at: string;
 }
 

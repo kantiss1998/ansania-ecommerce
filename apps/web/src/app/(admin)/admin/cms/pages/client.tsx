@@ -1,6 +1,7 @@
 "use client";
 
 import { CMSPage } from "@repo/shared";
+import { FileText, Plus, Edit2, Trash2, Loader2, FileX } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -45,22 +46,37 @@ function PagesContent({ initialData }: PagesClientProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            Pages Management
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Atur halaman statis dan SEO konten
-          </p>
+    <div className="space-y-8">
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 px-5 py-2.5 shadow-sm border border-indigo-100/50 mb-4">
+              <FileText className="h-4 w-4 text-indigo-600" />
+              <span className="text-sm font-semibold text-indigo-700">
+                CMS Pages
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-indigo-800 to-gray-900 bg-clip-text text-transparent font-heading">
+              Pages Management
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Atur halaman statis dan SEO konten
+            </p>
+          </div>
+          <Link href="/admin/cms/pages/create">
+            <Button
+              variant="gradient"
+              size="md"
+              className="shadow-lg hover:shadow-xl rounded-2xl"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Buat Halaman
+            </Button>
+          </Link>
         </div>
-        <Link href="/admin/cms/pages/create">
-          <Button variant="primary">+ Buat Halaman</Button>
-        </Link>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -107,17 +123,23 @@ function PagesContent({ initialData }: PagesClientProps) {
                   <TableCell>
                     <div className="flex justify-center gap-2">
                       <Link href={`/admin/cms/pages/${page.id}`}>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl"
+                        >
+                          <Edit2 className="mr-1.5 h-3.5 w-3.5" />
                           Edit
                         </Button>
                       </Link>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-error-600 hover:bg-error-50"
+                        className="text-red-600 hover:bg-red-50 rounded-xl"
                         isLoading={isDeleting === page.id}
                         onClick={() => handleDelete(page.id)}
                       >
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                         Hapus
                       </Button>
                     </div>
@@ -126,11 +148,11 @@ function PagesContent({ initialData }: PagesClientProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="py-12 text-center text-gray-500"
-                >
-                  Belum ada halaman.
+                <TableCell colSpan={5} className="py-16 text-center">
+                  <FileX className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-base font-medium text-gray-600">
+                    Belum ada halaman.
+                  </p>
                 </TableCell>
               </TableRow>
             )}
@@ -143,7 +165,18 @@ function PagesContent({ initialData }: PagesClientProps) {
 
 export default function PagesClient({ initialData }: PagesClientProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-indigo-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Memuat halaman...
+            </p>
+          </div>
+        </div>
+      }
+    >
       <PagesContent initialData={initialData} />
     </Suspense>
   );

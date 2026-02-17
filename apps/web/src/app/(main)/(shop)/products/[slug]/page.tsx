@@ -32,8 +32,11 @@ export async function generateMetadata({
     openGraph: {
       title: product.name,
       description: product.description,
-      images: (product.images?.filter(Boolean) as string[]) ||
-        (product.thumbnail_url ? [product.thumbnail_url] : ["/placeholder-product.svg"]),
+      images:
+        (product.images?.filter(Boolean) as string[]) ||
+        (product.thumbnail_url
+          ? [product.thumbnail_url]
+          : ["/placeholder-product.svg"]),
     },
   };
 }

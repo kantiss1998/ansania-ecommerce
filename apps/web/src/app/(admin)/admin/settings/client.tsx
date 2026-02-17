@@ -1,5 +1,6 @@
 "use client";
 
+import { Settings, Save, Loader2, Info } from "lucide-react";
 import { useState, Suspense } from "react";
 
 import { Button } from "@/components/ui/Button";
@@ -35,31 +36,48 @@ function AdminSettingsContent({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Site Settings</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Konfigurasi global sistem, integrasi pihak ketiga, dan parameter
-            bisnis
-          </p>
+    <div className="space-y-8">
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-zinc-50 to-gray-50 px-5 py-2.5 shadow-sm border border-zinc-100/50 mb-4">
+              <Settings className="h-4 w-4 text-zinc-600" />
+              <span className="text-sm font-semibold text-zinc-700">
+                Konfigurasi Sistem
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-zinc-800 to-gray-900 bg-clip-text text-transparent font-heading">
+              Site Settings
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Konfigurasi global sistem, integrasi pihak ketiga, dan parameter
+              bisnis
+            </p>
+          </div>
+          <Button
+            variant="gradient"
+            size="md"
+            className="shadow-lg hover:shadow-xl rounded-2xl"
+            onClick={handleSave}
+            isLoading={isSaving}
+          >
+            <Save className="mr-2 h-4 w-4" />
+            Simpan Perubahan
+          </Button>
         </div>
-        <Button variant="primary" onClick={handleSave} isLoading={isSaving}>
-          Simpan Perubahan
-        </Button>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Tabs Sidebar */}
-        <aside className="lg:w-64 flex flex-row lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0">
+        <aside className="lg:w-72 flex flex-row lg:flex-col gap-3 overflow-x-auto pb-2 lg:pb-0">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+              className={`px-5 py-4 rounded-2xl text-sm font-bold transition-all shadow-sm whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "bg-primary-50 text-primary-700 shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100"
+                  ? "bg-gradient-to-r from-zinc-500 to-gray-600 text-white shadow-lg scale-[1.02]"
+                  : "bg-white border-2 border-gray-200 text-gray-600 hover:border-zinc-300 hover:shadow-md"
               }`}
             >
               {tab.label}
@@ -68,7 +86,7 @@ function AdminSettingsContent({
         </aside>
 
         {/* Tab Content */}
-        <main className="flex-1 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <main className="flex-1 rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
           {activeTab === "general" && (
             <div className="space-y-6 max-w-2xl">
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
@@ -171,9 +189,9 @@ function AdminSettingsContent({
                     />
                   </div>
                 </div>
-                <div className="p-4 rounded-lg bg-blue-50 border border-blue-100 flex items-start gap-3">
-                  <div className="text-blue-500 mt-0.5">ⓘ</div>
-                  <p className="text-xs text-blue-700">
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-100 flex items-start gap-3">
+                  <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-blue-700">
                     Parameter ini digunakan untuk melakukan sinkronisasi produk,
                     stok, dan pesanan secara otomatis.
                   </p>
@@ -263,8 +281,13 @@ export default function AdminSettingsClient({
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-gray-500">
-          Memuat pengaturan sistem...
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-zinc-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Memuat pengaturan sistem...
+            </p>
+          </div>
         </div>
       }
     >

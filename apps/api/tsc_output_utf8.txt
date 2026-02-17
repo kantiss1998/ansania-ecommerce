@@ -1,0 +1,25 @@
+﻿src/services/admin/systemService.ts(259,40): error TS2345: Argument of type 'CmsSetting[]' is not assignable to parameter of type '{ setting_key: string; setting_value: string; }[]'.
+  Type 'CmsSetting' is not assignable to type '{ setting_key: string; setting_value: string; }'.
+    Types of property 'setting_value' are incompatible.
+      Type 'string | null' is not assignable to type 'string'.
+        Type 'null' is not assignable to type 'string'.
+src/services/odoo/product.service.ts(113,54): error TS2345: Argument of type 'Record<string, unknown>[]' is not assignable to parameter of type 'OdooProductTemplate[]'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'OdooProductTemplate': id, name, categ_id
+src/services/odoo/product.service.ts(120,9): error TS2345: Argument of type 'Record<string, unknown>[]' is not assignable to parameter of type 'OdooProductTemplate[]'.
+  Type 'Record<string, unknown>' is missing the following properties from type 'OdooProductTemplate': id, name, categ_id
+src/services/odoo/product.service.ts(353,42): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(...items: ConcatArray<OdooProductVariant>[]): OdooProductVariant[]', gave the following error.
+    Argument of type 'Record<string, unknown>[]' is not assignable to parameter of type 'ConcatArray<OdooProductVariant>'.
+      The types returned by 'slice(...)' are incompatible between these types.
+        Type 'Record<string, unknown>[]' is not assignable to type 'OdooProductVariant[]'.
+          Type 'Record<string, unknown>' is missing the following properties from type 'OdooProductVariant': id, product_tmpl_id, display_name
+  Overload 2 of 2, '(...items: (OdooProductVariant | ConcatArray<OdooProductVariant>)[]): OdooProductVariant[]', gave the following error.
+    Argument of type 'Record<string, unknown>[]' is not assignable to parameter of type 'OdooProductVariant | ConcatArray<OdooProductVariant>'.
+      Type 'Record<string, unknown>[]' is not assignable to type 'ConcatArray<OdooProductVariant>'.
+        The types returned by 'slice(...)' are incompatible between these types.
+          Type 'Record<string, unknown>[]' is not assignable to type 'OdooProductVariant[]'.
+            Type 'Record<string, unknown>' is missing the following properties from type 'OdooProductVariant': id, product_tmpl_id, display_name
+src/services/odoo/product.service.ts(877,27): error TS2345: Argument of type '(item: { id: number; qty_available: number; }) => [number, number]' is not assignable to parameter of type '(value: Record<string, unknown>, index: number, array: Record<string, unknown>[]) => [number, number]'.
+  Types of parameters 'item' and 'value' are incompatible.
+    Type 'Record<string, unknown>' is missing the following properties from type '{ id: number; qty_available: number; }': id, qty_available
+src/services/odoo/product.service.ts(908,34): error TS2322: Type '{}' is not assignable to type 'number'.

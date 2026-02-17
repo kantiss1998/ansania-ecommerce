@@ -10,7 +10,14 @@ import { sequelize } from "../config/database";
 
 export interface SyncLogAttributes {
   id: number;
-  sync_type: "products" | "stock" | "orders" | "customers" | "addresses" | "categories" | "full_sync";
+  sync_type:
+    | "products"
+    | "stock"
+    | "orders"
+    | "customers"
+    | "addresses"
+    | "categories"
+    | "full_sync";
   sync_direction: "from_odoo" | "to_odoo";
   status: "success" | "failed" | "partial";
   records_processed: number;

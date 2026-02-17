@@ -1,6 +1,7 @@
 "use client";
 
 import { PaginatedResponse } from "@repo/shared";
+import { Activity, Loader2, ClipboardList } from "lucide-react";
 import { Suspense } from "react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -32,17 +33,23 @@ function AdminActivityLogsContent({
   initialData,
 }: AdminActivityLogsClientProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Activity Logs</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Audit Trail: Pantau seluruh aktivitas administrator dan sistem
-          </p>
+    <div className="space-y-8">
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-slate-50 to-zinc-50 px-5 py-2.5 shadow-sm border border-slate-100/50 mb-4">
+          <Activity className="h-4 w-4 text-slate-600" />
+          <span className="text-sm font-semibold text-slate-700">
+            System Monitoring
+          </span>
         </div>
+        <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-slate-800 to-gray-900 bg-clip-text text-transparent font-heading">
+          Activity Logs
+        </h2>
+        <p className="mt-3 text-base text-gray-600">
+          Audit Trail: Pantau seluruh aktivitas administrator dan sistem
+        </p>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -85,11 +92,11 @@ function AdminActivityLogsContent({
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="py-12 text-center text-gray-500"
-                >
-                  Tidak ada data log aktivitas.
+                <TableCell colSpan={6} className="py-16 text-center">
+                  <ClipboardList className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-base font-medium text-gray-600">
+                    Tidak ada data log aktivitas.
+                  </p>
                 </TableCell>
               </TableRow>
             )}
@@ -106,8 +113,13 @@ export default function AdminActivityLogsClient({
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-gray-500">
-          Memuat audit trail...
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-slate-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Memuat audit trail...
+            </p>
+          </div>
         </div>
       }
     >

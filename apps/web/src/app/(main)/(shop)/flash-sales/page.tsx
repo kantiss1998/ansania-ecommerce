@@ -72,7 +72,7 @@ export default async function FlashSalesPage() {
                     const discount = Math.round(
                       ((item.original_price - item.flash_sale_price) /
                         item.original_price) *
-                      100,
+                        100,
                     );
                     const soldPercentage = Math.round(
                       (item.sold_count / item.stock_limit) * 100,
@@ -120,7 +120,9 @@ export default async function FlashSalesPage() {
                           <div className="mt-6 space-y-2">
                             <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-gray-500">
                               <span>Terjual {item.sold_count}</span>
-                              <span>Sisa {item.stock_limit - item.sold_count}</span>
+                              <span>
+                                Sisa {item.stock_limit - item.sold_count}
+                              </span>
                             </div>
                             <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
                               <div

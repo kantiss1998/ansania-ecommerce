@@ -52,16 +52,16 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
   const discountPercentage =
     product.compare_price && product.selling_price
       ? Math.round(
-        ((Number(product.compare_price) - Number(product.selling_price)) /
-          Number(product.compare_price)) *
-        100,
-      )
+          ((Number(product.compare_price) - Number(product.selling_price)) /
+            Number(product.compare_price)) *
+            100,
+        )
       : 0;
 
   const currentPrice =
     selectedVariant?.price && Number(selectedVariant.price) > 0
       ? Number(selectedVariant.price)
-      : (Number(product.selling_price) || Number(product.base_price) || 0);
+      : Number(product.selling_price) || Number(product.base_price) || 0;
 
   // Map images to string array for gallery component
   const galleryImages = (product.images?.filter(Boolean) as string[]) || [];
@@ -284,7 +284,11 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                       success("Produk ditambahkan ke wishlist");
                     } catch (err) {
                       console.error(err);
-                      showError(err instanceof Error ? err.message : "Gagal menambahkan ke wishlist");
+                      showError(
+                        err instanceof Error
+                          ? err.message
+                          : "Gagal menambahkan ke wishlist",
+                      );
                     }
                   }}
                 >

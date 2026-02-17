@@ -2,6 +2,16 @@
 
 import { Review, PaginatedResponse } from "@repo/shared";
 import { REVIEW_STATUS } from "@repo/shared/constants";
+import {
+  MessageSquare,
+  Star,
+  Check,
+  X,
+  Trash2,
+  Loader2,
+  MessageCircleX,
+  Filter,
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
@@ -67,53 +77,69 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
 
   const StarRating = ({ rating }: { rating: number }) => {
     return (
-      <div className="flex text-yellow-400">
+      <div className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map((s) => (
-          <span
+          <Star
             key={s}
-            className={s <= rating ? "fill-current" : "text-gray-300"}
-          >
-            ★
-          </span>
+            className={`h-4 w-4 ${
+              s <= rating
+                ? "fill-yellow-400 text-yellow-400"
+                : "fill-gray-200 text-gray-200"
+            }`}
+          />
         ))}
       </div>
     );
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            Ulasan & Rating
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Moderasi ulasan produk dari pelanggan untuk menjaga kualitas konten
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant={
-              currentStatus === REVIEW_STATUS.PENDING ? "primary" : "outline"
-            }
-            size="sm"
-            onClick={() =>
-              router.push(`/admin/reviews?status=${REVIEW_STATUS.PENDING}`)
-            }
-          >
-            Butuh Moderasi
-          </Button>
-          <Button
-            variant={currentStatus === "" ? "primary" : "outline"}
-            size="sm"
-            onClick={() => router.push("/admin/reviews")}
-          >
-            Semua
-          </Button>
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yellow-50 to-orange-50 px-5 py-2.5 shadow-sm border border-yellow-100/50 mb-4">
+              <MessageSquare className="h-4 w-4 text-yellow-600" />
+              <span className="text-sm font-semibold text-yellow-700">
+                Manajemen Ulasan
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-yellow-800 to-gray-900 bg-clip-text text-transparent font-heading">
+              Ulasan & Rating
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Moderasi ulasan produk dari pelanggan untuk menjaga kualitas
+              konten
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant={
+                currentStatus === REVIEW_STATUS.PENDING ? "gradient" : "outline"
+              }
+              size="sm"
+              className="rounded-2xl"
+              onClick={() =>
+                router.push(`/admin/reviews?status=${REVIEW_STATUS.PENDING}`)
+              }
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Butuh Moderasi
+            </Button>
+            <Button
+              variant={currentStatus === "" ? "gradient" : "outline"}
+              size="sm"
+              className="rounded-2xl"
+              onClick={() => router.push("/admin/reviews")}
+            >
+              Semua
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      {/* Reviews Table */}
+      <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -132,16 +158,17 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
                   <TableCell className="max-w-[180px]">
                     <div className="flex items-center gap-3">
                       {review.product?.image && (
-                        <Image
-                          src={review.product.image}
-                          alt={review.product?.name || ""}
-                          width={40}
-                          height={40}
-                          className="rounded object-cover border border-gray-100"
-                        />
+                        <div className="relative h-12 w-12 overflow-hidden rounded-2xl border-2 border-gray-200 bg-gray-50 shadow-sm">
+                          <Image
+                            src={review.product.image}
+                            alt={review.product?.name || ""}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
                       )}
                       <span
-                        className="font-medium text-gray-900 truncate"
+                        className="font-bold text-gray-900 truncate"
                         title={review.product?.name}
                       >
                         {review.product?.name || "Produk Tidak Ada"}
@@ -186,41 +213,41 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
                     {new Date(review.created_at).toLocaleDateString("id-ID")}
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-center gap-1">
+                    <div className="flex justify-center gap-2">
                       {review.status === REVIEW_STATUS.PENDING && (
                         <>
                           <Button
                             variant="ghost"
-                            className="h-8 w-8 p-0 text-success-600 hover:bg-success-50"
+                            className="h-9 w-9 p-0 text-green-600 hover:bg-green-50 rounded-xl"
                             onClick={() =>
                               handleModeration(review.id, "approve")
                             }
                             isLoading={isActionLoading === review.id}
                             title="Setujui"
                           >
-                            ✓
+                            <Check className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
-                            className="h-8 w-8 p-0 text-error-600 hover:bg-error-50"
+                            className="h-9 w-9 p-0 text-red-600 hover:bg-red-50 rounded-xl"
                             onClick={() =>
                               handleModeration(review.id, "reject")
                             }
                             isLoading={isActionLoading === review.id}
                             title="Tolak"
                           >
-                            ✕
+                            <X className="h-4 w-4" />
                           </Button>
                         </>
                       )}
                       <Button
                         variant="ghost"
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-error-600"
+                        className="h-9 w-9 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl"
                         onClick={() => handleModeration(review.id, "delete")}
                         isLoading={isActionLoading === review.id}
                         title="Hapus"
                       >
-                        🗑
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -228,11 +255,11 @@ function AdminReviewsContent({ initialData }: AdminReviewsClientProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="py-12 text-center text-gray-500"
-                >
-                  Tidak ada ulasan ditemukan.
+                <TableCell colSpan={6} className="py-16 text-center">
+                  <MessageCircleX className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-base font-medium text-gray-600">
+                    Tidak ada ulasan ditemukan.
+                  </p>
                 </TableCell>
               </TableRow>
             )}
@@ -249,7 +276,14 @@ export default function AdminReviewsClient({
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-gray-500">Memuat ulasan...</div>
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-yellow-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Memuat ulasan...
+            </p>
+          </div>
+        </div>
       }
     >
       <AdminReviewsContent initialData={initialData} />

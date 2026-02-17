@@ -3,8 +3,7 @@ import { Request, Response, NextFunction } from "express";
 
 import * as adminAnalyticsService from "../../services/admin/analyticsService";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getDateRange(query: any) {
+function getDateRange(query: Record<string, unknown>) {
   const startDate = query.startDate
     ? new Date(query.startDate as string)
     : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -14,13 +13,12 @@ function getDateRange(query: any) {
   return { startDate, endDate };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleReportResponse(
   req: Request,
   res: Response,
-  data: any,
+  data: unknown,
   filename: string,
-): any {
+): Response | void {
   if (req.query.export === "csv") {
     const csv = toCSV(Array.isArray(data) ? data : [data]);
     res.setHeader("Content-Type", "text/csv");

@@ -173,14 +173,14 @@ export default function AdminOrderDetailClient({
           {(order.status === ORDER_STATUS.PAID ||
             order.status === ORDER_STATUS.PROCESSING ||
             order.status === ORDER_STATUS.DELIVERED) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowRefundModal(true)}
-              >
-                💰 Process Refund
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowRefundModal(true)}
+            >
+              💰 Process Refund
+            </Button>
+          )}
         </div>
       </div>
 
@@ -301,8 +301,8 @@ export default function AdminOrderDetailClient({
                   <span>
                     {formatCurrency(
                       order.total_amount -
-                      order.shipping_cost +
-                      (order.voucher_discount || 0),
+                        order.shipping_cost +
+                        (order.voucher_discount || 0),
                     )}
                   </span>
                 </div>

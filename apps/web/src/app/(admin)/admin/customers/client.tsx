@@ -1,6 +1,16 @@
 "use client";
 
 import { User, PaginatedResponse } from "@repo/shared";
+import {
+  Users,
+  Download,
+  Search,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  UserX,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
@@ -41,40 +51,59 @@ function AdminCustomersContent({ initialData }: AdminCustomersClientProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Pelanggan</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Kelola data pelanggan dan riwayat aktivitas mereka
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="md">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 px-5 py-2.5 shadow-sm border border-green-100/50 mb-4">
+              <Users className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-semibold text-green-700">
+                Manajemen Pelanggan
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-800 to-gray-900 bg-clip-text text-transparent font-heading">
+              Pelanggan
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Kelola data pelanggan dan riwayat aktivitas mereka
+            </p>
+          </div>
+          <Button variant="outline" size="md" className="rounded-2xl">
+            <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <div className="flex-1 flex gap-2">
-          <Input
-            label="Cari Pelanggan"
-            type="text"
-            placeholder="Nama, email atau nomor telepon..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
+      {/* Search Bar */}
+      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-lg">
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <Input
+              label="Cari Pelanggan"
+              type="text"
+              placeholder="Nama, email atau nomor telepon..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+          </div>
           <div className="mt-8">
-            <Button onClick={handleSearch} variant="secondary">
+            <Button
+              onClick={handleSearch}
+              variant="gradient"
+              className="rounded-2xl shadow-lg hover:shadow-xl"
+            >
+              <Search className="mr-2 h-4 w-4" />
               Cari
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      {/* Customers Table */}
+      <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -91,7 +120,7 @@ function AdminCustomersContent({ initialData }: AdminCustomersClientProps) {
             {initialData?.items && initialData.items.length > 0 ? (
               initialData.items.map((customer) => (
                 <TableRow key={customer.id}>
-                  <TableCell className="font-medium text-gray-900">
+                  <TableCell className="font-bold text-gray-900">
                     {customer.full_name || "Tanpa Nama"}
                   </TableCell>
                   <TableCell>{customer.email}</TableCell>
@@ -116,7 +145,12 @@ function AdminCustomersContent({ initialData }: AdminCustomersClientProps) {
                   </TableCell>
                   <TableCell className="text-center">
                     <Link href={`/admin/customers/${customer.id}`}>
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl"
+                      >
+                        <Eye className="mr-1.5 h-3.5 w-3.5" />
                         Detail
                       </Button>
                     </Link>
@@ -125,13 +159,22 @@ function AdminCustomersContent({ initialData }: AdminCustomersClientProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="py-12 text-center text-gray-500"
-                >
-                  {initialData
-                    ? "Tidak ada pelanggan ditemukan"
-                    : "Gagal memuat data pelanggan"}
+                <TableCell colSpan={7} className="py-16 text-center">
+                  <UserX className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-base font-medium text-gray-600">
+                    {initialData
+                      ? "Tidak ada pelanggan ditemukan"
+                      : "Gagal memuat data pelanggan"}
+                  </p>
+                  {!initialData && (
+                    <Button
+                      onClick={() => window.location.reload()}
+                      variant="gradient"
+                      className="mt-4 rounded-2xl"
+                    >
+                      Coba Lagi
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             )}
@@ -139,19 +182,22 @@ function AdminCustomersContent({ initialData }: AdminCustomersClientProps) {
         </Table>
 
         {initialData?.pagination && initialData.pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4">
-            <p className="text-sm text-gray-700">
+          <div className="flex items-center justify-between border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-5">
+            <p className="text-sm font-medium text-gray-700">
               Menampilkan halaman{" "}
-              <span className="font-medium">{initialData.pagination.page}</span>{" "}
+              <span className="font-bold text-gray-900">
+                {initialData.pagination.page}
+              </span>{" "}
               dari{" "}
-              <span className="font-medium">
+              <span className="font-bold text-gray-900">
                 {initialData.pagination.totalPages}
               </span>
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-xl"
                 disabled={initialData.pagination.page <= 1}
                 onClick={() => {
                   const params = new URLSearchParams(searchParams.toString());
@@ -162,11 +208,13 @@ function AdminCustomersContent({ initialData }: AdminCustomersClientProps) {
                   router.push(`/admin/customers?${params.toString()}`);
                 }}
               >
+                <ChevronLeft className="mr-1 h-4 w-4" />
                 Sebelumnya
               </Button>
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-xl"
                 disabled={
                   initialData.pagination.page >=
                   initialData.pagination.totalPages
@@ -181,6 +229,7 @@ function AdminCustomersContent({ initialData }: AdminCustomersClientProps) {
                 }}
               >
                 Berikutnya
+                <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -196,8 +245,13 @@ export default function AdminCustomersClient({
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-gray-500">
-          Memuat data pelanggan...
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-green-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Memuat data pelanggan...
+            </p>
+          </div>
         </div>
       }
     >

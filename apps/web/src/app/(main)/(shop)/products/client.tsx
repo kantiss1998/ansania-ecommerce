@@ -122,19 +122,27 @@ function ProductsContent() {
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50/50 to-white">
       <div className="container mx-auto px-4 py-8">
         {/* Enhanced Header */}
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-50 to-purple-50 rounded-full px-4 py-2 mb-4">
+        <div className="mb-12 text-center space-y-4 animate-fade-in">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-50 to-purple-50 rounded-full px-5 py-2.5 shadow-sm border border-primary-100/50">
             <Sparkles className="h-4 w-4 text-primary-600" />
             <span className="text-sm font-semibold text-primary-700">
-              Koleksi Produk
+              Koleksi Produk Pilihan
             </span>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
-            Semua Produk
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+            Semua Produk Kerudung
           </h1>
-          <p className="mt-2 text-gray-600">
-            Temukan furnitur berkualitas untuk rumah impian Anda
+          <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">
+            Koleksi kerudung berkualitas premium dengan desain modern dan bahan
+            pilihan
           </p>
+
+          {/* Decorative Line */}
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-primary-300" />
+            <Sparkles className="h-4 w-4 text-primary-500" />
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-primary-300" />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">

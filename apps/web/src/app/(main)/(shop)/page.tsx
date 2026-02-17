@@ -47,12 +47,19 @@ export default async function HomePage() {
       total_reviews: item.product!.total_reviews || 0,
       is_featured: item.product!.is_featured,
       is_new: false,
-      images: item.product!.images?.map((url) => ({ image_url: url })) || [],
+      images: item.product!.images || [],
     }));
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white via-gray-50/50 to-white">
-      <div className="container mx-auto px-4 py-8 space-y-16">
+    <main className="min-h-screen bg-gradient-to-b from-white via-primary-50/10 to-white relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute top-20 right-0 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl animate-pulse-slow" />
+      <div
+        className="absolute top-1/2 left-0 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl animate-pulse-slow"
+        style={{ animationDelay: "2s" }}
+      />
+
+      <div className="container mx-auto px-4 py-8 space-y-16 relative z-10">
         {/* --- MOCKUP SECTION (Comment this once you have real data) --- */}
         <HomeMockup />
         {/* ------------------------------------------------------------- */}
@@ -77,42 +84,53 @@ export default async function HomePage() {
         {/* Social Media Links from Settings */}
         {siteSettings && siteSettings.socialLinks && (
           <section className="mt-20 mb-12 relative">
-            {/* Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-50 via-purple-50 to-pink-50 rounded-3xl blur-3xl opacity-30" />
+            {/* Enhanced Gradient Background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-50 via-purple-50 to-pink-50 rounded-3xl blur-3xl opacity-40" />
+            <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary-300/30 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-300/30 rounded-full blur-2xl" />
 
             <div className="relative flex flex-col items-center justify-center gap-8 border-t border-gray-100 pt-16 pb-8">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm border border-gray-100">
-                <Sparkles className="h-4 w-4 text-primary-600" />
-                <span className="text-sm font-semibold text-gray-700">
+              {/* Enhanced Badge */}
+              <div className="inline-flex items-center gap-2 bg-white rounded-full px-5 py-2.5 shadow-md border border-gray-200/50">
+                <Sparkles className="h-4 w-4 text-primary-600 animate-pulse" />
+                <span className="text-sm font-bold text-transparent bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text">
                   Terhubung dengan Kami
                 </span>
               </div>
 
-              <div className="text-center">
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-primary-700 to-gray-900 bg-clip-text text-transparent font-heading mb-3">
+              {/* Enhanced Title Section */}
+              <div className="text-center space-y-3">
+                <h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-700 to-purple-700 bg-clip-text text-transparent font-heading mb-3">
                   Ikuti Kami di Media Sosial
                 </h3>
-                <p className="text-gray-600">
-                  Dapatkan inspirasi dan update terbaru dari kami
+                <p className="text-gray-600 text-lg max-w-md mx-auto leading-relaxed">
+                  Dapatkan inspirasi gaya, tips padu padan, dan update koleksi
+                  terbaru
                 </p>
               </div>
 
-              <div className="flex gap-6">
+              {/* Enhanced Social Media Cards */}
+              <div className="flex flex-wrap gap-6 justify-center">
                 {siteSettings.socialLinks.instagram && (
                   <a
                     href={siteSettings.socialLinks.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex flex-col items-center gap-3 p-6 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all transform hover:scale-105 hover:-translate-y-1 border border-gray-100 hover:border-transparent"
+                    className="group flex flex-col items-center gap-4 p-8 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 border border-gray-100 hover:border-pink-200 min-w-[160px]"
                     aria-label="Instagram"
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-lg group-hover:shadow-pink-500/30 transition-shadow">
-                      <Instagram className="h-7 w-7" />
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                      <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white shadow-xl group-hover:shadow-pink-500/50 transition-all duration-500">
+                        <Instagram className="h-8 w-8" />
+                      </div>
                     </div>
-                    <span className="text-sm font-semibold text-gray-700 group-hover:text-pink-600 transition-colors">
-                      Instagram
-                    </span>
+                    <div className="text-center space-y-1">
+                      <span className="text-base font-bold text-gray-800 group-hover:text-pink-600 transition-colors">
+                        Instagram
+                      </span>
+                      <p className="text-xs text-gray-500">@ansania</p>
+                    </div>
                   </a>
                 )}
                 {siteSettings.socialLinks.facebook && (
@@ -120,15 +138,21 @@ export default async function HomePage() {
                     href={siteSettings.socialLinks.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex flex-col items-center gap-3 p-6 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all transform hover:scale-105 hover:-translate-y-1 border border-gray-100 hover:border-transparent"
+                    className="group flex flex-col items-center gap-4 p-8 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 border border-gray-100 hover:border-blue-200 min-w-[160px]"
                     aria-label="Facebook"
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-lg group-hover:shadow-blue-500/30 transition-shadow">
-                      <Facebook className="h-7 w-7" />
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                      <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-xl group-hover:shadow-blue-500/50 transition-all duration-500">
+                        <Facebook className="h-8 w-8" />
+                      </div>
                     </div>
-                    <span className="text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors">
-                      Facebook
-                    </span>
+                    <div className="text-center space-y-1">
+                      <span className="text-base font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                        Facebook
+                      </span>
+                      <p className="text-xs text-gray-500">/ansania</p>
+                    </div>
                   </a>
                 )}
                 {siteSettings.socialLinks.whatsapp && (
@@ -136,15 +160,21 @@ export default async function HomePage() {
                     href={siteSettings.socialLinks.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex flex-col items-center gap-3 p-6 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all transform hover:scale-105 hover:-translate-y-1 border border-gray-100 hover:border-transparent"
+                    className="group flex flex-col items-center gap-4 p-8 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 border border-gray-100 hover:border-green-200 min-w-[160px]"
                     aria-label="WhatsApp"
                   >
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-700 text-white shadow-lg group-hover:shadow-green-500/30 transition-shadow">
-                      <MessageCircle className="h-7 w-7" />
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-green-500 to-green-700 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+                      <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-green-700 text-white shadow-xl group-hover:shadow-green-500/50 transition-all duration-500">
+                        <MessageCircle className="h-8 w-8" />
+                      </div>
                     </div>
-                    <span className="text-sm font-semibold text-gray-700 group-hover:text-green-600 transition-colors">
-                      WhatsApp
-                    </span>
+                    <div className="text-center space-y-1">
+                      <span className="text-base font-bold text-gray-800 group-hover:text-green-600 transition-colors">
+                        WhatsApp
+                      </span>
+                      <p className="text-xs text-gray-500">Chat Kami</p>
+                    </div>
                   </a>
                 )}
               </div>

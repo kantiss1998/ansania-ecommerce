@@ -78,13 +78,19 @@ export async function listAllReviews(query: {
 
   // Map to JSON and add status field
   const items: AdminReviewResult[] = rows.map((r) => {
-    const review = r.get({ plain: true }) as any;
+    const review = r.get({ plain: true }) as AdminReviewResult & {
+      product?: {
+        images?: Array<{ image_url: string; is_primary: boolean }>;
+        image?: string | null;
+      };
+    };
 
     // Derive main image for frontend compatibility
     if (review.product && Array.isArray(review.product.images)) {
       const primaryImage =
-        review.product.images.find((img: any) => img.is_primary) ||
-        review.product.images[0];
+        review.product.images.find(
+          (img: { is_primary: boolean }) => img.is_primary,
+        ) || review.product.images[0];
       review.product.image = primaryImage ? primaryImage.image_url : null;
     }
 

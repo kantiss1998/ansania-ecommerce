@@ -181,7 +181,7 @@ export class OdooOrderService {
 
       console.log(`[ODOO_SYNC] Found ${orders.length} orders to check status.`);
 
-      let updatedCount = 0;
+      const updatedCount = 0;
       let errorCount = 0;
 
       for (const order of orders) {
@@ -207,7 +207,8 @@ export class OdooOrderService {
         records_processed: updatedCount,
         records_failed: errorCount,
         execution_time_ms: duration,
-        error_message: errorCount > 0 ? `Failed for ${errorCount} orders` : null,
+        error_message:
+          errorCount > 0 ? `Failed for ${errorCount} orders` : null,
       });
 
       return {

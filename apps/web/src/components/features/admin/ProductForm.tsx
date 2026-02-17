@@ -33,10 +33,10 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
       compare_price: 0,
       category: categories[0]
         ? {
-          id: categories[0].id,
-          name: categories[0].name,
-          slug: categories[0].slug,
-        }
+            id: categories[0].id,
+            name: categories[0].name,
+            slug: categories[0].slug,
+          }
         : undefined,
       is_featured: false,
       is_new: true,
@@ -144,10 +144,11 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-left rounded-lg text-sm font-medium transition-all ${activeTab === tab
-                ? "bg-primary-50 text-primary-700 shadow-sm"
-                : "text-gray-500 hover:bg-gray-100"
-                }`}
+              className={`px-4 py-2 text-left rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab
+                  ? "bg-primary-50 text-primary-700 shadow-sm"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -229,7 +230,9 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                   <input
                     type="number"
                     className="w-full rounded-lg border-gray-300 p-2.5 border focus:ring-primary-500 focus:border-primary-500"
-                    value={formData.compare_price ?? formData.discount_price ?? 0}
+                    value={
+                      formData.compare_price ?? formData.discount_price ?? 0
+                    }
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -294,40 +297,43 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                 Media Produk
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {formData.images?.filter(img => !!img).map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="relative aspect-square rounded-lg border border-gray-200 overflow-hidden bg-gray-50 group"
-                  >
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={img}
-                        alt={`Product image ${idx + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-1 right-1 bg-white/80 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-50 hover:text-red-500"
-                        onClick={() => {
-                          const newImgs = [...(formData.images || [])];
-                          newImgs.splice(idx, 1);
-                          setFormData({ ...formData, images: newImgs });
-                        }}
-                      >
-                        ✕
-                      </button>
+                {formData.images
+                  ?.filter((img) => !!img)
+                  .map((img, idx) => (
+                    <div
+                      key={idx}
+                      className="relative aspect-square rounded-lg border border-gray-200 overflow-hidden bg-gray-50 group"
+                    >
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={img}
+                          alt={`Product image ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          className="absolute top-1 right-1 bg-white/80 rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-50 hover:text-red-500"
+                          onClick={() => {
+                            const newImgs = [...(formData.images || [])];
+                            newImgs.splice(idx, 1);
+                            setFormData({ ...formData, images: newImgs });
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
                 <button
                   type="button"
                   disabled={!isEdit || isUploading}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center transition-all ${!isEdit
-                    ? "bg-gray-50 border-gray-100 cursor-not-allowed text-gray-300"
-                    : "border-gray-200 text-gray-400 hover:border-primary-500 hover:text-primary-500"
-                    }`}
+                  className={`aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center transition-all ${
+                    !isEdit
+                      ? "bg-gray-50 border-gray-100 cursor-not-allowed text-gray-300"
+                      : "border-gray-200 text-gray-400 hover:border-primary-500 hover:text-primary-500"
+                  }`}
                 >
                   {isUploading ? (
                     <span className="text-[10px] font-medium animate-pulse">

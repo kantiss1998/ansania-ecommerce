@@ -38,11 +38,11 @@ export function Footer() {
                 <span className="text-sm font-medium">Newsletter</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4 leading-tight">
-                Bergabung dengan Komunitas Kami
+                Bergabung dengan Komunitas Ansania
               </h2>
               <p className="text-primary-100 text-lg leading-relaxed">
-                Dapatkan penawaran eksklusif, inspirasi desain, dan pembaruan
-                produk terbaru langsung ke inbox Anda.
+                Dapatkan penawaran eksklusif, inspirasi gaya hijab, dan koleksi
+                kerudung terbaru langsung ke inbox Anda.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
@@ -75,8 +75,9 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-gray-600 leading-relaxed">
-              Destinasi furnitur premium untuk hunian impian Anda. Kualitas
-              terbaik dengan desain yang tak lekang oleh waktu.
+              Destinasi kerudung premium dengan kualitas terbaik dan desain
+              modern yang elegan. Sempurnakan penampilan Anda dengan koleksi
+              kami.
             </p>
             <div className="flex space-x-3">
               <a

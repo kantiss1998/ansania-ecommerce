@@ -115,19 +115,19 @@ export function ProfileContent() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-8 shadow-lg"
+        className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 shadow-xl"
       >
         {/* Decorative blur */}
         <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-primary-50 to-purple-50 rounded-full blur-3xl opacity-30"></div>
 
         <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-4 py-2 mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-5 py-2.5 shadow-sm border border-primary-100/50 mb-6">
             <Sparkles className="h-4 w-4 text-primary-600" />
             <span className="text-sm font-semibold text-primary-700">
               Profil Saya
@@ -138,20 +138,20 @@ export function ProfileContent() {
             <div className="flex items-center gap-6">
               {/* Avatar */}
               <div className="relative group">
-                <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-primary-100 to-purple-100 flex items-center justify-center shadow-lg">
-                  <User className="h-12 w-12 text-primary-600" />
+                <div className="h-28 w-28 rounded-3xl bg-gradient-to-br from-primary-100 to-purple-100 flex items-center justify-center shadow-lg">
+                  <User className="h-14 w-14 text-primary-600" />
                 </div>
-                <button className="absolute bottom-0 right-0 rounded-xl bg-gradient-to-r from-primary-600 to-purple-600 p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                <button className="absolute bottom-0 right-0 rounded-xl bg-gradient-to-r from-primary-600 to-purple-600 p-2.5 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                   <Camera className="h-4 w-4 text-white" />
                 </button>
               </div>
 
               {/* User Info */}
               <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
                   {user?.full_name || "User"}
                 </h2>
-                <p className="mt-1 text-sm text-gray-600">{user?.email}</p>
+                <p className="mt-2 text-base text-gray-600">{user?.email}</p>
               </div>
             </div>
 
@@ -159,7 +159,7 @@ export function ProfileContent() {
               <Button
                 variant="gradient"
                 size="sm"
-                className="flex items-center gap-2 shadow-lg"
+                className="flex items-center gap-2 shadow-lg hover:shadow-xl"
                 onClick={() => setIsEditing(true)}
               >
                 <Edit2 className="h-4 w-4" />
@@ -175,9 +175,9 @@ export function ProfileContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg"
+        className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl"
       >
-        <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
           Informasi Profil
         </h3>
 
@@ -243,7 +243,7 @@ export function ProfileContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + index * 0.1 }}
             whileHover={{ scale: 1.02 }}
-            className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg transition-all hover:shadow-xl cursor-pointer"
+            className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-6 shadow-lg transition-all hover:shadow-xl cursor-pointer"
           >
             {/* Decorative blur */}
             <div

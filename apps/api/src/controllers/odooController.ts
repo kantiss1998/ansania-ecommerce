@@ -168,7 +168,9 @@ export const getSyncStatus = async (
     });
 
     // Get last sync details from logs
-    const getLastSync = async (syncType: "products" | "stock" | "orders" | "customers") => {
+    const getLastSync = async (
+      syncType: "products" | "stock" | "orders" | "customers",
+    ) => {
       const log = await SyncLog.findOne({
         where: { sync_type: syncType, status: "success" },
         order: [["created_at", "DESC"]],
@@ -179,12 +181,13 @@ export const getSyncStatus = async (
       };
     };
 
-    const [productsSync, stockSync, categoriesSync, ordersSync] = await Promise.all([
-      getLastSync("products"),
-      getLastSync("stock"),
-      getLastSync("products"), // Fallback for categories since it's not in ENUM
-      getLastSync("orders"),
-    ]);
+    const [productsSync, stockSync, categoriesSync, ordersSync] =
+      await Promise.all([
+        getLastSync("products"),
+        getLastSync("stock"),
+        getLastSync("products"), // Fallback for categories since it's not in ENUM
+        getLastSync("orders"),
+      ]);
 
     const config = odooClient.getConfig();
 

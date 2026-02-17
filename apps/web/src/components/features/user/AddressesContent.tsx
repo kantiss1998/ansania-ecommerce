@@ -1,5 +1,6 @@
 "use client";
 
+import { MapPin, Plus } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 
 import { AddressForm } from "@/components/features/checkout/AddressForm";
@@ -96,61 +97,64 @@ export function AddressesContent() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
+          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-5 py-2.5 shadow-sm border border-primary-100/50 mb-4">
+            <MapPin className="h-4 w-4 text-primary-600" />
+            <span className="text-sm font-semibold text-primary-700">
+              Alamat Saya
+            </span>
+          </div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
             Alamat Tersimpan
           </h2>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-2 text-base text-gray-600">
             Kelola alamat pengiriman Anda
           </p>
         </div>
-        <Button variant="primary" size="md" onClick={handleAddNew}>
-          + Tambah Alamat
+        <Button
+          variant="gradient"
+          size="md"
+          onClick={handleAddNew}
+          className="mt-4 md:mt-0 shadow-lg hover:shadow-xl flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Tambah Alamat
         </Button>
       </div>
 
       {/* Addresses List */}
       {isLoading ? (
         <div className="flex justify-center p-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-700 border-t-transparent"></div>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-600 border-t-transparent"></div>
         </div>
       ) : addresses.length === 0 ? (
-        <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
-          <svg
-            className="mx-auto h-16 w-16 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          <p className="mt-4 text-lg font-medium text-gray-900">
+        <div className="rounded-3xl border-2 border-dashed border-gray-200 bg-gray-50 p-12 text-center">
+          <MapPin className="mx-auto h-16 w-16 text-gray-400" />
+          <p className="mt-6 text-lg font-semibold text-gray-900">
             Belum Ada Alamat
           </p>
           <p className="mt-2 text-sm text-gray-600">
             Tambahkan alamat untuk memudahkan proses checkout
           </p>
+          <Button
+            variant="gradient"
+            size="sm"
+            onClick={handleAddNew}
+            className="mt-6"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Alamat Pertama
+          </Button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {addresses.map((address) => (
             <div
               key={address.id}
-              className="rounded-lg border border-gray-200 bg-white p-6"
+              className="rounded-3xl border border-gray-200 bg-white p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">

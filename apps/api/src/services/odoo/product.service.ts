@@ -83,14 +83,19 @@ interface VariantInfo {
 }
 
 export class OdooProductService {
-  async safeSearchRead(
+  async safeSearchRead<T = unknown>(
     model: string,
     domain: unknown[] = [],
     fields: string[] = [],
     options: Record<string, unknown> = {},
-  ) {
-    const result = await odooClient.searchRead(model, domain, fields, options);
-    return Array.isArray(result) ? result : [];
+  ): Promise<T[]> {
+    const result = await odooClient.searchRead<T>(
+      model,
+      domain,
+      fields,
+      options,
+    );
+    return Array.isArray(result) ? (result as T[]) : [];
   }
 
   // Main sync function
@@ -133,7 +138,9 @@ export class OdooProductService {
         sync_type: "products",
         sync_direction: "from_odoo",
         status: "success",
-        records_processed: (syncResult.processedProducts || 0) + (syncResult.processedVariants || 0),
+        records_processed:
+          (syncResult.processedProducts || 0) +
+          (syncResult.processedVariants || 0),
         records_failed: 0,
         execution_time_ms: duration,
         error_message: null,
@@ -270,11 +277,10 @@ export class OdooProductService {
       console.log("📦 Fetching 'INTERNAL' categories from Odoo...");
 
       // 1. Find categories with "INTERNAL" in the name
-      const categories = await this.safeSearchRead(
-        "product.category",
-        [["name", "ilike", "INTERNAL"]],
-        ["id", "name"],
-      );
+      const categories = await this.safeSearchRead<{
+        id: number;
+        name: string;
+      }>("product.category", [["name", "ilike", "INTERNAL"]], ["id", "name"]);
 
       if (!categories || categories.length === 0) {
         console.warn("⚠️ No category named 'INTERNAL' found in Odoo.");
@@ -287,7 +293,7 @@ export class OdooProductService {
       );
 
       // 2. Fetch products belonging to these categories
-      const products = await this.safeSearchRead(
+      const products = await this.safeSearchRead<OdooProductTemplate>(
         "product.template",
         [
           ["categ_id", "in", categoryIds],
@@ -334,7 +340,7 @@ export class OdooProductService {
 
       for (let i = 0; i < productIds.length; i += chunkSize) {
         const chunk = productIds.slice(i, i + chunkSize);
-        const variants = await this.safeSearchRead(
+        const variants = await this.safeSearchRead<OdooProductVariant>(
           "product.product",
           [["product_tmpl_id", "in", chunk]],
           [
@@ -370,21 +376,22 @@ export class OdooProductService {
       console.log("🎨 Fetching attribute values from Odoo...");
 
       // Get template attribute values (Large limit to ensure we get all)
-      const templateAttrValues = await this.safeSearchRead(
-        "product.template.attribute.value",
-        [],
-        [
-          "id",
-          "product_tmpl_id",
-          "attribute_id",
-          "product_attribute_value_id",
-          "html_color",
-        ],
-        { limit: 10000 },
-      );
+      const templateAttrValues =
+        await this.safeSearchRead<OdooTemplateAttributeValue>(
+          "product.template.attribute.value",
+          [],
+          [
+            "id",
+            "product_tmpl_id",
+            "attribute_id",
+            "product_attribute_value_id",
+            "html_color",
+          ],
+          { limit: 10000 },
+        );
 
       // Get attribute values details
-      const attributeValues = await this.safeSearchRead(
+      const attributeValues = await this.safeSearchRead<OdooAttributeValue>(
         "product.attribute.value",
         [],
         ["id", "name", "attribute_id", "html_color"],
@@ -392,12 +399,10 @@ export class OdooProductService {
       );
 
       // Get attributes for names
-      const attributes = await this.safeSearchRead(
-        "product.attribute",
-        [],
-        ["id", "name"],
-        { limit: 1000 },
-      );
+      const attributes = await this.safeSearchRead<{
+        id: number;
+        name: string;
+      }>("product.attribute", [], ["id", "name"], { limit: 1000 });
 
       console.log(
         `✅ Loaded ${templateAttrValues.length} template values, ${attributeValues.length} attribute values, ${attributes.length} attributes`,
@@ -420,7 +425,10 @@ export class OdooProductService {
   async getValidWarehouse() {
     try {
       console.log("🏭 Fetching 'GUDANG ONLINE'...");
-      const warehouses = await this.safeSearchRead(
+      const warehouses = await this.safeSearchRead<{
+        id: number;
+        name: string;
+      }>(
         "stock.warehouse",
         [["name", "=", "GUDANG ONLINE"]],
         ["id", "name", "code"],
@@ -431,7 +439,7 @@ export class OdooProductService {
         console.log(
           `✅ Found Warehouse: ${warehouses[0].name} (ID: ${warehouses[0].id})`,
         );
-        return warehouses[0];
+        return warehouses[0] as { id: number; name: string };
       } else {
         console.error(
           "❌ CRITICAL: 'GUDANG ONLINE' warehouse not found in Odoo.",
@@ -802,7 +810,7 @@ export class OdooProductService {
     try {
       console.log(`📖 Getting Odoo product with ID: ${odooProductId} `);
 
-      const products = await this.safeSearchRead(
+      const products = await this.safeSearchRead<OdooProductTemplate>(
         "product.template",
         [["id", "=", odooProductId]],
         [
@@ -866,7 +874,10 @@ export class OdooProductService {
         const chunk = odooIds.slice(i, i + chunkSize);
 
         try {
-          const stockData = await this.safeSearchRead(
+          const stockData = await this.safeSearchRead<{
+            id: number;
+            qty_available: number;
+          }>(
             "product.product",
             [["id", "in", chunk]],
             ["id", "qty_available"],
@@ -936,7 +947,8 @@ export class OdooProductService {
         records_processed: syncedCount,
         records_failed: errorCount,
         execution_time_ms: duration,
-        error_message: errorCount > 0 ? `Failed for ${errorCount} variants` : null,
+        error_message:
+          errorCount > 0 ? `Failed for ${errorCount} variants` : null,
       });
 
       return { updated: syncedCount };

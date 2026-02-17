@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authSchemas } from "@repo/shared";
+import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -45,89 +46,98 @@ export function ForgotPasswordForm() {
 
   if (emailSent) {
     return (
-      <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50 text-center">
-        <div className="mb-6 flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success-50">
-            <svg
-              className="h-8 w-8 text-success-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
+      <div className="w-full max-w-md mx-auto space-y-6">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-green-50 to-emerald-50 px-5 py-2.5 shadow-sm border border-green-100/50">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <span className="text-sm font-semibold text-green-700">
+              Berhasil Terkirim
+            </span>
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 font-heading">
-          Email Terkirim!
-        </h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Kami telah mengirimkan link reset password ke email Anda. Silakan cek
-          inbox atau folder spam.
-        </p>
+        <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl text-center">
+          <div className="mb-6 flex justify-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-green-50 to-emerald-50">
+              <Mail className="h-10 w-10 text-green-600" />
+            </div>
+          </div>
 
-        <div className="mt-8">
-          <Link
-            href="/auth/login"
-            className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
-          >
-            ← Kembali ke login
-          </Link>
+          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-green-800 to-gray-900 bg-clip-text text-transparent font-heading">
+            Email Terkirim!
+          </h2>
+          <p className="mt-3 text-base text-gray-600">
+            Kami telah mengirimkan link reset password ke email Anda. Silakan
+            cek inbox atau folder spam.
+          </p>
+
+          <div className="mt-8">
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Kembali ke login
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 font-heading">
-          Lupa Password?
+    <div className="w-full max-w-md mx-auto space-y-6">
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-5 py-2-5 shadow-sm border border-primary-100/50">
+          <Mail className="h-4 w-4 text-primary-600" />
+          <span className="text-sm font-semibold text-primary-700">
+            Lupa Password
+          </span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+          Reset Password
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="text-base text-gray-600">
           Masukkan email Anda dan kami akan mengirimkan link untuk reset
           password
         </p>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Input
-          label="Email"
-          type="email"
-          placeholder="nama@example.com"
-          error={errors.email?.message}
-          {...register("email")}
-          required
-        />
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <Input
+            label="Email"
+            type="email"
+            placeholder="nama@example.com"
+            error={errors.email?.message}
+            {...register("email")}
+            required
+          />
 
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          fullWidth
-          isLoading={isLoading}
-          className="shadow-primary-500/20 shadow-lg"
-        >
-          Kirim Link Reset
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            variant="gradient"
+            size="lg"
+            fullWidth
+            isLoading={isLoading}
+            className="shadow-lg hover:shadow-xl"
+          >
+            <Mail className="mr-2 h-5 w-5" />
+            Kirim Link Reset
+          </Button>
+        </form>
 
-      {/* Footer */}
-      <div className="mt-8 text-center">
-        <Link
-          href="/auth/login"
-          className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
-        >
-          ← Kembali ke login
-        </Link>
+        {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+          <Link
+            href="/auth/login"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Kembali ke login
+          </Link>
+        </div>
       </div>
     </div>
   );

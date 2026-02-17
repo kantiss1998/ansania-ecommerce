@@ -1,6 +1,8 @@
 const path = require("path");
 require("ts-node/register");
-require("dotenv").config({ path: path.resolve(__dirname, "../../../..", ".env") });
+require("dotenv").config({
+  path: path.resolve(__dirname, "../../../..", ".env"),
+});
 
 module.exports = {
   development: {

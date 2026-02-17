@@ -1,8 +1,7 @@
 import { Category, Product } from "@repo/database";
+import { PaginatedResponse } from "@repo/shared";
 import { NotFoundError } from "@repo/shared/errors";
 import { Op } from "sequelize";
-
-import { PaginatedResponse } from "@repo/shared";
 
 export async function listAdminCategories(query: {
   search?: string;

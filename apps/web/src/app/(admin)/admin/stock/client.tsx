@@ -1,6 +1,16 @@
 "use client";
 
 import { StockItem, PaginatedResponse } from "@repo/shared";
+import {
+  Archive,
+  RefreshCw,
+  Search,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  PackageX,
+} from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 
@@ -74,72 +84,94 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
   const currentType = searchParams.get("type") || "";
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            Stok (Inventori)
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Pantau level stok produk yang sinkron dengan Odoo
-          </p>
-        </div>
-        <div className="flex gap-2">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-50 to-cyan-50 px-5 py-2.5 shadow-sm border border-teal-100/50 mb-4">
+              <Archive className="h-4 w-4 text-teal-600" />
+              <span className="text-sm font-semibold text-teal-700">
+                Manajemen Stok
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-teal-800 to-gray-900 bg-clip-text text-transparent font-heading">
+              Stok (Inventori)
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Pantau level stok produk yang sinkron dengan Odoo
+            </p>
+          </div>
           <Button
             variant="outline"
             size="md"
+            className="rounded-2xl"
             onClick={handleSync}
             disabled={isSyncing}
           >
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${isSyncing ? "animate-spin" : ""}`}
+            />
             {isSyncing ? "Sinkronisasi..." : "Sinkron dari Odoo"}
           </Button>
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-        <div className="flex-1 flex gap-2">
-          <Input
-            label="Cari SKU atau Nama"
-            type="text"
-            placeholder="Contoh: ANS-001..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
-          <div className="mt-8">
-            <Button onClick={handleSearch} variant="secondary">
-              Cari
-            </Button>
+      {/* Search and Filter */}
+      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-lg">
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <div className="flex-1 flex gap-3">
+            <div className="flex-1">
+              <Input
+                label="Cari SKU atau Nama"
+                type="text"
+                placeholder="Contoh: ANS-001..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              />
+            </div>
+            <div className="mt-8">
+              <Button
+                onClick={handleSearch}
+                variant="gradient"
+                className="rounded-2xl shadow-lg hover:shadow-xl"
+              >
+                <Search className="mr-2 h-4 w-4" />
+                Cari
+              </Button>
+            </div>
           </div>
-        </div>
-        <div className="w-full sm:w-64">
-          <label className="mb-1 block text-sm font-medium text-gray-700">
-            Filter Kondisi
-          </label>
-          <div className="flex rounded-lg border border-gray-300 p-1 bg-gray-50">
-            <button
-              onClick={() => handleFilterType("")}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${!currentType ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              Semua
-            </button>
-            <button
-              onClick={() => handleFilterType("low_stock")}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${currentType === "low_stock" ? "bg-white text-warning-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              Menipis
-            </button>
-            <button
-              onClick={() => handleFilterType("out_of_stock")}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${currentType === "out_of_stock" ? "bg-white text-error-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              Habis
-            </button>
+          <div className="w-full sm:w-72">
+            <label className="mb-2 block text-sm font-semibold text-gray-700">
+              Filter Kondisi
+            </label>
+            <div className="flex rounded-2xl border-2 border-gray-200 p-1.5 bg-gray-50">
+              <button
+                onClick={() => handleFilterType("")}
+                className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition-all ${!currentType ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md" : "text-gray-600 hover:text-gray-900"}`}
+              >
+                Semua
+              </button>
+              <button
+                onClick={() => handleFilterType("low_stock")}
+                className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition-all ${currentType === "low_stock" ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-md" : "text-gray-600 hover:text-gray-900"}`}
+              >
+                Menipis
+              </button>
+              <button
+                onClick={() => handleFilterType("out_of_stock")}
+                className={`flex-1 rounded-xl px-4 py-2 text-sm font-semibold transition-all ${currentType === "out_of_stock" ? "bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md" : "text-gray-600 hover:text-gray-900"}`}
+              >
+                Habis
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      {/* Stock Table */}
+      <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -155,12 +187,12 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
             {initialData?.items && initialData.items.length > 0 ? (
               initialData.items.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-mono text-xs font-medium text-gray-900">
+                  <TableCell className="font-mono text-sm font-bold text-gray-900">
                     {item.sku}
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium text-gray-900">{item.name}</p>
+                      <p className="font-bold text-gray-900">{item.name}</p>
                       <div className="flex gap-2 text-xs text-gray-500">
                         {item.color && <span>Warna: {item.color}</span>}
                         {item.size && <span>Ukuran: {item.size}</span>}
@@ -194,8 +226,9 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary-600"
+                      className="text-teal-600 hover:bg-teal-50 rounded-xl"
                     >
+                      <FileText className="mr-1.5 h-3.5 w-3.5" />
                       Log Stok
                     </Button>
                   </TableCell>
@@ -203,13 +236,22 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="py-12 text-center text-gray-500"
-                >
-                  {initialData
-                    ? "Tidak ada data stok ditemukan"
-                    : "Gagal memuat data stok"}
+                <TableCell colSpan={6} className="py-16 text-center">
+                  <PackageX className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-base font-medium text-gray-600">
+                    {initialData
+                      ? "Tidak ada data stok ditemukan"
+                      : "Gagal memuat data stok"}
+                  </p>
+                  {!initialData && (
+                    <Button
+                      onClick={() => window.location.reload()}
+                      variant="gradient"
+                      className="mt-4 rounded-2xl"
+                    >
+                      Coba Lagi
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             )}
@@ -217,19 +259,22 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
         </Table>
 
         {initialData?.pagination && initialData.pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4">
-            <p className="text-sm text-gray-700">
+          <div className="flex items-center justify-between border-t border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-5">
+            <p className="text-sm font-medium text-gray-700">
               Menampilkan halaman{" "}
-              <span className="font-medium">{initialData.pagination.page}</span>{" "}
+              <span className="font-bold text-gray-900">
+                {initialData.pagination.page}
+              </span>{" "}
               dari{" "}
-              <span className="font-medium">
+              <span className="font-bold text-gray-900">
                 {initialData.pagination.totalPages}
               </span>
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-xl"
                 disabled={initialData.pagination.page <= 1}
                 onClick={() => {
                   const params = new URLSearchParams(searchParams.toString());
@@ -240,11 +285,13 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
                   router.push(`/admin/stock?${params.toString()}`);
                 }}
               >
+                <ChevronLeft className="mr-1 h-4 w-4" />
                 Sebelumnya
               </Button>
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-xl"
                 disabled={
                   initialData.pagination.page >=
                   initialData.pagination.totalPages
@@ -259,6 +306,7 @@ function AdminStockContent({ initialData }: AdminStockClientProps) {
                 }}
               >
                 Berikutnya
+                <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -274,8 +322,13 @@ export default function AdminStockClient({
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-gray-500">
-          Memuat data inventori...
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-teal-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Memuat data inventori...
+            </p>
+          </div>
         </div>
       }
     >

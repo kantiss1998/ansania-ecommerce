@@ -2,6 +2,7 @@
 
 import { PaginatedResponse } from "@repo/shared";
 import { EMAIL_STATUS } from "@repo/shared/constants";
+import { Mail, Trash2, RotateCw, Loader2, Inbox } from "lucide-react";
 import { Suspense } from "react";
 
 import { Badge } from "@/components/ui/Badge";
@@ -36,22 +37,32 @@ function AdminEmailQueueContent({ initialData }: AdminEmailQueueClientProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">Email Queue</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Monitor status pengiriman email sistem (transaksional, otp, promosi)
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="md">
+    <div className="space-y-8">
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-50 to-purple-50 px-5 py-2.5 shadow-sm border border-violet-100/50 mb-4">
+              <Mail className="h-4 w-4 text-violet-600" />
+              <span className="text-sm font-semibold text-violet-700">
+                Email System
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-violet-800 to-gray-900 bg-clip-text text-transparent font-heading">
+              Email Queue
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Monitor status pengiriman email sistem (transaksional, otp,
+              promosi)
+            </p>
+          </div>
+          <Button variant="outline" size="md" className="rounded-2xl">
+            <Trash2 className="mr-2 h-4 w-4" />
             Clear Sent Logs
           </Button>
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -107,8 +118,10 @@ function AdminEmailQueueContent({ initialData }: AdminEmailQueueClientProps) {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="rounded-xl"
                         onClick={() => handleRetry(email.id)}
                       >
+                        <RotateCw className="mr-1.5 h-3.5 w-3.5" />
                         Retry
                       </Button>
                     )}
@@ -117,11 +130,11 @@ function AdminEmailQueueContent({ initialData }: AdminEmailQueueClientProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="py-12 text-center text-gray-500"
-                >
-                  Tidak ada data antrean email.
+                <TableCell colSpan={6} className="py-16 text-center">
+                  <Inbox className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p className="text-base font-medium text-gray-600">
+                    Tidak ada data antrean email.
+                  </p>
                 </TableCell>
               </TableRow>
             )}
@@ -138,8 +151,13 @@ export default function AdminEmailQueueClient({
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-gray-500">
-          Memuat antrean email...
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-violet-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Memuat antrean email...
+            </p>
+          </div>
         </div>
       }
     >

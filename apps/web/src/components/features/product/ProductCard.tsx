@@ -28,13 +28,14 @@ export function ProductCard({ product }: ProductCardProps) {
   const discountPercentage =
     product.compare_price && product.selling_price
       ? Math.round(
-        ((Number(product.compare_price) - Number(product.selling_price)) /
-          Number(product.compare_price)) *
-        100,
-      )
+          ((Number(product.compare_price) - Number(product.selling_price)) /
+            Number(product.compare_price)) *
+            100,
+        )
       : 0;
 
-  const price = Number(product.selling_price) || Number(product.base_price) || 0;
+  const price =
+    Number(product.selling_price) || Number(product.base_price) || 0;
   const isOutOfStock = product.stock_status === STOCK_STATUS.OUT_OF_STOCK;
 
   return (
@@ -98,7 +99,11 @@ export function ProductCard({ product }: ProductCardProps) {
               success("Produk berhasil ditambahkan ke wishlist");
             } catch (err) {
               console.error(err);
-              showError(err instanceof Error ? err.message : "Gagal menambahkan ke wishlist");
+              showError(
+                err instanceof Error
+                  ? err.message
+                  : "Gagal menambahkan ke wishlist",
+              );
             }
           }}
         >

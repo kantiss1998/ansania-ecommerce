@@ -36,12 +36,17 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
 
     try {
       setUploading(true);
-      const imageUrl = await adminCategoryService.uploadCategoryImage(initialData.id, file);
+      const imageUrl = await adminCategoryService.uploadCategoryImage(
+        initialData.id,
+        file,
+      );
       setFormData({ ...formData, image_url: imageUrl });
       success("Gambar kategori berhasil diunggah.");
     } catch (error) {
       console.error("Upload error:", error);
-      showError(error instanceof Error ? error.message : "Gagal mengunggah gambar.");
+      showError(
+        error instanceof Error ? error.message : "Gagal mengunggah gambar.",
+      );
     } finally {
       setUploading(false);
     }
@@ -222,7 +227,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                 Gambar Kategori
               </label>
               <div
-                className={`aspect-square w-full rounded-lg border-2 border-dashed ${uploading ? 'animate-pulse bg-gray-50' : 'border-gray-200'} flex flex-col items-center justify-center p-4 text-center group hover:border-primary-500 transition-all cursor-pointer`}
+                className={`aspect-square w-full rounded-lg border-2 border-dashed ${uploading ? "animate-pulse bg-gray-50" : "border-gray-200"} flex flex-col items-center justify-center p-4 text-center group hover:border-primary-500 transition-all cursor-pointer`}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <input
@@ -258,7 +263,11 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                       {uploading ? "..." : "+"}
                     </span>
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-primary-500">
-                      {uploading ? "Uploading..." : isEdit ? "Upload Image" : "Simpan dulu untuk upload"}
+                      {uploading
+                        ? "Uploading..."
+                        : isEdit
+                          ? "Upload Image"
+                          : "Simpan dulu untuk upload"}
                     </span>
                   </>
                 )}

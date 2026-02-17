@@ -20,8 +20,8 @@ export interface MappedProduct {
   category_id: number;
   base_price: number;
   discount_price?: number;
-  selling_price: string; // from DB
-  compare_price?: string; // from DB
+  selling_price: number;
+  compare_price?: number | null;
   rating_average: number;
   total_reviews: number;
   thumbnail_url: string | null;
@@ -41,12 +41,32 @@ export interface ProductListResult {
   totalPages: number;
 }
 
+interface ProductJSON {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  category_id: number;
+  selling_price: string | number;
+  compare_price?: string | number;
+  created_at: string | Date;
+  is_active: boolean;
+  is_featured: boolean;
+  ratingsSummary?: {
+    average_rating?: number | string;
+    total_reviews?: number | string;
+  };
+  images?: Array<{ image_url: string; is_primary: boolean }>;
+  [key: string]: unknown;
+}
+
 export function mapProduct(product: unknown): MappedProduct | null {
   if (!product) return null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data = (product as any).toJSON
-    ? (product as any).toJSON()
-    : (product as Record<string, unknown>);
+  const data = (
+    product && typeof product === "object" && "toJSON" in product
+      ? (product as { toJSON: () => ProductJSON }).toJSON()
+      : (product as ProductJSON)
+  ) as ProductJSON;
 
   // Map prices
   // If compare_price (original) exists, then selling_price is the discount_price
@@ -75,8 +95,8 @@ export function mapProduct(product: unknown): MappedProduct | null {
   const thumbnail_url =
     (
       data.images as
-      | Array<{ image_url: string; is_primary: boolean }>
-      | undefined
+        | Array<{ image_url: string; is_primary: boolean }>
+        | undefined
     )?.find((img) => img.is_primary)?.image_url ||
     (data.images as Array<{ image_url: string }> | undefined)?.[0]?.image_url ||
     null;
@@ -354,9 +374,7 @@ export async function getNewArrivals(
 }
 
 // Get all variants for a product
-export async function getProductVariants(
-  productId: number,
-): Promise<{
+export async function getProductVariants(productId: number): Promise<{
   product: { id: number; name: string; slug: string };
   variants: ProductVariant[];
 } | null> {

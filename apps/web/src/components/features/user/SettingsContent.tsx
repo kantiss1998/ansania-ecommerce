@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Lock, Bell, LogOut, Sparkles, AlertTriangle } from "lucide-react";
+import { Lock, Bell, LogOut, Settings, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
@@ -95,23 +95,23 @@ export function SettingsContent() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-4 py-2 mb-4">
-          <Sparkles className="h-4 w-4 text-primary-600" />
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-5 py-2.5 shadow-sm border border-primary-100/50 mb-4">
+          <Settings className="h-4 w-4 text-primary-600" />
           <span className="text-sm font-semibold text-primary-700">
             Pengaturan Akun
           </span>
         </div>
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
           Pengaturan
         </h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-3 text-base text-gray-600">
           Kelola keamanan dan preferensi akun Anda
         </p>
       </motion.div>
@@ -121,7 +121,7 @@ export function SettingsContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg"
+        className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 shadow-xl"
       >
         {/* Decorative blur */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full blur-3xl opacity-30"></div>
@@ -130,23 +130,23 @@ export function SettingsContent() {
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="inline-flex rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 p-3 shadow-md">
-                <Lock className="h-5 w-5 text-blue-600" />
+                <Lock className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                   Keamanan Akun
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 mt-1">
                   Ubah password untuk keamanan akun Anda
                 </p>
               </div>
             </div>
             {!isChangingPassword && (
               <Button
-                variant="outline"
+                variant="gradient"
                 size="sm"
                 onClick={() => setIsChangingPassword(true)}
-                className="border-2"
+                className="shadow-lg hover:shadow-xl"
               >
                 Ubah Password
               </Button>
@@ -234,7 +234,7 @@ export function SettingsContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="relative overflow-hidden rounded-2xl border-2 border-gray-100 bg-white p-6 shadow-lg"
+        className="relative overflow-hidden rounded-3xl border border-gray-200 bg-white p-8 shadow-xl"
       >
         {/* Decorative blur */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-50 to-pink-50 rounded-full blur-3xl opacity-30"></div>
@@ -242,13 +242,13 @@ export function SettingsContent() {
         <div className="relative">
           <div className="flex items-center gap-3 mb-6">
             <div className="inline-flex rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 p-3 shadow-md">
-              <Bell className="h-5 w-5 text-purple-600" />
+              <Bell className="h-6 w-6 text-purple-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 Privasi & Preferensi
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 mt-1">
                 Atur notifikasi dan preferensi Anda
               </p>
             </div>
@@ -309,21 +309,21 @@ export function SettingsContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="relative overflow-hidden rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-6 shadow-lg"
+        className="relative overflow-hidden rounded-3xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-8 shadow-xl"
       >
         {/* Decorative blur */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-100 to-orange-100 rounded-full blur-3xl opacity-40"></div>
 
         <div className="relative">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-6">
             <div className="inline-flex rounded-xl bg-gradient-to-br from-red-100 to-orange-100 p-3 shadow-md">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
+              <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-red-700 to-orange-700 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-red-700 to-orange-700 bg-clip-text text-transparent">
                 Zona Bahaya
               </h2>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 mt-1">
                 Tindakan di bawah ini bersifat permanen
               </p>
             </div>

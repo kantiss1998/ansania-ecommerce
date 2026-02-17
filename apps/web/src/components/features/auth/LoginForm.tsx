@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authSchemas, LoginDTO } from "@repo/shared";
 import { USER_ROLES } from "@repo/shared/constants";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -52,15 +52,23 @@ export function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-8">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-gray-900 font-heading">
-          Selamat Datang Kembali
+    <div className="w-full max-w-md mx-auto space-y-6">
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary-50 to-purple-50 px-5 py-2.5 shadow-sm border border-primary-100/50">
+          <Sparkles className="h-4 w-4 text-primary-600" />
+          <span className="text-sm font-semibold text-primary-700">
+            Selamat Datang
+          </span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-primary-800 to-gray-900 bg-clip-text text-transparent font-heading">
+          Masuk ke Ansania
         </h1>
-        <p className="text-gray-500">Masuk untuk mengakses akun Anda</p>
+        <p className="text-base text-gray-600">
+          Masuk untuk mengakses akun Anda
+        </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-xl shadow-gray-200/50 backdrop-blur-sm">
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Input
             label="Email"
@@ -118,11 +126,11 @@ export function LoginForm() {
 
           <Button
             type="submit"
-            variant="primary"
+            variant="gradient"
             size="lg"
             fullWidth
             isLoading={isLoading}
-            className="shadow-lg shadow-primary-500/30 hover:shadow-primary-500/40"
+            className="shadow-lg hover:shadow-xl"
           >
             <LogIn className="mr-2 h-5 w-5" />
             Masuk Sekarang

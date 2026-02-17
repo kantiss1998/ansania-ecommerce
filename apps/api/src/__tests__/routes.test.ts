@@ -41,11 +41,10 @@ describe("API Routes", () => {
     it("POST /auth/register should be reachable", async () => {
       // Mock implementation for this test
       const authService = await import("../services/authService");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(authService.register).mockResolvedValue({
-        user: { id: 1, email: "test@example.com" },
-        token: "abc",
-      } as any);
+        id: 1,
+        email: "test@example.com",
+      } as unknown as never);
 
       const res = await request(app).post("/auth/register").send({
         email: "test@example.com",
@@ -60,11 +59,11 @@ describe("API Routes", () => {
 
     it("POST /auth/login should be reachable", async () => {
       const authService = await import("../services/authService");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(authService.login).mockResolvedValue({
         user: { id: 1, email: "test@example.com" },
         token: "abc",
-      } as any);
+        refresh_token: "def",
+      } as unknown as never);
 
       const res = await request(app)
         .post("/auth/login")
@@ -78,14 +77,13 @@ describe("API Routes", () => {
   describe("Product Routes", () => {
     it("GET /products should return products", async () => {
       const productService = await import("../services/productService");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(productService.listProducts).mockResolvedValue({
         products: [],
         total: 0,
         page: 1,
         limit: 10,
         totalPages: 0,
-      } as any);
+      } as unknown as never);
 
       const res = await request(app).get("/products");
       expect(res.status).toBe(200);
@@ -104,11 +102,10 @@ describe("API Routes", () => {
 
     it("GET /cart with header should return cart", async () => {
       const cartService = await import("../services/cartService");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(cartService.getCart).mockResolvedValue({
         id: 1,
         items: [],
-      } as any);
+      } as unknown as never);
 
       const res = await request(app)
         .get("/cart")

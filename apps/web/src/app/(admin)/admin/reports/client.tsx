@@ -5,6 +5,15 @@ import {
   CustomerReportData,
   InventoryReportData,
 } from "@repo/shared";
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  Package,
+  Download,
+  Loader2,
+  FileX,
+} from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -23,8 +32,13 @@ interface AdminReportsClientProps {
 function AdminReportsContent({ initialData }: AdminReportsClientProps) {
   if (!initialData) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-white">
-        <p className="text-gray-500">Gagal memuat data laporan.</p>
+      <div className="flex h-64 items-center justify-center rounded-3xl border-2 border-dashed border-gray-300 bg-white">
+        <div className="text-center">
+          <FileX className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+          <p className="text-base font-medium text-gray-600">
+            Gagal memuat data laporan.
+          </p>
+        </div>
       </div>
     );
   }
@@ -33,17 +47,24 @@ function AdminReportsContent({ initialData }: AdminReportsClientProps) {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            Reports & Analytics
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Analisis performa bisnis, perilaku pelanggan, dan status inventori
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="md">
+      <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 px-5 py-2.5 shadow-sm border border-emerald-100/50 mb-4">
+              <BarChart3 className="h-4 w-4 text-emerald-600" />
+              <span className="text-sm font-semibold text-emerald-700">
+                Business Analytics
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-emerald-800 to-gray-900 bg-clip-text text-transparent font-heading">
+              Reports & Analytics
+            </h2>
+            <p className="mt-3 text-base text-gray-600">
+              Analisis performa bisnis, perilaku pelanggan, dan status inventori
+            </p>
+          </div>
+          <Button variant="outline" size="md" className="rounded-2xl">
+            <Download className="mr-2 h-4 w-4" />
             Download PDF Summary
           </Button>
         </div>
@@ -51,9 +72,12 @@ function AdminReportsContent({ initialData }: AdminReportsClientProps) {
 
       {/* Top Summaries */}
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary-50 opacity-50" />
-          <h3 className="text-sm font-medium text-gray-500">
+        <div className="relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-white to-blue-50 p-6 shadow-lg hover:shadow-xl transition-all">
+          <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-blue-200 opacity-30" />
+          <div className="inline-flex p-3 rounded-2xl bg-blue-100 border border-blue-200 mb-3">
+            <TrendingUp className="h-6 w-6 text-blue-600" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-600">
             Total Penjualan (Bulan Ini)
           </h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
@@ -67,9 +91,14 @@ function AdminReportsContent({ initialData }: AdminReportsClientProps) {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-secondary-50 opacity-50" />
-          <h3 className="text-sm font-medium text-gray-500">Pelanggan Baru</h3>
+        <div className="relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-white to-green-50 p-6 shadow-lg hover:shadow-xl transition-all">
+          <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-green-200 opacity-30" />
+          <div className="inline-flex p-3 rounded-2xl bg-green-100 border border-green-200 mb-3">
+            <Users className="h-6 w-6 text-green-600" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-600">
+            Pelanggan Baru
+          </h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
             {customers ? customers.new_customers : "-"}
           </p>
@@ -81,9 +110,12 @@ function AdminReportsContent({ initialData }: AdminReportsClientProps) {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-error-50 opacity-50" />
-          <h3 className="text-sm font-medium text-gray-500">Valuasi Stok</h3>
+        <div className="relative overflow-hidden rounded-3xl border-2 border-gray-200 bg-gradient-to-br from-white to-orange-50 p-6 shadow-lg hover:shadow-xl transition-all">
+          <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-orange-200 opacity-30" />
+          <div className="inline-flex p-3 rounded-2xl bg-orange-100 border border-orange-200 mb-3">
+            <Package className="h-6 w-6 text-orange-600" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-600">Valuasi Stok</h3>
           <p className="mt-2 text-3xl font-bold text-gray-900">
             {inventory ? formatCurrency(inventory.valuation) : "-"}
           </p>
@@ -100,7 +132,7 @@ function AdminReportsContent({ initialData }: AdminReportsClientProps) {
 
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Sales Section */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
           <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">Performa Penjualan</h3>
             <Link
@@ -141,7 +173,7 @@ function AdminReportsContent({ initialData }: AdminReportsClientProps) {
         </div>
 
         {/* Growth Section */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-3xl border border-gray-200 bg-white shadow-xl overflow-hidden">
           <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 flex items-center justify-between">
             <h3 className="font-semibold text-gray-900">
               Pertumbuhan Pelanggan
@@ -211,9 +243,9 @@ function AdminReportsContent({ initialData }: AdminReportsClientProps) {
           <Link
             key={link.href}
             href={link.href}
-            className="group p-4 rounded-xl border border-gray-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-all"
+            className="group p-5 rounded-2xl border-2 border-gray-200 bg-white hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-lg transition-all"
           >
-            <p className="font-medium text-gray-900 group-hover:text-primary-700">
+            <p className="font-bold text-gray-900 group-hover:text-emerald-700">
               {link.label}
             </p>
             <p className="mt-1 text-xs text-gray-500">{link.count}</p>
@@ -230,8 +262,13 @@ export default function AdminReportsClient({
   return (
     <Suspense
       fallback={
-        <div className="p-8 text-center text-gray-500">
-          Mempersiapkan laporan...
+        <div className="flex h-64 items-center justify-center rounded-3xl border border-gray-200 bg-white shadow-lg">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 mx-auto mb-4 text-emerald-600 animate-spin" />
+            <p className="text-base font-medium text-gray-600">
+              Mempersiapkan laporan...
+            </p>
+          </div>
         </div>
       }
     >
