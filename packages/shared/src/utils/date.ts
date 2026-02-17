@@ -49,7 +49,7 @@ export function formatDateShort(date: Date | string): string {
  */
 export function formatDateISO(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toISOString().split("T")[0];
+  return d.toISOString().split("T")[0] ?? "";
 }
 
 /**

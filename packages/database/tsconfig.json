@@ -23,8 +23,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {}
+    "baseUrl": "."
   },
   "include": [
     "src/**/*"

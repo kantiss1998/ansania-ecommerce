@@ -6,10 +6,10 @@
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "dev": "tsc --watch",
     "clean": "rm -rf build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --build --noEmit",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "db:migrate": "sequelize-cli db:migrate",

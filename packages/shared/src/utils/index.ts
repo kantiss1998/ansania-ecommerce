@@ -93,7 +93,10 @@ export function removeEmptyValues<T extends Record<string, unknown>>(
 export function toCSV(data: Record<string, unknown>[]): string {
   if (data.length === 0) return "";
 
-  const headers = Object.keys(data[0]);
+  const firstRow = data[0];
+  if (!firstRow) return "";
+
+  const headers = Object.keys(firstRow);
   const csvRows = [];
 
   // Add header row
@@ -103,7 +106,10 @@ export function toCSV(data: Record<string, unknown>[]): string {
   for (const row of data) {
     const values = headers.map((header) => {
       const val = row[header];
-      const escaped = ("" + val).replace(/"/g, '""'); // Escape double quotes
+      const escaped = (val !== undefined && val !== null ? "" + val : "").replace(
+        /"/g,
+        '""',
+      ); // Escape double quotes
       return `"${escaped}"`; // Wrap in double quotes
     });
     csvRows.push(values.join(","));
