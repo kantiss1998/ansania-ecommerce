@@ -19,12 +19,15 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
+
+      - name: Build dependencies
+        run: npx turbo run build --filter=@repo/shared --filter=@repo/database
 
       - name: Build and Bundle projects
         run: |
-          npm run build
-          npm run bundle --workspace=api
+          npx turbo run build --filter=web --filter=api
+          npx turbo run bundle --filter=api --workspace=api
 
       - name: Prepare Web Standalone
         run: |
