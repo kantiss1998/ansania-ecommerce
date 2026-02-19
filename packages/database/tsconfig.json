@@ -22,7 +22,12 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@repo/shared": [
+        "../shared/dist/index.d.ts"
+      ]
+    }
   },
   "include": [
     "src/**/*"
