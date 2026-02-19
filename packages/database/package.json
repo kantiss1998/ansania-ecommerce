@@ -6,7 +6,7 @@
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node -e \"try{console.log('Shared Dist Content:', require('fs').readdirSync('../shared/dist'))}catch(e){console.error('Error listing shared dist:', e)}\" && tsc -p tsconfig.json",
     "dev": "tsc --watch",
     "clean": "rm -rf build",
     "typecheck": "tsc --build --noEmit",

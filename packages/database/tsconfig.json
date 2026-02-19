@@ -25,7 +25,7 @@
     "baseUrl": ".",
     "paths": {
       "@repo/shared": [
-        "../shared/dist"
+        "../shared/dist/index.d.ts"
       ],
       "@repo/shared/*": [
         "../shared/dist/*"
