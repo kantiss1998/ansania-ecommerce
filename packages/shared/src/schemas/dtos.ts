@@ -1,8 +1,3 @@
-export interface AddToWishlistDTO {
-  product_id: number;
-  product_variant_id?: number;
-}
-
 // Address DTOs
 export interface CreateAddressDTO {
   label?: string;
