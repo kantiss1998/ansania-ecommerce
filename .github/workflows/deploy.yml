@@ -23,8 +23,8 @@ jobs:
 
       - name: Build and Bundle projects
         run: |
-          npx turbo run build --filter=web --filter=api --no-cache
-          npx turbo run bundle --filter=api --workspace=api --no-cache
+          npx turbo run build --filter=web --filter=api --force
+          npx turbo run bundle --filter=api --force
 
       - name: Prepare Web Standalone
         run: |
