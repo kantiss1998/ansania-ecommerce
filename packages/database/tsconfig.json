@@ -22,7 +22,15 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@repo/shared": [
+        "../shared/src"
+      ],
+      "@repo/shared/*": [
+        "../shared/src/*"
+      ]
+    }
   },
   "references": [
     {
