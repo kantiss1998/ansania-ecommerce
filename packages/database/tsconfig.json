@@ -25,10 +25,18 @@
     "baseUrl": ".",
     "paths": {
       "@repo/shared": [
-        "../shared/dist/index.d.ts"
+        "../shared/dist"
+      ],
+      "@repo/shared/*": [
+        "../shared/dist/*"
       ]
     }
   },
+  "references": [
+    {
+      "path": "../shared"
+    }
+  ],
   "include": [
     "src/**/*"
   ],
