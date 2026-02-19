@@ -27,7 +27,22 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@repo/shared": [
+        "./packages/shared/dist"
+      ],
+      "@repo/shared/*": [
+        "./packages/shared/dist/*"
+      ],
+      "@repo/database": [
+        "./packages/database/build"
+      ],
+      "@repo/database/*": [
+        "./packages/database/build/*"
+      ]
+    }
   },
   "exclude": [
     "node_modules",
