@@ -1,17 +1,15 @@
 // Load environment variables FIRST before any imports
 import dotenv from "dotenv";
 
-// Use absolute path to ensure .env is found
-const envPath = "D:\\Kantiss\\zanza_project\\ansania-ecommerce\\.env";
-console.log("[ENV] Loading .env from:", envPath);
-const result = dotenv.config({ path: envPath });
+// Load .env from current directory if available (for local dev)
+const result = dotenv.config();
 
 if (result.error) {
-  console.error("[ENV] ❌ Failed to load .env:", result.error);
+  console.log("[ENV] No .env file found (using system env vars)");
 } else {
   console.log("[ENV] ✅ .env loaded successfully");
-  console.log("[ENV] ODOO_URL:", process.env.ODOO_URL ? "SET" : "NOT SET");
 }
+console.log("[ENV] ODOO_URL:", process.env.ODOO_URL ? "SET" : "NOT SET");
 
 // Now import app and other modules AFTER env is loaded
 // IMPORTANT: Use require() instead of import to prevent hoisting
@@ -21,7 +19,7 @@ const { sequelize } = require("@repo/database");
 const app = require("./app").default;
 /* eslint-enable @typescript-eslint/no-var-requires */
 
-const PORT = process.env.API_PORT || 5000;
+const PORT = process.env.PORT || process.env.API_PORT || 5000;
 
 async function startServer() {
   try {
