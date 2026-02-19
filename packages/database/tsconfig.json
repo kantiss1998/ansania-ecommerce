@@ -25,23 +25,19 @@
     "baseUrl": ".",
     "paths": {
       "@repo/shared": [
-        "../shared/src"
+        "../shared/dist"
       ],
       "@repo/shared/*": [
-        "../shared/src/*"
+        "../shared/dist/*"
       ]
     }
   },
-  "references": [
-    {
-      "path": "../shared"
-    }
-  ],
   "include": [
     "src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "build"
   ]
 }
