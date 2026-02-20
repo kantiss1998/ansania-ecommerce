@@ -38,7 +38,8 @@ jobs:
         run: |
           mkdir -p deploy/api
           cp apps/api/dist/index.js deploy/api/
-          cp apps/api/package.json deploy/api/
+          node -e "const pkg=require('./apps/api/package.json'); pkg.dependencies = { 'mysql2': pkg.dependencies['mysql2'] || '^3.9.1' }; delete pkg.devDependencies; require('fs').writeFileSync('./deploy/api/package.json', JSON.stringify(pkg, null, 2))"
+          cd deploy/api && npm install --production
 
       # Deploy Web to cPanel
       - name: Deploy Web to cPanel
