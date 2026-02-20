@@ -50,7 +50,7 @@ jobs:
           port: ${{ secrets.FTP_PORT || 21 }}
           local-dir: ./deploy/web/
           server-dir: ${{ secrets.FTP_WEB_ROOT }}/
-          protocol: ftps
+          protocol: ftp
 
       # Deploy API to cPanel
       - name: Deploy API to cPanel
@@ -62,4 +62,4 @@ jobs:
           port: ${{ secrets.FTP_PORT || 21 }}
           local-dir: ./deploy/api/
           server-dir: ${{ secrets.FTP_API_ROOT }}/
-          protocol: ftps
+          protocol: ftp
