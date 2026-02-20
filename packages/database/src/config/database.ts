@@ -3,6 +3,8 @@ import path from "path";
 import dotenv from "dotenv";
 import { Sequelize } from "sequelize";
 
+import mysql2 from "mysql2";
+
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, "../../../..", ".env") });
 
@@ -14,6 +16,7 @@ const config = {
   username: process.env.DATABASE_USER || "root",
   password: process.env.DATABASE_PASSWORD || "root",
   dialect: "mysql" as const,
+  dialectModule: mysql2, // Explicitly pass the mysql2 module
   logging: process.env.NODE_ENV === "development" ? console.log : false,
   pool: {
     max: 10,
