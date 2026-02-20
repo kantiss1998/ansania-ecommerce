@@ -29,12 +29,22 @@ jobs:
       - name: Prepare Web Standalone
         run: |
           mkdir -p deploy/web
-          cp -r apps/web/.next/standalone/apps/web/. deploy/web/
-          cp -r apps/web/.next/standalone/node_modules deploy/web/
-          cp -r apps/web/.next/standalone/packages deploy/web/
-          cp -r apps/web/public deploy/web/public
+          # Copy dependencies first (root level of standalone output)
+          cp -R apps/web/.next/standalone/node_modules deploy/web/
+          
+          # Copy application code (nested inside apps/web)
+          cp apps/web/.next/standalone/apps/web/server.js deploy/web/
+          cp apps/web/.next/standalone/apps/web/package.json deploy/web/
+          cp -R apps/web/.next/standalone/apps/web/.next deploy/web/
+          
+          # Copy public and static assets to correct location
+          cp -R apps/web/public deploy/web/public
           mkdir -p deploy/web/.next/static
-          cp -r apps/web/.next/static/. deploy/web/.next/static/
+          cp -R apps/web/.next/static/. deploy/web/.next/static/
+          
+          # Verify content before upload
+          echo "Listing deploy/web content:"
+          ls -la deploy/web
 
       - name: Prepare API Bundle
         run: |
