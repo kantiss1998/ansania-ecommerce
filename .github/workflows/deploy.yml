@@ -29,10 +29,12 @@ jobs:
       - name: Prepare Web Standalone
         run: |
           mkdir -p deploy/web
-          cp -r apps/web/.next/standalone/. deploy/web/
-          cp -r apps/web/public deploy/web/apps/web/public
-          mkdir -p deploy/web/apps/web/.next/static
-          cp -r apps/web/.next/static/. deploy/web/apps/web/.next/static/
+          cp -r apps/web/.next/standalone/apps/web/. deploy/web/
+          cp -r apps/web/.next/standalone/node_modules deploy/web/
+          cp -r apps/web/.next/standalone/packages deploy/web/
+          cp -r apps/web/public deploy/web/public
+          mkdir -p deploy/web/.next/static
+          cp -r apps/web/.next/static/. deploy/web/.next/static/
 
       - name: Prepare API Bundle
         run: |
