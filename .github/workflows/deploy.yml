@@ -42,9 +42,14 @@ jobs:
           mkdir -p deploy/web/.next/static
           cp -R apps/web/.next/static/. deploy/web/.next/static/
           
-          # Verify content before upload
-          echo "Listing deploy/web content:"
-          ls -la deploy/web
+          # Zip everything for reliable upload
+          cd deploy/web
+          zip -r web-deploy.zip .
+          cd ../..
+          
+          # Prepare upload folder
+          mkdir -p deploy/web-upload
+          mv deploy/web/web-deploy.zip deploy/web-upload/
 
       - name: Prepare API Bundle
         run: |
@@ -60,7 +65,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT || 21 }}
-          local-dir: ./deploy/web/
+          local-dir: ./deploy/web-upload/
           server-dir: ${{ secrets.FTP_WEB_ROOT }}/
           protocol: ftp
 
