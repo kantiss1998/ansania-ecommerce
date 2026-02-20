@@ -1,5 +1,6 @@
 // Load environment variables FIRST before any imports
 import dotenv from "dotenv";
+import "mysql2";
 
 // Load .env from current directory if available (for local dev)
 const result = dotenv.config();

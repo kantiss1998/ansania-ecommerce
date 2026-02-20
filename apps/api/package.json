@@ -10,7 +10,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "bundle": "ncc build src/server.ts -o dist -m -e mysql2",
+    "bundle": "ncc build src/server.ts -o dist -m",
     "test": "vitest"
   },
   "dependencies": {
